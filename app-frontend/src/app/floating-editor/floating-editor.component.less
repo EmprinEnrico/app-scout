@@ -1,0 +1,44 @@
+.main{
+    background-color: rgba(0, 0, 0, 0.5);
+    height: auto;
+    width: 100%;
+    max-width: 100vh;
+
+    padding: var(--safe-area-inset-top) var(--safe-area-inset-right) var(--safe-area-inset-bottom) var(--safe-area-inset-left);
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 5;
+}
+
+.content{
+    background-color: white;
+    width: calc(100% - 10px);
+
+
+    margin: 5px 5px 5px 5px;
+}
+
+.form{
+    width: 100%;
+
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+
+    .form-filed{
+        width: 100%;
+        overflow:scroll;
+    }
+
+    button{
+        margin: 5px;
+    }
+}
+
+.annulla{
+    --mdc-filled-button-container-color: rgb(220, 30, 30);
+}

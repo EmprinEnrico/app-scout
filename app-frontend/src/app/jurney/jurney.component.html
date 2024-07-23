@@ -1,0 +1,31 @@
+<app-floating-editor *ngIf="editor" (editorChange)="changeEditor()" [editingObjectiveNumber]="editingObjectiveNumber" [editingTappa]="editingTappa" [database]="database"></app-floating-editor>
+<div>
+  <h6 *ngIf="selectedBranca == 'branco'">La mia pista</h6>
+  <h6 *ngIf="selectedBranca == 'reparto'">Il mio sentiero</h6>
+  <h6 *ngIf="selectedBranca == 'clan'">La mia strada</h6>
+
+  <div>
+    <mat-divider></mat-divider>
+      <div *ngIf="selectedBranca != 'clan'">
+        <h6 *ngIf="selectedTappa == 'branco-1'">Prede per lupo legge</h6>
+        <h6 *ngIf="selectedTappa == 'branco-2'">Prede per lupo rupe</h6>
+        <h6 *ngIf="selectedTappa == 'branco-3'">Prede per lupo anziano</h6>
+
+        <h6 *ngIf="selectedTappa == 'reparto-1'">Obbiettivi per la tappa della scoperta</h6>
+        <h6 *ngIf="selectedTappa == 'reparto-2'">Obbiettivi per la tappa della competenza</h6>
+        <h6 *ngIf="selectedTappa == 'reparto-3'">Obbiettivi per la tappa della responsabilità</h6>
+      </div>
+
+      <div *ngIf="selectedBranca == 'clan'" [ngSwitch]="selectedTappa">
+        <h6 *ngSwitchCase="'clan-1'">Il mio punto della strada 1</h6>
+        <h6 *ngSwitchDefault>Fuori degli 8 punti di default o errore</h6>
+      </div>
+
+      <div *ngFor="let objective of selectedTappaObjectives; let i = index" class="list">
+        <ol>{{ i + 1 }}: {{objective}} 
+          <button mat-button class="edit-button" (click)="changeEditor(); editingObjectiveNumber = i; editingTappa = selectedTappa">
+            <mat-icon matSuffix>mode_edit</mat-icon>
+          </button>
+        </ol>
+      </div>
+  </div>

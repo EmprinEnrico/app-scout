@@ -1,0 +1,41 @@
+:root {
+    --safe-area-inset-top: 0px;
+    --safe-area-inset-right: 0px;
+    --safe-area-inset-bottom: 0px;
+    --safe-area-inset-left: 0px;
+}
+
+.main{
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+
+    /* Adjust margin based on safe area insets */
+    padding-top: var(--safe-area-inset-top);
+    padding-right: var(--safe-area-inset-right);
+    padding-left: var(--safe-area-inset-left);
+
+    display: flex;
+    flex-flow: column;
+
+}
+
+.content{
+    // Expand the containing page
+    flex-grow: 1;
+    
+    padding: 5px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.content::-webkit-scrollbar {
+    display: none;
+    overflow-y: scroll;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.content{
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    overflow-y: scroll;
+}

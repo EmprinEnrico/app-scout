@@ -1,0 +1,44 @@
+<div>
+  <!-- La mia pista section for 'branco' tappe -->
+  <h6>La mia pista</h6>
+  <div *ngFor="let tappa of (allFilledTappe | keyvalue)">
+    <div *ngIf="tappa.key === 'branco-1' || tappa.key === 'branco-2' || tappa.key === 'branco-3'">
+      <h5 *ngIf="tappa.key === 'branco-1'">{{ dhs.tappeBranco[0].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'branco-2'">{{ dhs.tappeBranco[1].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'branco-3'">{{ dhs.tappeBranco[2].viewValue }}</h5>
+      <ul *ngFor="let obj of tappa.value" class="bullet">
+        <li>{{ obj }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Il mio sentiero section for 'reparto' tappe -->
+  <h6>Il mio sentiero</h6>
+  <div *ngFor="let tappa of (allFilledTappe | keyvalue)">
+    <div *ngIf="tappa.key === 'reparto-1' || tappa.key === 'reparto-2' || tappa.key === 'reparto-3'">
+      <h5 *ngIf="tappa.key === 'reparto-1'">{{ dhs.tappeReparto[0].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'reparto-2'">{{ dhs.tappeReparto[1].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'reparto-3'">{{ dhs.tappeReparto[2].viewValue }}</h5>
+      <ul *ngFor="let obj of tappa.value" class="bullet">
+        <li>{{ obj }}</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- La mia strada section for 'clan' tappe -->
+  <h6>La mia strada</h6>
+  <div *ngFor="let tappa of (allFilledTappe | keyvalue)">
+    <div *ngIf="tappa.key === 'clan-1' || tappa.key === 'clan-2' || tappa.key === 'clan-3' || tappa.key === 'clan-4' || tappa.key === 'clan-5' || tappa.key === 'clan-6' || tappa.key === 'clan-7' || tappa.key === 'clan-8'">
+      <h5 *ngIf="tappa.key === 'clan-1'">{{ dhs.tappeClan[0].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-2'">{{ dhs.tappeClan[1].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-3'">{{ dhs.tappeClan[2].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-4'">{{ dhs.tappeClan[3].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-5'">{{ dhs.tappeClan[4].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-6'">{{ dhs.tappeClan[5].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-7'">{{ dhs.tappeClan[6].viewValue }}</h5>
+      <h5 *ngIf="tappa.key === 'clan-8'">{{ dhs.tappeClan[7].viewValue }}</h5>
+      <ul *ngFor="let obj of tappa.value" class="bullet">
+        <li>{{ obj }}</li>
+      </ul>
+    </div>
+  </div>

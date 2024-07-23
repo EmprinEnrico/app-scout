@@ -1,0 +1,39 @@
+<h6>Seleziona la tua branca</h6>
+<form>
+  <mat-form-field>
+    <mat-label>Sono in:</mat-label>
+    <mat-select [(ngModel)]="selectedBranca" (selectionChange)="onBrancaChange()" name="branca">
+      <mat-option *ngFor="let branca of branche" [value]="branca.value">
+        {{ branca.viewValue }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="selectedBranca == 'branco'">
+    <mat-label>Caccio per:</mat-label>
+    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
+      <mat-option *ngFor="let tappaBranco of tappeBranco" [value]="tappaBranco.value">
+        {{ tappaBranco.viewValue }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="selectedBranca == 'reparto'">
+    <mat-label>Cammino per:</mat-label>
+    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
+      <mat-option *ngFor="let tappaReparto of tappeReparto" [value]="tappaReparto.value">
+        {{ tappaReparto.viewValue }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <mat-form-field *ngIf="selectedBranca == 'clan'">
+    <mat-label>Cammino per:</mat-label>
+    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
+      <mat-option *ngFor="let tappaClan of tappeClan" [value]="tappaClan.value">
+        {{ tappaClan.viewValue }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</form>
+
