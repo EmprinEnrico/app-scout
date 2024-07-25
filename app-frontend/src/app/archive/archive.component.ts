@@ -2,11 +2,12 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { PreferencesService } from '../services/preferences.service';
 import { CommonModule } from '@angular/common';
 import { Database, DatahandlerService } from '../services/datahandler.service';
+import { LottieAnimationComponent } from '../lottie-animation/lottie-animation.component';
 
 @Component({
   selector: 'app-archive',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LottieAnimationComponent],
   templateUrl: './archive.component.html',
   styleUrl: './archive.component.less'
 })

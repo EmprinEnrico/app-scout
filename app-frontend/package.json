@@ -9,6 +9,9 @@
     "test": "ng test",
     "serve:ssr:app-frontend": "node dist/app-frontend/server/server.mjs"
   },
+  "scarfSettings": {
+    "enabled": false
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^18.1.0",
@@ -28,6 +31,8 @@
     "@capacitor/preferences": "^6.0.1",
     "capacitor-plugin-safe-area": "^3.0.3",
     "cocoapods": "^0.0.0",
+    "lottie-web": "^5.12.2",
+    "ngx-lottie": "^12.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
