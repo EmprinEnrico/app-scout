@@ -3,8 +3,6 @@ import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SafeArea } from 'capacitor-plugin-safe-area';
 import { FloatingEditorComponent } from './floating-editor/floating-editor.component';
-import { CommonModule } from '@angular/common';
-import { state } from '@angular/animations';
 
 @Component({
   selector: 'app-root',

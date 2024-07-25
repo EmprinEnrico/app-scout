@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AnimationItem } from 'lottie-web';
 import { AnimationOptions, LottieComponent } from 'ngx-lottie';
 
@@ -9,14 +9,26 @@ import { AnimationOptions, LottieComponent } from 'ngx-lottie';
   templateUrl: './lottie-animation.component.html',
   styleUrl: './lottie-animation.component.less'
 })
-export class LottieAnimationComponent {
+export class LottieAnimationComponent implements OnInit{
   private animationItem: AnimationItem | undefined;
 
+  @Input() path: string = '';
+  @Input() loop: boolean = true;
+  @Input() autoplay: boolean = true;
+
   options: AnimationOptions = {
-    path: 'lottie/BonfireTent.json',
-  loop: false,
+    path: '',
+    loop: true,
     autoplay: true
   };
+
+  ngOnInit(): void {
+    this.options = {
+      path: this.path,
+      loop: this.loop,
+      autoplay: this.autoplay
+    };
+  }
 
   animationCreated(animationItem: AnimationItem): void {
     this.animationItem = animationItem;

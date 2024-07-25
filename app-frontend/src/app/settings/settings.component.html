@@ -1,6 +1,10 @@
-<h6>Seleziona la tua branca</h6>
+<h1 class="title-1 title">Impostazioni</h1>
+<mat-divider></mat-divider>
+
+<p class="title-2 section-title">La mia branca</p>
+<div class="section-container">
 <form>
-  <mat-form-field>
+  <mat-form-field subscriptSizing="dynamic">
     <mat-label>Sono in:</mat-label>
     <mat-select [(ngModel)]="selectedBranca" (selectionChange)="onBrancaChange()" name="branca">
       <mat-option *ngFor="let branca of branche" [value]="branca.value">
@@ -9,7 +13,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field *ngIf="selectedBranca == 'branco'">
+  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'branco'">
     <mat-label>Caccio per:</mat-label>
     <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
       <mat-option *ngFor="let tappaBranco of tappeBranco" [value]="tappaBranco.value">
@@ -18,7 +22,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field *ngIf="selectedBranca == 'reparto'">
+  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'reparto'">
     <mat-label>Cammino per:</mat-label>
     <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
       <mat-option *ngFor="let tappaReparto of tappeReparto" [value]="tappaReparto.value">
@@ -27,7 +31,7 @@
     </mat-select>
   </mat-form-field>
   
-  <mat-form-field *ngIf="selectedBranca == 'clan'">
+  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'clan'">
     <mat-label>Cammino per:</mat-label>
     <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
       <mat-option *ngFor="let tappaClan of tappeClan" [value]="tappaClan.value">
@@ -36,4 +40,17 @@
     </mat-select>
   </mat-form-field>
 </form>
+</div>
 
+<p class="title-2 section-title">Info su questa app</p>
+<div class="section-container">
+  <mat-list>
+    <mat-list-item><a href="javascript:void(0);">Chi sono</a></mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item><a href="javascript:void(0);">Supporta lo sviluppo</a></mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item><a href="javascript:void(0);">Other</a></mat-list-item>
+  </mat-list>
+</div>
+
+<div class="end-page-spacer"></div>

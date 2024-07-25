@@ -6,11 +6,21 @@ import { PreferencesService } from '../services/preferences.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DatahandlerService } from '../services/datahandler.service';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [MatButtonToggleModule, MatFormFieldModule, MatSelectModule, FormsModule, CommonModule],
+  imports: [
+    MatButtonToggleModule, 
+    MatFormFieldModule, 
+    MatSelectModule, 
+    FormsModule, 
+    CommonModule, 
+    MatListModule, 
+    MatDividerModule
+  ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
