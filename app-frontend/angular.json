@@ -20,6 +20,9 @@
             "outputPath": "dist/app-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "allowedCommonJsDependencies": [
+                "lottie-web"
+            ],
             "polyfills": [
               "zone.js"
             ],
