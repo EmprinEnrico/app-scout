@@ -1,12 +1,14 @@
 <nav>
-    <button class="nav-button-container" routerLink="/jurney">
-      Jurney
-    </button>
-    <button class="nav-button-container" routerLink="/archive">
-      Archive
-    </button>
-    <button class="nav-button-container" routerLink="/settings">
-      Settings
-    </button>
+  <mat-button-toggle-group [hideSingleSelectionIndicator]="hideSingleSelectionIndicator()">
+    <mat-button-toggle routerLink="/jurney">
+        <mat-icon aria-hidden="false" aria-label="Jurney" fontIcon="history_edu"></mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle routerLink="/archive">
+        <mat-icon aria-hidden="false" aria-label="Archive" fontIcon="collections_bookmark"></mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle routerLink="/settings">
+        <mat-icon aria-hidden="false" aria-label="Settings" fontIcon="settings"></mat-icon>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
 </nav>
   

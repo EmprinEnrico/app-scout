@@ -25,12 +25,24 @@ nav {
     justify-content: stretch;
     gap: 1px;
     background-color: @nav-bg-color;
+    border-radius: 10px 10px 0px 0px;
+    overflow: hidden;
 
-    .nav-button-container {
+    mat-button-toggle-group{
         flex-grow: 1;
-        background-color: transparent;
+        text-align: center;
+
+        --mat-standard-button-toggle-shape: 0px;
+        --mat-standard-button-toggle-divider-color: transparent;
+        border: none;
+    }
+
+    mat-button-toggle{
+        flex-grow: 1;
         border: none;
         text-align: center;
+        display: flex;
+        color: white;
     }
 }
 
@@ -75,7 +87,3 @@ nav {
 
 
 
-button{
-    font-size: 1em;
-    color: white;
-}
