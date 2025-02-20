@@ -128,7 +128,7 @@ export class DatahandlerService {
     }
 
     async setTappaObjective(database: Database, tappa: string, objectiveNumber: number, objective: string):Promise<Database> {
-        // Add check on array lenght
+        
         database[tappa][objectiveNumber - 1] = objective;
         await this.setDatabase(database);
         return database;

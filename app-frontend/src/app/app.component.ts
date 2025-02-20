@@ -2,12 +2,11 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SafeArea } from 'capacitor-plugin-safe-area';
-import { FloatingEditorComponent } from './floating-editor/floating-editor.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FloatingEditorComponent],
+  imports: [RouterOutlet, NavbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.less'
 })

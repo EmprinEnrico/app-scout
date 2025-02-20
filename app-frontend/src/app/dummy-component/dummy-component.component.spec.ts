@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FloatingEditorComponent } from './floating-editor.component';
+import { DummyComponentComponent } from './dummy-component.component';
 
-describe('FloatingEditorComponent', () => {
-  let component: FloatingEditorComponent;
-  let fixture: ComponentFixture<FloatingEditorComponent>;
+describe('DummyComponentComponent', () => {
+  let component: DummyComponentComponent;
+  let fixture: ComponentFixture<DummyComponentComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FloatingEditorComponent]
+      imports: [DummyComponentComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FloatingEditorComponent);
+    fixture = TestBed.createComponent(DummyComponentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

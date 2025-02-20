@@ -1,28 +1,25 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, ElementRef, inject, Injector, ViewChild } from '@angular/core';
 import { PreferencesService } from '../services/preferences.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import { FloatingEditorComponent } from '../floating-editor/floating-editor.component';
 import { DatahandlerService, Tappa, Branca, Database } from '../services/datahandler.service';
+import { FormsModule } from '@angular/forms';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field'
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-jurney',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatDividerModule, FloatingEditorComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatDividerModule, FormsModule, MatFormFieldModule, MatSelectModule, TextFieldModule],
   templateUrl: './jurney.component.html',
   styleUrl: './jurney.component.less'
 })
 export class JurneyComponent {
-
-  editor = false;
-  editingObjectiveNumber: number | undefined;
-  editingTappa: string | undefined;
-
-  changeEditor(){
-    this.editor = !this.editor;
-  }
 
   selectedBranca: any;
   selectedTappa: any;
@@ -36,10 +33,15 @@ export class JurneyComponent {
 
   selectedTappaObjectives: string[] = [];
 
-  constructor(private cdr: ChangeDetectorRef, private dhs: DatahandlerService) {}
+
+  constructor(private cdr: ChangeDetectorRef, private dhs: DatahandlerService, private router: Router) {}
 
   async ngOnInit(): Promise<void> {
-    await this.getInitialValues();
+    this.selectedBranca = await this.dhs.getSelectedBranca();
+    this.selectedTappa = await this.dhs.getSelectedTappa();
+    this.database = await this.dhs.getDatabase();
+
+    this.cdr.detectChanges();
     this.branche = this.dhs.branche;
     this.tappeBranco = this.dhs.tappeBranco;
     this.tappeReparto = this.dhs.tappeReparto;
@@ -48,12 +50,6 @@ export class JurneyComponent {
     await this.getSelectedTappaObjectives();
   }
 
-  async getInitialValues(): Promise<void> {
-    this.selectedBranca = await this.dhs.getSelectedBranca();
-    this.selectedTappa = await this.dhs.getSelectedTappa();
-    this.database = await this.dhs.getDatabase();
-    this.cdr.detectChanges();
-  }
 
   async getSelectedTappaObjectives() {
     try {
@@ -61,11 +57,76 @@ export class JurneyComponent {
         this.database = await this.dhs.getDatabase();
       }
       this.selectedTappaObjectives = this.dhs.getTappaObjectives(this.database, this.selectedTappa);
+      if (this.selectedTappaObjectives.length == 0){
+        this.dhs.setTappaObjective(this.database, this.selectedTappa, 1, "");
+        this.database = await this.dhs.getDatabase();
+        this.selectedTappaObjectives = this.dhs.getTappaObjectives(this.database, this.selectedTappa);
+      }
     } catch (error) {
-      console.log("Unavle to get selectedTappaObjectives:" + error);
+      console.log("Unable to get selectedTappaObjectives:" + error);
     }
   }
   
 
+  async updateObjective(objectiveIndex: number, event: Event) {
+    const target = event.target as HTMLTextAreaElement;
+    if (!target) return; // Ensure target exists
+
+    this.database = await this.dhs.getDatabase();
+
+    // Ensure selectedTappa exists
+    if (!this.selectedTappa) {
+        throw new Error("selectedTappa is undefined");
+    }
+
+    // Ensure the objectives array exists
+    if (!this.database[this.selectedTappa]) {
+        this.database[this.selectedTappa] = [];
+    }
+
+    
+   
+
+    if((objectiveIndex + 1) == this.selectedTappaObjectives.length){
+      this.dhs.setTappaObjective(this.database, this.selectedTappa, objectiveIndex + 2, "");
+      
+    }
+
+    if (target.value) {
+      this.dhs.setTappaObjective(this.database, this.selectedTappa, objectiveIndex + 1, target.value);
+    }
+
+    if (target.value == ""){
+      this.dhs.removeObjective(this.database, this.selectedTappa, objectiveIndex + 1);
+    }
+
+    this.getSelectedTappaObjectives();
+    this.redirectTo("/jurney")
+    
+  }
+
+  private _injector = inject(Injector);
+
+  @ViewChild('autosize') autosize!: CdkTextareaAutosize;
+
+  triggerResize() {
+    // Wait for content to render, then trigger textarea resize.
+    afterNextRender(
+      () => {
+        this.autosize.resizeToFitContent(true);
+      },
+      {
+        injector: this._injector,
+      },
+    );
+  }
+
+
+  redirectTo(uri: string) {
+    this.router.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
+      this.router.navigate([uri])});
+  }
+
+  
 }
 
