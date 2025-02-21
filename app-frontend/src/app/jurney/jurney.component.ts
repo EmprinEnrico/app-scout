@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 export class JurneyComponent {
 
   selectedBranca: any;
-  selectedTappa: any;
+  selectedTappa!: string;
 
   branche: Branca[] | undefined;
   tappeBranco: Tappa[] | undefined;
@@ -37,17 +37,7 @@ export class JurneyComponent {
   constructor(private cdr: ChangeDetectorRef, private dhs: DatahandlerService, private router: Router) {}
 
   async ngOnInit(): Promise<void> {
-    this.selectedBranca = await this.dhs.getSelectedBranca();
-    this.selectedTappa = await this.dhs.getSelectedTappa();
-    this.database = await this.dhs.getDatabase();
-
-    this.cdr.detectChanges();
-    this.branche = this.dhs.branche;
-    this.tappeBranco = this.dhs.tappeBranco;
-    this.tappeReparto = this.dhs.tappeReparto;
-    this.tappeClan = this.dhs.tappeClan;
-
-    await this.getSelectedTappaObjectives();
+    this.getFreshValues();
   }
 
 
@@ -127,6 +117,62 @@ export class JurneyComponent {
       this.router.navigate([uri])});
   }
 
+
+  async onBrancaChange(): Promise<void> {
+    this.dhs.setSelectedBranca(this.selectedBranca);
+    this.dhs.setSelectedTappa(this.selectedBranca + "-1");
+    this.getFreshValues();
+  }
   
+  async getFreshValues(){
+    this.selectedBranca = await this.dhs.getSelectedBranca();
+    this.selectedTappa = await this.dhs.getSelectedTappa();
+    this.database = await this.dhs.getDatabase();
+
+    this.cdr.detectChanges();
+    this.branche = this.dhs.branche;
+    this.tappeBranco = this.dhs.tappeBranco;
+    this.tappeReparto = this.dhs.tappeReparto;
+    this.tappeClan = this.dhs.tappeClan;
+
+    await this.getSelectedTappaObjectives();
+  }
+
+  async previwsTappa(): Promise<void> {
+    const selectedTappaNumber: number = Number(this.selectedTappa.slice(-1))
+
+    if(selectedTappaNumber === 1){
+      console.log("ultimo")
+      return;
+    }
+    const newTappa = this.selectedTappa.slice(0, -1) + (selectedTappaNumber - 1);
+    console.log(newTappa);
+    this.dhs.setSelectedTappa(newTappa);
+    this.getFreshValues();
+  }
+  
+  async nextTappa(): Promise<void> {
+    const selectedTappaNumber: number = Number(this.selectedTappa.slice(-1));
+
+    if (selectedTappaNumber >= 3) {
+        console.log("ultimo");
+
+        if (this.selectedBranca === "clan") {
+            if (selectedTappaNumber > 7) {
+                console.log("ultimo clan");
+                return;
+            }
+
+            console.log("clanaaaaa");
+        } else {
+            return; // Ensures only "clan" goes beyond 3
+        }
+    }
+
+    const newTappa = this.selectedTappa.slice(0, -1) + (selectedTappaNumber + 1);
+    this.dhs.setSelectedTappa(newTappa);
+    this.getFreshValues();
+}
+
 }
 

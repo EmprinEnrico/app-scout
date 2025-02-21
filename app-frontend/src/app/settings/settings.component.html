@@ -3,53 +3,15 @@
 
 <p class="title-2 section-title">La mia branca</p>
 <div class="section-container">
-<form>
-  <mat-form-field subscriptSizing="dynamic">
-    <mat-label>Sono in:</mat-label>
-    <mat-select [(ngModel)]="selectedBranca" (selectionChange)="onBrancaChange()" name="branca">
-      <mat-option *ngFor="let branca of branche" [value]="branca.value">
-        {{ branca.viewValue }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
 
-  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'branco'">
-    <mat-label>Caccio per:</mat-label>
-    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
-      <mat-option *ngFor="let tappaBranco of tappeBranco" [value]="tappaBranco.value">
-        {{ tappaBranco.viewValue }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'reparto'">
-    <mat-label>Cammino per:</mat-label>
-    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
-      <mat-option *ngFor="let tappaReparto of tappeReparto" [value]="tappaReparto.value">
-        {{ tappaReparto.viewValue }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  
-  <mat-form-field subscriptSizing="dynamic" *ngIf="selectedBranca == 'clan'">
-    <mat-label>Cammino per:</mat-label>
-    <mat-select [(ngModel)]="selectedTappa" (selectionChange)="onTappaChange()" name="tappa">
-      <mat-option *ngFor="let tappaClan of tappeClan" [value]="tappaClan.value">
-        {{ tappaClan.viewValue }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-</form>
 </div>
 
 <p class="title-2 section-title">Info su questa app</p>
 <div class="section-container">
   <mat-list>
-    <mat-list-item><a href="https://enricoemprin.it">Chi sono</a></mat-list-item>
-    <mat-divider></mat-divider>
     <mat-list-item><a href="https://github.com/emprine/app-scout">Supporta lo sviluppo</a></mat-list-item>
     <mat-divider></mat-divider>
-    <mat-list-item><a href="https://emprine.github.io/app-scout">Other</a></mat-list-item>
+    <mat-list-item><a href="https://emprine.github.io/app-scout">Altre info</a></mat-list-item>
   </mat-list>
 </div>
 

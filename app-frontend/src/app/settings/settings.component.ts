@@ -52,12 +52,4 @@ export class SettingsComponent {
     this.selectedTappa = await this.dhs.getSelectedTappa();
     this.cdr.detectChanges();
   }
-
-  async onBrancaChange(): Promise<void> {
-    this.dhs.setSelectedBranca(this.selectedBranca);
-  }
-
-  async onTappaChange(): Promise<void> {
-    this.dhs.setSelectedTappa(this.selectedTappa);
-  }
 }

@@ -26,9 +26,9 @@ export class DatahandlerService {
     // Selected settings data
 
     public branche: Branca[] = [
-        {value: 'branco', viewValue: 'Branco'},
-        {value: 'reparto', viewValue: 'Reparto'},
-        {value: 'clan', viewValue: 'Clan'},
+        {value: 'branco', viewValue: 'La mia pista'},
+        {value: 'reparto', viewValue: 'Il mio sentiero'},
+        {value: 'clan', viewValue: 'La mia strada'},
     ];
 
     public tappeBranco: Tappa[] = [
