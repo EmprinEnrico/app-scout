@@ -14,7 +14,7 @@
         }
 
         .text-container{
-            background-color: var(--section-color);
+            background-color: rgb(244, 248, 255);
             margin: 0px 2px 0px 1em;
             border-radius: 10px;
             padding: 5px 3px 5px 3px;
@@ -23,6 +23,7 @@
             flex-grow: 1;
 
             textarea{
+                font-size: 1rem; 
                 flex-grow: 1;
                 resize: none;
                 border: none;
@@ -37,11 +38,16 @@
 .title-1{
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    margin-top: 2em;
+    justify-content: space-between;
 
     .mat-mdc-form-field {
         --mdc-filled-text-field-container-color: transparent;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    img{
+        height: auto;
+        width: 2em;
     }
     
 }
@@ -49,8 +55,10 @@
 .title-2{
     h6{
         margin-top: 1em;   
+        font-weight: 500;
     }
 
+    
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap; 

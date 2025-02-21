@@ -1,6 +1,9 @@
 <div>
   <div class="title-1">
+    <img src="AGESCI.svg_-262x300.png">
+    <img src="CNGEI_150x150.png">
     <mat-form-field subscriptSizing="dynamic">
+      <mat-label>Scegli:</mat-label>
       <mat-select [(ngModel)]="selectedBranca" (selectionChange)="onBrancaChange()" name="branca">
         <mat-option *ngFor="let branca of branche" [value]="branca.value">
           {{ branca.viewValue }}
@@ -11,14 +14,15 @@
   
   <div>
     <mat-divider></mat-divider>
+    <br>
       <div *ngIf="selectedBranca != 'clan'" class="title-2">
         <h6 *ngIf="selectedTappa == 'branco-1'" >Prede per lupo legge</h6>
         <h6 *ngIf="selectedTappa == 'branco-2'" >Prede per lupo rupe</h6>
         <h6 *ngIf="selectedTappa == 'branco-3'" >Prede per lupo anziano</h6>
 
-        <h6 *ngIf="selectedTappa == 'reparto-1'" >Obbiettivi per la tappa della scoperta</h6>
-        <h6 *ngIf="selectedTappa == 'reparto-2'" >Obbiettivi per la tappa della competenza</h6>
-        <h6 *ngIf="selectedTappa == 'reparto-3'" >Obbiettivi per la tappa della responsabilità</h6>
+        <h6 *ngIf="selectedTappa == 'reparto-1'" >La tappa della scoperta</h6>
+        <h6 *ngIf="selectedTappa == 'reparto-2'" >La tappa della competenza</h6>
+        <h6 *ngIf="selectedTappa == 'reparto-3'" >La tappa della responsabilità</h6>
 
         <div class="arrow-button">
           <button mat-icon-button (click)="previwsTappa()"><i class="material-icons">arrow_back</i></button>
@@ -43,8 +47,8 @@
         </div>
       </div>
 
-      
-
+      <br>
+      <p>I miei obbiettivi:</p>
 
 
       <div *ngFor="let objective of selectedTappaObjectives; let i = index" class="list">
@@ -55,7 +59,7 @@
                 #autosize="cdkTextareaAutosize"
                 cdkAutosizeMinRows="1"
                  name="objective"
-                 rows="1" 
+                 rows="2" 
                  [ngModel]="selectedTappaObjectives[i]" 
                  (blur)="updateObjective(i, $event)"
                  placeholder="Il mio obbiettivo..."
