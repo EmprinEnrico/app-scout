@@ -9,6 +9,25 @@ import { PreferencesService } from './preferences.service';
 import { BrowserLogService } from './browser-log.service';
 
 export type StatusOverride = 'auto' | 'active' | 'paused' | 'completed';
+export type ReminderFrequency =
+  'none' | 'once' | 'daily' | 'weekly' | 'yearly' | 'weekdays' | 'custom';
+export type ReminderIntervalUnit = 'week' | 'month' | 'year';
+export type ReminderEndMode = 'never' | 'date' | 'count';
+
+export interface ReminderRule {
+  frequency: ReminderFrequency;
+  time: string;
+  date?: string;
+  weekday?: number;
+  month?: number;
+  dayOfMonth?: number;
+  interval?: number;
+  intervalUnit?: ReminderIntervalUnit;
+  weekdays?: number[];
+  endMode?: ReminderEndMode;
+  endDate?: string;
+  occurrenceCount?: number;
+}
 
 export interface Goal {
   id: number;
@@ -37,6 +56,11 @@ export interface Task {
   body: string;
   done: boolean;
   dueDate: string | null;
+  reminderFrequency: ReminderFrequency;
+  reminderTime: string | null;
+  reminderWeekday: number | null;
+  reminderRule: ReminderRule | null;
+  notificationId: number | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -181,9 +205,9 @@ export class DatahandlerService {
         const tasks = goalWithSteps.steps.flatMap(step => step.tasks);
         return {
           ...goalWithSteps,
-          openTasks: tasks.filter(task => !task.done).length,
-          overdueTasks: tasks.filter(task => this.isOverdue(task)).length,
-          upcomingTasks: tasks.filter(task => this.isUpcoming(task)).length,
+          openTasks: tasks.filter(task => this.isMeaningfulTask(task) && !task.done).length,
+          overdueTasks: 0,
+          upcomingTasks: tasks.filter(task => this.hasReminder(task)).length,
         };
       })
     );
@@ -360,6 +384,11 @@ export class DatahandlerService {
         body,
         done: false,
         dueDate: null,
+        reminderFrequency: 'none',
+        reminderTime: null,
+        reminderWeekday: null,
+        reminderRule: null,
+        notificationId: this.getNotificationId(taskId),
         sortOrder: this.getNextLocalSortOrder(store.tasks.filter(task => task.stepId === stepId)),
         createdAt: now,
         updatedAt: now,
@@ -372,15 +401,15 @@ export class DatahandlerService {
     const now = this.now();
     const sortOrder = await this.getNextSortOrder('tasks', 'WHERE step_id = ?', [stepId]);
     const result = await db.run(
-      `INSERT INTO tasks (step_id, body, done, due_date, sort_order, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [stepId, body, 0, null, sortOrder, now, now]
+      `INSERT INTO tasks (step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [stepId, body, 0, null, 'none', null, null, null, null, sortOrder, now, now]
     );
     await this.persistWebStore();
     return Number(result.changes?.lastId);
   }
 
-  async updateTask(task: Pick<Task, 'id' | 'body' | 'done' | 'dueDate'>): Promise<void> {
+  async updateTask(task: Pick<Task, 'id' | 'body' | 'done' | 'dueDate' | 'reminderFrequency' | 'reminderTime' | 'reminderWeekday' | 'reminderRule' | 'notificationId'>): Promise<void> {
     if (this.useLocalStore) {
       const store = await this.getLocalStore();
       const storedTask = store.tasks.find(item => item.id === task.id);
@@ -388,6 +417,11 @@ export class DatahandlerService {
         storedTask.body = task.body;
         storedTask.done = task.done;
         storedTask.dueDate = task.dueDate;
+        storedTask.reminderFrequency = task.reminderFrequency;
+        storedTask.reminderTime = task.reminderTime;
+        storedTask.reminderWeekday = task.reminderWeekday;
+        storedTask.reminderRule = task.reminderRule;
+        storedTask.notificationId = task.notificationId;
         storedTask.updatedAt = this.now();
         await this.saveLocalStore(store);
       }
@@ -397,9 +431,20 @@ export class DatahandlerService {
     const db = await this.getDb();
     await db.run(
       `UPDATE tasks
-       SET body = ?, done = ?, due_date = ?, updated_at = ?
+       SET body = ?, done = ?, due_date = ?, reminder_frequency = ?, reminder_time = ?, reminder_weekday = ?, reminder_rule = ?, notification_id = ?, updated_at = ?
       WHERE id = ?`,
-      [task.body, task.done ? 1 : 0, task.dueDate, this.now(), task.id]
+      [
+        task.body,
+        task.done ? 1 : 0,
+        task.dueDate,
+        task.reminderFrequency,
+        task.reminderTime,
+        task.reminderWeekday,
+        this.stringifyReminderRule(task.reminderRule),
+        task.notificationId,
+        this.now(),
+        task.id,
+      ]
     );
     await this.persistWebStore();
   }
@@ -418,8 +463,9 @@ export class DatahandlerService {
   }
 
   getProgress(tasks: Task[], statusOverride: StatusOverride = 'auto'): ProgressStats {
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.done).length;
+    const meaningfulTasks = tasks.filter(task => this.isMeaningfulTask(task));
+    const totalTasks = meaningfulTasks.length;
+    const completedTasks = meaningfulTasks.filter(task => task.done).length;
     const computedPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
     const isComplete = statusOverride === 'completed' || (totalTasks > 0 && completedTasks === totalTasks);
 
@@ -554,6 +600,11 @@ export class DatahandlerService {
         body TEXT NOT NULL,
         done INTEGER NOT NULL DEFAULT 0,
         due_date TEXT,
+        reminder_frequency TEXT NOT NULL DEFAULT 'none',
+        reminder_time TEXT,
+        reminder_weekday INTEGER,
+        reminder_rule TEXT,
+        notification_id INTEGER,
         sort_order INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -561,6 +612,25 @@ export class DatahandlerService {
         FOREIGN KEY(step_id) REFERENCES steps(id) ON DELETE CASCADE
       );
     `);
+    await this.ensureTaskReminderColumns(db);
+  }
+
+  private async ensureTaskReminderColumns(db: SQLiteDBConnection): Promise<void> {
+    const result = await db.query('PRAGMA table_info(tasks)');
+    const columns = new Set((result.values ?? []).map(row => String(row.name)));
+    const additions = [
+      { name: 'reminder_frequency', sql: "ALTER TABLE tasks ADD COLUMN reminder_frequency TEXT NOT NULL DEFAULT 'none'" },
+      { name: 'reminder_time', sql: 'ALTER TABLE tasks ADD COLUMN reminder_time TEXT' },
+      { name: 'reminder_weekday', sql: 'ALTER TABLE tasks ADD COLUMN reminder_weekday INTEGER' },
+      { name: 'reminder_rule', sql: 'ALTER TABLE tasks ADD COLUMN reminder_rule TEXT' },
+      { name: 'notification_id', sql: 'ALTER TABLE tasks ADD COLUMN notification_id INTEGER' },
+    ];
+
+    for (const addition of additions) {
+      if (!columns.has(addition.name)) {
+        await db.execute(addition.sql);
+      }
+    }
   }
 
   private async ensureStarterData(): Promise<void> {
@@ -585,7 +655,7 @@ export class DatahandlerService {
        VALUES (?, ?, ?, ?, ?, ?)`,
       [
         'Build my path',
-        'A starter goal you can edit or replace. Use steps to organize the parts of a goal and tasks for concrete actions.',
+        '',
         'auto',
         1,
         now,
@@ -642,7 +712,7 @@ export class DatahandlerService {
 
     const db = await this.getDb();
     const result = await db.query(
-      `SELECT id, step_id, body, done, due_date, sort_order, created_at, updated_at
+      `SELECT id, step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, updated_at
        FROM tasks
        WHERE step_id = ?
        ORDER BY sort_order, id`,
@@ -678,7 +748,7 @@ export class DatahandlerService {
     store.goals.push({
       id: goalId,
       title: 'Build my path',
-      description: 'A starter goal you can edit or replace. Use steps to organize the parts of a goal and tasks for concrete actions.',
+      description: '',
       statusOverride: 'auto',
       sortOrder: this.getNextLocalSortOrder(store.goals),
       createdAt: now,
@@ -698,12 +768,18 @@ export class DatahandlerService {
         createdAt: now,
         updatedAt: now,
       });
+      const taskId = store.nextTaskId++;
       store.tasks.push({
-        id: store.nextTaskId++,
+        id: taskId,
         stepId,
         body: 'Write one concrete action for this step.',
         done: false,
         dueDate: null,
+        reminderFrequency: 'none',
+        reminderTime: null,
+        reminderWeekday: null,
+        reminderRule: null,
+        notificationId: this.getNotificationId(taskId),
         sortOrder: 1,
         createdAt: now,
         updatedAt: now,
@@ -716,7 +792,7 @@ export class DatahandlerService {
 
   private async getLocalStore(): Promise<LocalGoalStore> {
     const stored = await this.preferencesService.get<LocalGoalStore>(this.localStoreKey);
-    return stored ?? {
+    const store = stored ?? {
       nextGoalId: 1,
       nextStepId: 1,
       nextTaskId: 1,
@@ -724,6 +800,8 @@ export class DatahandlerService {
       steps: [],
       tasks: [],
     };
+    store.tasks = store.tasks.map(task => this.normalizeLocalTask(task));
+    return store;
   }
 
   private async saveLocalStore(store: LocalGoalStore): Promise<void> {
@@ -766,9 +844,26 @@ export class DatahandlerService {
       body: String(row.body),
       done: Number(row.done) === 1,
       dueDate: row.due_date ? String(row.due_date) : null,
+      reminderFrequency: this.mapReminderFrequency(row.reminder_frequency),
+      reminderTime: row.reminder_time ? String(row.reminder_time) : null,
+      reminderWeekday: row.reminder_weekday ? Number(row.reminder_weekday) : null,
+      reminderRule: this.parseReminderRule(row.reminder_rule),
+      notificationId: row.notification_id ? Number(row.notification_id) : this.getNotificationId(Number(row.id)),
       sortOrder: Number(row.sort_order),
       createdAt: String(row.created_at),
       updatedAt: String(row.updated_at),
+    };
+  }
+
+  private normalizeLocalTask(task: Partial<Task> & Pick<Task, 'id' | 'stepId' | 'body' | 'done' | 'sortOrder' | 'createdAt' | 'updatedAt'>): Task {
+    return {
+      ...task,
+      dueDate: task.dueDate ?? null,
+      reminderFrequency: this.mapReminderFrequency(task.reminderFrequency),
+      reminderTime: task.reminderTime ?? null,
+      reminderWeekday: task.reminderWeekday ?? null,
+      reminderRule: this.normalizeReminderRule(task.reminderRule ?? null),
+      notificationId: task.notificationId ?? this.getNotificationId(task.id),
     };
   }
 
@@ -788,6 +883,83 @@ export class DatahandlerService {
       return false;
     }
     return task.dueDate >= this.today();
+  }
+
+  private hasReminder(task: Task): boolean {
+    return task.reminderFrequency !== 'none' && (!!task.reminderTime || !!task.reminderRule);
+  }
+
+  private isMeaningfulTask(task: Task): boolean {
+    return task.body.trim() !== '';
+  }
+
+  private mapReminderFrequency(value: unknown): ReminderFrequency {
+    const allowed: ReminderFrequency[] = [
+      'none',
+      'once',
+      'daily',
+      'weekly',
+      'yearly',
+      'weekdays',
+      'custom',
+    ];
+    return allowed.includes(value as ReminderFrequency) ? value as ReminderFrequency : 'none';
+  }
+
+  private parseReminderRule(value: unknown): ReminderRule | null {
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return this.normalizeReminderRule(JSON.parse(String(value)));
+    } catch {
+      return null;
+    }
+  }
+
+  private stringifyReminderRule(rule: ReminderRule | null): string | null {
+    const normalized = this.normalizeReminderRule(rule);
+    return normalized ? JSON.stringify(normalized) : null;
+  }
+
+  private normalizeReminderRule(rule: Partial<ReminderRule> | null): ReminderRule | null {
+    if (!rule || !rule.time) {
+      return null;
+    }
+
+    const frequency = this.mapReminderFrequency(rule.frequency);
+    if (frequency === 'none') {
+      return null;
+    }
+
+    const normalized: ReminderRule = {
+      frequency,
+      time: String(rule.time),
+      endMode: this.mapReminderEndMode(rule.endMode),
+    };
+    if (rule.date) normalized.date = String(rule.date);
+    if (rule.weekday) normalized.weekday = Number(rule.weekday);
+    if (rule.month) normalized.month = Number(rule.month);
+    if (rule.dayOfMonth) normalized.dayOfMonth = Number(rule.dayOfMonth);
+    if (rule.interval) normalized.interval = Math.max(1, Number(rule.interval));
+    if (this.isReminderIntervalUnit(rule.intervalUnit)) normalized.intervalUnit = rule.intervalUnit;
+    if (Array.isArray(rule.weekdays)) normalized.weekdays = rule.weekdays.map(Number).filter(day => day >= 1 && day <= 7);
+    if (rule.endDate) normalized.endDate = String(rule.endDate);
+    if (rule.occurrenceCount) normalized.occurrenceCount = Math.max(1, Number(rule.occurrenceCount));
+    return normalized;
+  }
+
+  private mapReminderEndMode(value: unknown): ReminderEndMode {
+    return value === 'date' || value === 'count' ? value : 'never';
+  }
+
+  private isReminderIntervalUnit(value: unknown): value is ReminderIntervalUnit {
+    return value === 'week' || value === 'month' || value === 'year';
+  }
+
+  private getNotificationId(taskId: number): number {
+    return 100000 + taskId;
   }
 
   private now(): string {

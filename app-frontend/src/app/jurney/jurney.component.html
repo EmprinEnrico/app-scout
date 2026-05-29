@@ -2,10 +2,28 @@
   <header class="journey-header">
     <div>
       <p class="eyebrow">Path Tracker</p>
-      <h1>Journey</h1>
+      <input
+        *ngIf="selectedGoal && !loading; else journeyTitle"
+        class="goal-title-editor"
+        aria-label="Goal title"
+        [(ngModel)]="selectedGoal.title"
+        (blur)="saveGoal()"
+      >
+      <ng-template #journeyTitle>
+        <h1>Journey</h1>
+      </ng-template>
     </div>
-    <button mat-mini-fab color="primary" type="button" aria-label="Add goal" (click)="addGoal()">
-      <mat-icon>add</mat-icon>
+
+    <button
+      *ngIf="selectedGoal && !loading"
+      mat-icon-button
+      color="warn"
+      type="button"
+      class="delete-goal"
+      aria-label="Delete goal"
+      (click)="deleteGoal()"
+    >
+      <mat-icon>delete</mat-icon>
     </button>
   </header>
 
@@ -18,6 +36,10 @@
       (click)="selectGoal(goal.id)"
     >
       <span>{{ goal.title }}</span>
+    </button>
+
+    <button mat-mini-fab color="primary" type="button" class="add-goal-button" aria-label="Add goal" (click)="addGoal()">
+      <mat-icon>add</mat-icon>
     </button>
   </div>
 
@@ -33,105 +55,74 @@
   </section>
 
   <article class="goal-detail" *ngIf="selectedGoal && !loading">
-    <div class="goal-topline">
-      <mat-form-field appearance="outline">
-        <mat-label>Goal title</mat-label>
-        <input matInput [(ngModel)]="selectedGoal.title" (blur)="saveGoal()">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Status</mat-label>
-        <mat-select [(ngModel)]="selectedGoal.statusOverride" (selectionChange)="saveGoal()">
-          <mat-option *ngFor="let status of statusOptions" [value]="status.value">
-            {{ status.label }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
-    <mat-form-field appearance="outline" class="wide-field">
-      <mat-label>Goal description</mat-label>
-      <textarea matInput rows="3" [(ngModel)]="selectedGoal.description" (blur)="saveGoal()"></textarea>
-    </mat-form-field>
-
     <div class="progress-block">
       <div>
-        <strong>{{ selectedGoal.progress.percent }}%</strong>
         <span>{{ selectedGoal.progress.completedTasks }}/{{ selectedGoal.progress.totalTasks }} tasks completed</span>
       </div>
       <mat-progress-bar mode="determinate" [value]="selectedGoal.progress.percent"></mat-progress-bar>
     </div>
 
-    <div class="section-heading">
-      <h2>Steps</h2>
-      <button mat-stroked-button type="button" (click)="addStep()">
-        <mat-icon>add</mat-icon>
-        Step
-      </button>
-    </div>
-
     <section class="step-list">
       <article class="step-panel" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
         <div class="step-header">
-          <mat-form-field appearance="outline">
-            <mat-label>Step title</mat-label>
-            <input matInput [(ngModel)]="step.title" (blur)="saveStep(step)">
-          </mat-form-field>
+          <input
+            class="step-title-editor"
+            aria-label="Step title"
+            [(ngModel)]="step.title"
+            (blur)="saveStep(step)"
+          >
 
-          <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <mat-select [(ngModel)]="step.statusOverride" (selectionChange)="saveStep(step)">
-              <mat-option *ngFor="let status of statusOptions" [value]="status.value">
-                {{ status.label }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <button mat-icon-button type="button" aria-label="Delete step" (click)="deleteStep(step)">
-            <mat-icon>delete</mat-icon>
+          <button
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="isStepCollapsed(step) ? 'Expand step' : 'Collapse step'"
+            (click)="toggleStepCollapsed(step)"
+          >
+            <mat-icon>{{ isStepCollapsed(step) ? 'expand_more' : 'expand_less' }}</mat-icon>
           </button>
         </div>
 
-        <mat-form-field appearance="outline" class="wide-field">
-          <mat-label>Step description</mat-label>
-          <textarea matInput rows="2" [(ngModel)]="step.description" (blur)="saveStep(step)"></textarea>
-        </mat-form-field>
-
-        <div class="step-progress">
-          <span>{{ step.progress.percent }}%</span>
-          <mat-progress-bar mode="determinate" [value]="step.progress.percent"></mat-progress-bar>
-        </div>
-
-        <div class="task-list">
-          <div class="task-row" *ngFor="let task of step.tasks; trackBy: trackById" [class.is-done]="task.done">
+        <div class="task-list" *ngIf="!isStepCollapsed(step)">
+          <div
+            class="task-row"
+            *ngFor="let task of step.tasks; trackBy: trackById"
+            [class.is-done]="task.done"
+            [class.is-placeholder]="task.body.trim() === ''"
+          >
             <mat-checkbox [ngModel]="task.done" (change)="toggleTask(task)"></mat-checkbox>
 
-            <mat-form-field appearance="outline" class="task-body">
-              <mat-label>Task</mat-label>
-              <textarea matInput rows="2" [(ngModel)]="task.body" (blur)="saveTask(task)"></textarea>
-            </mat-form-field>
+            <textarea
+              class="task-body"
+              cdkTextareaAutosize
+              [cdkAutosizeMinRows]="1"
+              [cdkAutosizeMaxRows]="12"
+              aria-label="Task"
+              placeholder="New task"
+              [(ngModel)]="task.body"
+              (blur)="handleTaskBlur(step, task)"
+            ></textarea>
 
-            <mat-form-field appearance="outline" class="due-date">
-              <mat-label>Due</mat-label>
-              <input matInput type="date" [(ngModel)]="task.dueDate" (blur)="saveTask(task)">
-            </mat-form-field>
-
-            <button mat-icon-button type="button" aria-label="Delete task" (click)="deleteTask(task)">
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="task-actions">
+              <button
+                *ngIf="task.body.trim() !== ''"
+                mat-icon-button
+                type="button"
+                class="reminder-button"
+                [class.has-reminder]="task.reminderFrequency !== 'none'"
+                [attr.aria-label]="reminderLabel(task)"
+                [title]="reminderLabel(task)"
+                (click)="configureReminder(task)">
+                <mat-icon>{{ task.reminderFrequency === 'none' ? 'notifications_none' : 'notifications_active' }}</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
-
-        <button mat-stroked-button type="button" class="add-task" (click)="addTask(step)">
-          <mat-icon>add</mat-icon>
-          Task
-        </button>
       </article>
     </section>
 
-    <button mat-button color="warn" type="button" class="delete-goal" (click)="deleteGoal()">
-      <mat-icon>delete</mat-icon>
-      Delete goal
+    <button mat-stroked-button type="button" class="add-step-button" (click)="addStep()">
+      <mat-icon>add</mat-icon>
+      Step
     </button>
   </article>
 </section>

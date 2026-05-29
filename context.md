@@ -67,8 +67,10 @@ This file stores durable project knowledge for future Codex sessions and for man
 
 - Codex runs in WSL, but the project build uses Windows Node/npm.
 - Build verification is user-run from `app-frontend` with `./build.sh`.
+- Do not try to run `./build.sh` from Codex; ask the user to run it, then inspect `app-frontend/build-log.txt`.
 - After asking the user to run `./build.sh`, Codex should inspect `app-frontend/build-log.txt` and continue from that output.
 - Browser runtime logging is user-run from `app-frontend` with `./log.sh`.
+- Do not try to run `./log.sh` from Codex; ask the user to run it or refresh the app, then inspect `app-frontend/browser-log.txt`.
 - After asking the user to run or refresh the app with `./log.sh` active, Codex should inspect `app-frontend/browser-log.txt`.
 - In the previous session, `./build.sh` passed with exit code 0 using Windows Node/npm. Node warned that v25.8.1 is not LTS.
 - The user plans to commit the current overhaul as the first branch commit before starting the next work session.

@@ -1,12 +1,14 @@
 <section class="archive-shell">
-  <div class="heading-lottie">
-    <app-lottie-animation [path]="'lottie/WalkingObjectives.json'" [loop]="true" [autoplay]="true"></app-lottie-animation>
-  </div>
+  <div class="archive-hero">
+    <header class="archive-header">
+      <p class="eyebrow">Read-only review</p>
+      <h1>Archive</h1>
+    </header>
 
-  <header class="archive-header">
-    <p class="eyebrow">Read-only review</p>
-    <h1>Archive</h1>
-  </header>
+    <div class="heading-lottie">
+      <app-lottie-animation [path]="'lottie/WalkingObjectives.json'" [loop]="true" [autoplay]="true"></app-lottie-animation>
+    </div>
+  </div>
 
   <p class="state-message" *ngIf="loading">Loading summary...</p>
   <p class="state-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -15,19 +17,14 @@
     <div class="goal-title-row">
       <div>
         <h2>{{ goal.title }}</h2>
-        <p *ngIf="goal.description">{{ goal.description }}</p>
         <small *ngIf="goal.statusOverride !== 'auto'">Manual status: {{ goal.statusOverride }}</small>
       </div>
-      <strong>{{ goal.progress.percent }}%</strong>
     </div>
-
-    <mat-progress-bar mode="determinate" [value]="goal.progress.percent"></mat-progress-bar>
 
     <div class="metrics">
       <span><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
       <span><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
-      <span><mat-icon>event_busy</mat-icon>{{ goal.overdueTasks }} overdue</span>
-      <span><mat-icon>event</mat-icon>{{ goal.upcomingTasks }} scheduled</span>
+      <span><mat-icon>notifications_active</mat-icon>{{ goal.upcomingTasks }} reminders</span>
     </div>
 
     <mat-divider></mat-divider>
@@ -38,16 +35,16 @@
           <h3>{{ step.title }}</h3>
           <small *ngIf="step.statusOverride !== 'auto'">Manual status: {{ step.statusOverride }}</small>
         </div>
-        <span>{{ step.progress.completedTasks }}/{{ step.progress.totalTasks }}</span>
       </div>
-      <mat-progress-bar mode="determinate" [value]="step.progress.percent"></mat-progress-bar>
 
       <ul>
-        <li *ngFor="let task of step.tasks; trackBy: trackById" [class.is-done]="task.done">
-          <mat-icon>{{ task.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-          <span>{{ task.body }}</span>
-          <time *ngIf="task.dueDate">{{ task.dueDate }}</time>
-        </li>
+        <ng-container *ngFor="let task of step.tasks; trackBy: trackById">
+          <li *ngIf="task.body.trim() !== ''" [class.is-done]="task.done">
+            <mat-icon>{{ task.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span>{{ task.body }}</span>
+            <time *ngIf="task.reminderFrequency !== 'none'">{{ reminderLabel(task) }}</time>
+          </li>
+        </ng-container>
       </ul>
     </section>
   </article>

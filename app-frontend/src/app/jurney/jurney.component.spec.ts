@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { JurneyComponent } from './jurney.component';
 import { DatahandlerService, GoalWithSteps } from '../services/datahandler.service';
@@ -27,6 +28,7 @@ describe('JurneyComponent', () => {
     await TestBed.configureTestingModule({
       imports: [JurneyComponent],
       providers: [
+        provideIonicAngular(),
         {
           provide: DatahandlerService,
           useValue: {

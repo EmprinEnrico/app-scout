@@ -40,8 +40,18 @@
               }
             ],
             "styles": [
-              "src/styles.less",
-              "@angular/material/prebuilt-themes/azure-blue.css"
+              "@ionic/angular/css/core.css",
+              "@ionic/angular/css/normalize.css",
+              "@ionic/angular/css/structure.css",
+              "@ionic/angular/css/typography.css",
+              "@ionic/angular/css/display.css",
+              "@ionic/angular/css/padding.css",
+              "@ionic/angular/css/float-elements.css",
+              "@ionic/angular/css/text-alignment.css",
+              "@ionic/angular/css/text-transformation.css",
+              "@ionic/angular/css/flex-utils.css",
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "src/styles.less"
             ],
             "scripts": []
           },
@@ -105,6 +115,16 @@
               }
             ],
             "styles": [
+              "@ionic/angular/css/core.css",
+              "@ionic/angular/css/normalize.css",
+              "@ionic/angular/css/structure.css",
+              "@ionic/angular/css/typography.css",
+              "@ionic/angular/css/display.css",
+              "@ionic/angular/css/padding.css",
+              "@ionic/angular/css/float-elements.css",
+              "@ionic/angular/css/text-alignment.css",
+              "@ionic/angular/css/text-transformation.css",
+              "@ionic/angular/css/flex-utils.css",
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/styles.less"
             ],

@@ -5,6 +5,18 @@
   margin: 0 auto;
 }
 
+.archive-hero {
+  position: relative;
+  min-height: 180px;
+}
+
+.archive-header {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+}
+
 .heading-lottie {
   max-height: 180px;
   overflow: hidden;
@@ -35,8 +47,7 @@
 
 .goal-title-row,
 .step-title-row,
-.metrics,
-li {
+.metrics {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -47,19 +58,9 @@ li {
   justify-content: space-between;
 }
 
-.goal-title-row p {
-  margin: 4px 0 0;
-  color: #53606f;
-}
-
 small {
   color: #667085;
   text-transform: capitalize;
-}
-
-.goal-title-row strong {
-  color: #183c9f;
-  font-size: 1.4rem;
 }
 
 .metrics {
@@ -94,14 +95,15 @@ ul {
 }
 
 li {
+  display: flex;
   align-items: flex-start;
+  gap: 8px;
   list-style: none;
   color: #172033;
 }
 
 li.is-done span {
   color: #667085;
-  text-decoration: line-through;
 }
 
 time {
