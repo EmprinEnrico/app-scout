@@ -1,16 +1,30 @@
-# app-scout
-An app designed to support Boy Scouts in their personal growth.
+# Path Tracker
 
-## Design:
+A local-first goals app built around goals, steps, and concrete tasks.
 
-Angular as a framework
+## Design
 
-Capacitor to make the native version
+- Angular frontend
+- Capacitor native app wrappers
+- SQLite local storage for goals, steps, tasks, and progress
 
-## For biuld:
+## Development
 
-ng build
+Install dependencies from `app-frontend`:
 
+```bash
+npm install
+```
+
+The SQLite overhaul also needs:
+
+```bash
+npm install @capacitor-community/sqlite jeep-sqlite
+```
+
+Build and sync native projects:
+
+```bash
+npm run build
 npx cap sync
-
-Then use Xcode or npx cap run ios
+```

@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.scoutapp.app',
-  appName: 'app-frontend',
+  appId: 'com.pathtracker.app',
+  appName: 'Path Tracker',
   webDir: 'dist/app-frontend/browser'
 };
 

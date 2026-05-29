@@ -1,69 +1,50 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { PreferencesService } from '../services/preferences.service';
 import { CommonModule } from '@angular/common';
-import { Database, DatahandlerService } from '../services/datahandler.service';
-import { LottieAnimationComponent } from '../lottie-animation/lottie-animation.component';
+import { Component, OnInit } from '@angular/core';
 import { MatDivider } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { DatahandlerService, GoalSummary } from '../services/datahandler.service';
+import { LottieAnimationComponent } from '../lottie-animation/lottie-animation.component';
+import { BrowserLogService } from '../services/browser-log.service';
 
 @Component({
   selector: 'app-archive',
   standalone: true,
-  imports: [CommonModule, LottieAnimationComponent, MatDivider],
+  imports: [CommonModule, LottieAnimationComponent, MatDivider, MatIconModule, MatProgressBarModule],
   templateUrl: './archive.component.html',
-  styleUrl: './archive.component.less'
+  styleUrl: './archive.component.less',
 })
-export class ArchiveComponent implements OnInit{
-  
-  database: Database | undefined;
-  allObjectives: any;
-  allFilledTappe: Database | undefined;
+export class ArchiveComponent implements OnInit {
+  summaries: GoalSummary[] = [];
+  loading = true;
+  errorMessage = '';
 
-  constructor(public dhs: DatahandlerService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private datahandler: DatahandlerService,
+    private browserLog: BrowserLogService,
+  ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.init();
-    
+    await this.load();
   }
 
-  async init(): Promise<void> {
+  async load(): Promise<void> {
     try {
-      this.database = await this.dhs.getDatabase();
-      this.allFilledTappe = this.dhs.getAllNonEmptyTappe(this.database);
-      this.cdr.detectChanges();
+      this.loading = true;
+      this.errorMessage = '';
+      this.browserLog.info('Archive load start');
+      await this.datahandler.initialize();
+      this.summaries = await this.datahandler.getGoalSummaries();
+      this.browserLog.info('Archive load complete', { goals: this.summaries.length });
     } catch (error) {
-      console.error('Error retrieving stored values:', error);
+      this.browserLog.error('Archive load failed', error);
+      this.errorMessage = `Unable to load archive: ${error}`;
+    } finally {
+      this.loading = false;
     }
   }
 
-  // Determine if there is content in branca
-  hasBrancoContent(): boolean {
-    let test = this.allFilledTappe && Object.keys(this.allFilledTappe).some(key => 
-      key === 'branco-1' || key === 'branco-2' || key === 'branco-3');
-    if (test == undefined) {
-      return false
-    } else {
-      return test
-    }
-  }
-
-  hasRepartoContent(): boolean {
-    let test = this.allFilledTappe && Object.keys(this.allFilledTappe).some(key => 
-      key === 'reparto-1' || key === 'reparto-2' || key === 'reparto-3');
-    if (test == undefined) {
-      return false
-    } else {
-      return test
-    }
-  }
-
-  hasClanContent(): boolean {
-    let test = this.allFilledTappe && Object.keys(this.allFilledTappe).some(key => 
-      key === 'clan-1' || key === 'clan-2' || key === 'clan-3' || key === 'clan-4' || key === 'clan-5' || key === 'clan-6' || key === 'clan-7' || key === 'clan-8');
-    
-    if (test == undefined) {
-      return false
-    } else {
-      return test
-    }
+  trackById(_: number, item: { id: number }): number {
+    return item.id;
   }
 }

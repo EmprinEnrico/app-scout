@@ -1,36 +1,119 @@
-
-h5{
-    font-style: italic;
-    text-decoration: underline;
+.archive-shell {
+  display: grid;
+  gap: 14px;
+  max-width: 920px;
+  margin: 0 auto;
 }
 
-h4{
-    margin-top: 1em;
-    margin-bottom: 0.2em;
+.heading-lottie {
+  max-height: 180px;
+  overflow: hidden;
 }
 
-h3{
-    text-align: center;
+.archive-header h1,
+.goal-summary h2,
+.step-summary h3 {
+  margin: 0;
 }
 
-.bullet{
-    padding-left: 1em;
-    margin-top: 0em;
-    margin-bottom: 0.5em;
-    li{
-        list-style-type:disc;
-        white-space: pre-line;
-    }
-    
+.eyebrow {
+  margin: 0 0 2px;
+  color: #53606f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.heading-lottie{
-    margin: 0px 10px 5px 10px;
+.goal-summary {
+  display: grid;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 12px;
 }
 
-.branca-group{
-    margin: 5px 1em 0px 1em;
-    padding: 0px 5px 0px 5px;
-    background-color: var(--section-color);
-    border-radius: 10px;
+.goal-title-row,
+.step-title-row,
+.metrics,
+li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.goal-title-row,
+.step-title-row {
+  justify-content: space-between;
+}
+
+.goal-title-row p {
+  margin: 4px 0 0;
+  color: #53606f;
+}
+
+small {
+  color: #667085;
+  text-transform: capitalize;
+}
+
+.goal-title-row strong {
+  color: #183c9f;
+  font-size: 1.4rem;
+}
+
+.metrics {
+  flex-wrap: wrap;
+}
+
+.metrics span {
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #344054;
+  background: #f8fafc;
+}
+
+.metrics mat-icon,
+li mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+.step-summary {
+  display: grid;
+  gap: 8px;
+}
+
+ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  align-items: flex-start;
+  list-style: none;
+  color: #172033;
+}
+
+li.is-done span {
+  color: #667085;
+  text-decoration: line-through;
+}
+
+time {
+  margin-left: auto;
+  color: #53606f;
+  white-space: nowrap;
+}
+
+.state-message {
+  color: #53606f;
+}
+
+.error {
+  color: #b42318;
 }

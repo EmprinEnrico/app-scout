@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ArchiveComponent } from './archive.component';
+import { DatahandlerService } from '../services/datahandler.service';
 
 describe('ArchiveComponent', () => {
   let component: ArchiveComponent;
@@ -8,7 +9,16 @@ describe('ArchiveComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ArchiveComponent]
+      imports: [ArchiveComponent],
+      providers: [
+        {
+          provide: DatahandlerService,
+          useValue: {
+            initialize: async () => undefined,
+            getGoalSummaries: async () => [],
+          },
+        },
+      ],
     })
     .compileComponents();
 

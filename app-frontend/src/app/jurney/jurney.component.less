@@ -1,74 +1,165 @@
-
-.mat-mdc-button-touch-target{
-    height: auto;
+.journey-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 920px;
+  margin: 0 auto;
 }
 
-.list{
-    ol{
-        padding-left: 1em;
-
-        display: flex;
-
-        p{
-            padding-top: 5px;
-        }
-
-        .text-container{
-            background-color: rgb(244, 248, 255);
-            margin: 0px 2px 0px 1em;
-            border-radius: 10px;
-            padding: 5px 3px 5px 3px;
-
-            display: flex;
-            flex-grow: 1;
-
-            textarea{
-                font-size: 1rem; 
-                flex-grow: 1;
-                resize: none;
-                border: none;
-                background-color: transparent;
-                outline: none;
-            }
-        }
-    }
-    
+.journey-header,
+.goal-topline,
+.section-heading,
+.step-header,
+.task-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-.title-1{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-
-    .mat-mdc-form-field {
-        --mdc-filled-text-field-container-color: transparent;
-        font-family: 'Courier New', Courier, monospace;
-    }
-
-    img{
-        height: auto;
-        width: 2em;
-    }
-    
+.journey-header,
+.section-heading {
+  justify-content: space-between;
+  align-items: center;
 }
 
-.title-2{
-    h6{
-        margin-top: 1em;   
-        font-weight: 500;
-    }
-
-    
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap; 
-    align-items: baseline;
-    justify-content: space-between;
+.journey-header h1,
+.section-heading h2 {
+  margin: 0;
 }
 
-.arrow-buttons{
-    align-self: baseline;
-    button{
-        padding: none !important;
-    }    
+.eyebrow {
+  margin: 0 0 2px;
+  color: #53606f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.goal-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.goal-chip {
+  flex: 0 0 auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: white;
+  color: #172033;
+  padding: 9px 12px;
+  font: inherit;
+}
+
+.goal-chip.is-selected {
+  border-color: #284fc4;
+  background: #eef3ff;
+  color: #183c9f;
+  font-weight: 700;
+}
+
+.goal-detail,
+.step-panel {
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.goal-topline mat-form-field:first-child,
+.step-header mat-form-field:first-child,
+.wide-field,
+.task-body {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.goal-topline mat-form-field:last-child,
+.step-header mat-form-field:nth-child(2) {
+  flex: 0 0 150px;
+}
+
+.progress-block,
+.step-progress {
+  display: grid;
+  gap: 7px;
+  margin: 2px 0 14px;
+}
+
+.progress-block div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.progress-block span,
+.step-progress span,
+.state-message {
+  color: #53606f;
+}
+
+.error {
+  color: #b42318;
+}
+
+.error-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+  background: #fff3f2;
+  color: #7a271a;
+  padding: 12px;
+}
+
+.error-panel span {
+  color: #912018;
+}
+
+.error-panel button {
+  justify-self: start;
+}
+
+.step-list {
+  display: grid;
+  gap: 12px;
+}
+
+.task-list {
+  display: grid;
+  gap: 8px;
+}
+
+.task-row {
+  align-items: center;
+}
+
+.task-row.is-done textarea {
+  color: #667085;
+  text-decoration: line-through;
+}
+
+.due-date {
+  flex: 0 0 150px;
+}
+
+.add-task,
+.delete-goal {
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .goal-topline,
+  .step-header,
+  .task-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .goal-topline mat-form-field:last-child,
+  .step-header mat-form-field:nth-child(2),
+  .due-date {
+    flex-basis: auto;
+  }
 }

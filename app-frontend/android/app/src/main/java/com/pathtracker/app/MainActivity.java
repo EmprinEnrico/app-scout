@@ -1,4 +1,4 @@
-package com.scoutapp.app;
+package com.pathtracker.app;
 
 import com.getcapacitor.BridgeActivity;
 

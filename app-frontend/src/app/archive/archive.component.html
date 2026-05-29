@@ -1,66 +1,58 @@
-<div class="heading-lottie">
-  <app-lottie-animation [path]="'lottie/WalkingObjectives.json'" [loop]="true" [autoplay]="true" ></app-lottie-animation>
-</div>
-
-<h3 class="title-1">Il mio percorso</h3>
-
-<!-- La mia pista section for 'branco' tappe -->
-<div *ngIf="hasBrancoContent()">
-  <h4 class="title-2">La mia pista</h4>
-  <mat-divider></mat-divider>
-</div>
-
-<div *ngFor="let tappa of (allFilledTappe | keyvalue)" class="branca-group">
-  <div *ngIf="tappa.key === 'branco-1' || tappa.key === 'branco-2' || tappa.key === 'branco-3'">
-    <h5 *ngIf="tappa.key === 'branco-1'" class="title-3">{{ dhs.tappeBranco[0].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'branco-2'" class="title-3">{{ dhs.tappeBranco[1].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'branco-3'" class="title-3">{{ dhs.tappeBranco[2].viewValue }}</h5>
-    <ul *ngFor="let obj of tappa.value" class="bullet">
-      <li>{{ obj }}</li>
-    </ul>
+<section class="archive-shell">
+  <div class="heading-lottie">
+    <app-lottie-animation [path]="'lottie/WalkingObjectives.json'" [loop]="true" [autoplay]="true"></app-lottie-animation>
   </div>
-</div>
 
-<!-- Il mio sentiero section for 'reparto' tappe -->
-<div *ngIf="hasRepartoContent()">
-  <h4 class="title-2">Il mio sentiero</h4>
-  <mat-divider></mat-divider>
-</div>
+  <header class="archive-header">
+    <p class="eyebrow">Read-only review</p>
+    <h1>Archive</h1>
+  </header>
 
-<div *ngFor="let tappa of (allFilledTappe | keyvalue)" class="branca-group">
-  <div *ngIf="tappa.key === 'reparto-1' || tappa.key === 'reparto-2' || tappa.key === 'reparto-3'">
-    <h5 *ngIf="tappa.key === 'reparto-1'" class="title-3">{{ dhs.tappeReparto[0].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'reparto-2'" class="title-3">{{ dhs.tappeReparto[1].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'reparto-3'" class="title-3">{{ dhs.tappeReparto[2].viewValue }}</h5>
-    <ul *ngFor="let obj of tappa.value" class="bullet">
-      <li>{{ obj }}</li>
-    </ul>
-  </div>
-</div>
+  <p class="state-message" *ngIf="loading">Loading summary...</p>
+  <p class="state-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-<!-- La mia strada section for 'clan' tappe -->
-<div *ngIf="hasClanContent()">
-  <h4 class="title-2">La mia strada</h4>
-  <mat-divider></mat-divider>
-</div>
+  <article class="goal-summary" *ngFor="let goal of summaries; trackBy: trackById">
+    <div class="goal-title-row">
+      <div>
+        <h2>{{ goal.title }}</h2>
+        <p *ngIf="goal.description">{{ goal.description }}</p>
+        <small *ngIf="goal.statusOverride !== 'auto'">Manual status: {{ goal.statusOverride }}</small>
+      </div>
+      <strong>{{ goal.progress.percent }}%</strong>
+    </div>
 
+    <mat-progress-bar mode="determinate" [value]="goal.progress.percent"></mat-progress-bar>
 
+    <div class="metrics">
+      <span><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
+      <span><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
+      <span><mat-icon>event_busy</mat-icon>{{ goal.overdueTasks }} overdue</span>
+      <span><mat-icon>event</mat-icon>{{ goal.upcomingTasks }} scheduled</span>
+    </div>
 
-<div *ngFor="let tappa of (allFilledTappe | keyvalue)" class="branca-group">
-  <div *ngIf="tappa.key === 'clan-1' || tappa.key === 'clan-2' || tappa.key === 'clan-3' || tappa.key === 'clan-4' || tappa.key === 'clan-5' || tappa.key === 'clan-6' || tappa.key === 'clan-7' || tappa.key === 'clan-8'">
-    <h5 *ngIf="tappa.key === 'clan-1'" class="title-3">{{ dhs.tappeClan[0].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-2'" class="title-3">{{ dhs.tappeClan[1].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-3'" class="title-3">{{ dhs.tappeClan[2].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-4'" class="title-3">{{ dhs.tappeClan[3].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-5'" class="title-3">{{ dhs.tappeClan[4].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-6'" class="title-3">{{ dhs.tappeClan[5].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-7'" class="title-3">{{ dhs.tappeClan[6].viewValue }}</h5>
-    <h5 *ngIf="tappa.key === 'clan-8'" class="title-3">{{ dhs.tappeClan[7].viewValue }}</h5>
-    <ul *ngFor="let obj of tappa.value" class="bullet">
-      <li>{{ obj }}</li>
-    </ul>
-  </div>
-</div>
+    <mat-divider></mat-divider>
 
+    <section class="step-summary" *ngFor="let step of goal.steps; trackBy: trackById">
+      <div class="step-title-row">
+        <div>
+          <h3>{{ step.title }}</h3>
+          <small *ngIf="step.statusOverride !== 'auto'">Manual status: {{ step.statusOverride }}</small>
+        </div>
+        <span>{{ step.progress.completedTasks }}/{{ step.progress.totalTasks }}</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="step.progress.percent"></mat-progress-bar>
+
+      <ul>
+        <li *ngFor="let task of step.tasks; trackBy: trackById" [class.is-done]="task.done">
+          <mat-icon>{{ task.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          <span>{{ task.body }}</span>
+          <time *ngIf="task.dueDate">{{ task.dueDate }}</time>
+        </li>
+      </ul>
+    </section>
+  </article>
+
+  <p class="state-message" *ngIf="!loading && summaries.length === 0">No goals yet.</p>
+</section>
 
 <div class="end-page-spacer"></div>

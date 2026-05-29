@@ -1,73 +1,139 @@
-<div>
-  <div class="title-1">
-    <img src="AGESCI.svg_-262x300.png">
-    <img src="CNGEI_150x150.png">
-    <mat-form-field subscriptSizing="dynamic">
-      <mat-label>Scegli:</mat-label>
-      <mat-select [(ngModel)]="selectedBranca" (selectionChange)="onBrancaChange()" name="branca">
-        <mat-option *ngFor="let branca of branche" [value]="branca.value">
-          {{ branca.viewValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>  
+<section class="journey-shell">
+  <header class="journey-header">
+    <div>
+      <p class="eyebrow">Path Tracker</p>
+      <h1>Journey</h1>
+    </div>
+    <button mat-mini-fab color="primary" type="button" aria-label="Add goal" (click)="addGoal()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </header>
+
+  <div class="goal-strip" *ngIf="goals.length > 0">
+    <button
+      type="button"
+      class="goal-chip"
+      *ngFor="let goal of goals; trackBy: trackById"
+      [class.is-selected]="goal.id === selectedGoal?.id"
+      (click)="selectGoal(goal.id)"
+    >
+      <span>{{ goal.title }}</span>
+    </button>
   </div>
-  
-  <div>
-    <mat-divider></mat-divider>
-    <br>
-      <div *ngIf="selectedBranca != 'clan'" class="title-2">
-        <h6 *ngIf="selectedTappa == 'branco-1'" >Prede per lupo legge</h6>
-        <h6 *ngIf="selectedTappa == 'branco-2'" >Prede per lupo rupe</h6>
-        <h6 *ngIf="selectedTappa == 'branco-3'" >Prede per lupo anziano</h6>
 
-        <h6 *ngIf="selectedTappa == 'reparto-1'" >La tappa della scoperta</h6>
-        <h6 *ngIf="selectedTappa == 'reparto-2'" >La tappa della competenza</h6>
-        <h6 *ngIf="selectedTappa == 'reparto-3'" >La tappa della responsabilità</h6>
+  <p class="state-message" *ngIf="loading">Loading your path...</p>
 
-        <div class="arrow-button">
-          <button mat-icon-button (click)="previwsTappa()"><i class="material-icons">arrow_back</i></button>
-          <button mat-icon-button (click)="nextTappa()"><i class="material-icons">arrow_forward</i></button>
+  <section class="error-panel" *ngIf="errorMessage">
+    <strong>{{ errorMessage }}</strong>
+    <span>Reload the database connection and try again.</span>
+    <button mat-stroked-button type="button" (click)="load()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </section>
+
+  <article class="goal-detail" *ngIf="selectedGoal && !loading">
+    <div class="goal-topline">
+      <mat-form-field appearance="outline">
+        <mat-label>Goal title</mat-label>
+        <input matInput [(ngModel)]="selectedGoal.title" (blur)="saveGoal()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedGoal.statusOverride" (selectionChange)="saveGoal()">
+          <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="wide-field">
+      <mat-label>Goal description</mat-label>
+      <textarea matInput rows="3" [(ngModel)]="selectedGoal.description" (blur)="saveGoal()"></textarea>
+    </mat-form-field>
+
+    <div class="progress-block">
+      <div>
+        <strong>{{ selectedGoal.progress.percent }}%</strong>
+        <span>{{ selectedGoal.progress.completedTasks }}/{{ selectedGoal.progress.totalTasks }} tasks completed</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="selectedGoal.progress.percent"></mat-progress-bar>
+    </div>
+
+    <div class="section-heading">
+      <h2>Steps</h2>
+      <button mat-stroked-button type="button" (click)="addStep()">
+        <mat-icon>add</mat-icon>
+        Step
+      </button>
+    </div>
+
+    <section class="step-list">
+      <article class="step-panel" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
+        <div class="step-header">
+          <mat-form-field appearance="outline">
+            <mat-label>Step title</mat-label>
+            <input matInput [(ngModel)]="step.title" (blur)="saveStep(step)">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select [(ngModel)]="step.statusOverride" (selectionChange)="saveStep(step)">
+              <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                {{ status.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-icon-button type="button" aria-label="Delete step" (click)="deleteStep(step)">
+            <mat-icon>delete</mat-icon>
+          </button>
         </div>
-      </div>
 
-      <div *ngIf="selectedBranca == 'clan'" [ngSwitch]="selectedTappa" class="title-2">
-        <h6 *ngSwitchCase="'clan-1'" >Il mio punto della strada 1</h6>
-        <h6 *ngSwitchCase="'clan-2'" >Il mio punto della strada 2</h6>
-        <h6 *ngSwitchCase="'clan-3'" >Il mio punto della strada 3</h6>
-        <h6 *ngSwitchCase="'clan-4'" >Il mio punto della strada 4</h6>
-        <h6 *ngSwitchCase="'clan-5'" >Il mio punto della strada 5</h6>
-        <h6 *ngSwitchCase="'clan-6'" >Il mio punto della strada 6</h6>
-        <h6 *ngSwitchCase="'clan-7'" >Il mio punto della strada 7</h6>
-        <h6 *ngSwitchCase="'clan-8'" >Il mio punto della strada 8</h6>
-        <h6 *ngSwitchDefault>Errore, riseleziona la tua branca</h6> 
+        <mat-form-field appearance="outline" class="wide-field">
+          <mat-label>Step description</mat-label>
+          <textarea matInput rows="2" [(ngModel)]="step.description" (blur)="saveStep(step)"></textarea>
+        </mat-form-field>
 
-        <div class="arrow-button">
-          <button mat-icon-button (click)="previwsTappa()"><i class="material-icons">arrow_back</i></button>
-          <button mat-icon-button (click)="nextTappa()"><i class="material-icons">arrow_forward</i></button>
+        <div class="step-progress">
+          <span>{{ step.progress.percent }}%</span>
+          <mat-progress-bar mode="determinate" [value]="step.progress.percent"></mat-progress-bar>
         </div>
-      </div>
 
-      <br>
-      <p>I miei obbiettivi:</p>
+        <div class="task-list">
+          <div class="task-row" *ngFor="let task of step.tasks; trackBy: trackById" [class.is-done]="task.done">
+            <mat-checkbox [ngModel]="task.done" (change)="toggleTask(task)"></mat-checkbox>
 
+            <mat-form-field appearance="outline" class="task-body">
+              <mat-label>Task</mat-label>
+              <textarea matInput rows="2" [(ngModel)]="task.body" (blur)="saveTask(task)"></textarea>
+            </mat-form-field>
 
-      <div *ngFor="let objective of selectedTappaObjectives; let i = index" class="list">
-        <ol><p>{{ i + 1 }}:</p> 
-              <div class="text-container">
-                <textarea
-                cdkTextareaAutosize
-                #autosize="cdkTextareaAutosize"
-                cdkAutosizeMinRows="1"
-                 name="objective"
-                 rows="2" 
-                 [ngModel]="selectedTappaObjectives[i]" 
-                 (blur)="updateObjective(i, $event)"
-                 placeholder="Il mio obbiettivo..."
-                 >
-                </textarea>
-              </div>
-        </ol>
-      </div>
-  </div>
+            <mat-form-field appearance="outline" class="due-date">
+              <mat-label>Due</mat-label>
+              <input matInput type="date" [(ngModel)]="task.dueDate" (blur)="saveTask(task)">
+            </mat-form-field>
+
+            <button mat-icon-button type="button" aria-label="Delete task" (click)="deleteTask(task)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <button mat-stroked-button type="button" class="add-task" (click)="addTask(step)">
+          <mat-icon>add</mat-icon>
+          Task
+        </button>
+      </article>
+    </section>
+
+    <button mat-button color="warn" type="button" class="delete-goal" (click)="deleteGoal()">
+      <mat-icon>delete</mat-icon>
+      Delete goal
+    </button>
+  </article>
+</section>
 
 <div class="end-page-spacer"></div>

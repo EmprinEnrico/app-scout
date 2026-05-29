@@ -1,178 +1,245 @@
-import { afterNextRender, ChangeDetectorRef, Component, ElementRef, inject, Injector, ViewChild } from '@angular/core';
-import { PreferencesService } from '../services/preferences.service';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { DatahandlerService, Tappa, Branca, Database } from '../services/datahandler.service';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {CdkTextareaAutosize} from '@angular/cdk/text-field'
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { TextFieldModule } from '@angular/cdk/text-field';
-import { Router } from '@angular/router';
+import {
+  DatahandlerService,
+  Goal,
+  GoalWithSteps,
+  StatusOverride,
+  StepWithTasks,
+  Task,
+} from '../services/datahandler.service';
+import { BrowserLogService } from '../services/browser-log.service';
 
 @Component({
   selector: 'app-jurney',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatDividerModule, FormsModule, MatFormFieldModule, MatSelectModule, TextFieldModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressBarModule,
+    MatSelectModule,
+  ],
   templateUrl: './jurney.component.html',
-  styleUrl: './jurney.component.less'
+  styleUrl: './jurney.component.less',
 })
-export class JurneyComponent {
+export class JurneyComponent implements OnInit {
+  goals: Goal[] = [];
+  selectedGoal: GoalWithSteps | undefined;
+  loading = true;
+  errorMessage = '';
 
-  selectedBranca: any;
-  selectedTappa!: string;
+  readonly statusOptions: { value: StatusOverride; label: string }[] = [
+    { value: 'auto', label: 'Auto' },
+    { value: 'active', label: 'Active' },
+    { value: 'paused', label: 'Paused' },
+    { value: 'completed', label: 'Completed' },
+  ];
 
-  branche: Branca[] | undefined;
-  tappeBranco: Tappa[] | undefined;
-  tappeReparto: Tappa[] | undefined;
-  tappeClan: Tappa[] | undefined;
-
-  database: Database | undefined;
-
-  selectedTappaObjectives: string[] = [];
-
-
-  constructor(private cdr: ChangeDetectorRef, private dhs: DatahandlerService, private router: Router) {}
+  constructor(
+    private datahandler: DatahandlerService,
+    private browserLog: BrowserLogService,
+  ) {}
 
   async ngOnInit(): Promise<void> {
-    this.getFreshValues();
+    await this.load();
   }
 
-
-  async getSelectedTappaObjectives() {
+  async load(goalId?: number): Promise<void> {
     try {
-      if (this.database == undefined) {
-        this.database = await this.dhs.getDatabase();
-      }
-      this.selectedTappaObjectives = this.dhs.getTappaObjectives(this.database, this.selectedTappa);
-      if (this.selectedTappaObjectives.length == 0){
-        this.dhs.setTappaObjective(this.database, this.selectedTappa, 1, "");
-        this.database = await this.dhs.getDatabase();
-        this.selectedTappaObjectives = this.dhs.getTappaObjectives(this.database, this.selectedTappa);
-      }
+      this.loading = true;
+      this.errorMessage = '';
+      this.browserLog.info('Journey load start', { goalId });
+      await this.datahandler.initialize();
+      this.goals = await this.datahandler.getGoals();
+      const selectedGoalId = goalId ?? await this.datahandler.getSelectedGoalId();
+      await this.selectGoal(selectedGoalId, false);
+      this.browserLog.info('Journey load complete', { goals: this.goals.length, selectedGoalId });
     } catch (error) {
-      console.log("Unable to get selectedTappaObjectives:" + error);
+      this.browserLog.error('Journey load failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to load goals', error);
+    } finally {
+      this.loading = false;
     }
   }
-  
 
-  async updateObjective(objectiveIndex: number, event: Event) {
-    const target = event.target as HTMLTextAreaElement;
-    if (!target) return; // Ensure target exists
-
-    this.database = await this.dhs.getDatabase();
-
-    // Ensure selectedTappa exists
-    if (!this.selectedTappa) {
-        throw new Error("selectedTappa is undefined");
+  async selectGoal(goalId: number, persist = true): Promise<void> {
+    try {
+      if (persist) {
+        await this.datahandler.setSelectedGoalId(goalId);
+      }
+      this.selectedGoal = await this.datahandler.getGoalWithSteps(goalId);
+    } catch (error) {
+      this.browserLog.error('Journey select goal failed', { goalId, error });
+      this.errorMessage = this.toErrorMessage('Unable to select goal', error);
     }
-
-    // Ensure the objectives array exists
-    if (!this.database[this.selectedTappa]) {
-        this.database[this.selectedTappa] = [];
-    }
-
-    
-   
-
-    if((objectiveIndex + 1) == this.selectedTappaObjectives.length){
-      this.dhs.setTappaObjective(this.database, this.selectedTappa, objectiveIndex + 2, "");
-      
-    }
-
-    if (target.value) {
-      this.dhs.setTappaObjective(this.database, this.selectedTappa, objectiveIndex + 1, target.value);
-    }
-
-    if (target.value == ""){
-      this.dhs.removeObjective(this.database, this.selectedTappa, objectiveIndex + 1);
-    }
-
-    this.getSelectedTappaObjectives();
-    this.redirectTo("/jurney")
-    
   }
 
-  private _injector = inject(Injector);
+  async addGoal(): Promise<void> {
+    try {
+      const goalId = await this.datahandler.createGoal();
+      this.browserLog.info('Journey goal created', { goalId });
+      await this.load(goalId);
+    } catch (error) {
+      this.browserLog.error('Journey create goal failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to create goal', error);
+    }
+  }
 
-  @ViewChild('autosize') autosize!: CdkTextareaAutosize;
+  async saveGoal(): Promise<void> {
+    if (!this.selectedGoal) {
+      return;
+    }
+    try {
+      await this.datahandler.updateGoal(this.selectedGoal);
+      this.browserLog.info('Journey goal saved', { goalId: this.selectedGoal.id });
+      this.goals = this.goals.map(goal => goal.id === this.selectedGoal?.id
+        ? { ...goal, title: this.selectedGoal.title, description: this.selectedGoal.description, statusOverride: this.selectedGoal.statusOverride }
+        : goal
+      );
+    } catch (error) {
+      this.browserLog.error('Journey save goal failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to save goal', error);
+    }
+  }
 
-  triggerResize() {
-    // Wait for content to render, then trigger textarea resize.
-    afterNextRender(
-      () => {
-        this.autosize.resizeToFitContent(true);
-      },
-      {
-        injector: this._injector,
-      },
+  async deleteGoal(): Promise<void> {
+    if (!this.selectedGoal || !confirm(`Delete "${this.selectedGoal.title}"?`)) {
+      return;
+    }
+    try {
+      await this.datahandler.deleteGoal(this.selectedGoal.id);
+      this.browserLog.info('Journey goal deleted', { goalId: this.selectedGoal.id });
+      await this.load();
+    } catch (error) {
+      this.browserLog.error('Journey delete goal failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to delete goal', error);
+    }
+  }
+
+  async addStep(): Promise<void> {
+    if (!this.selectedGoal) {
+      return;
+    }
+    try {
+      const stepId = await this.datahandler.createStep(this.selectedGoal.id);
+      this.browserLog.info('Journey step created', { goalId: this.selectedGoal.id, stepId });
+      await this.refreshSelectedGoal();
+    } catch (error) {
+      this.browserLog.error('Journey create step failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to create step', error);
+    }
+  }
+
+  async saveStep(step: StepWithTasks): Promise<void> {
+    try {
+      await this.datahandler.updateStep(step);
+      this.browserLog.info('Journey step saved', { stepId: step.id });
+      this.recalculateProgress();
+    } catch (error) {
+      this.browserLog.error('Journey save step failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to save step', error);
+    }
+  }
+
+  async deleteStep(step: StepWithTasks): Promise<void> {
+    if (!this.selectedGoal || !confirm(`Delete step "${step.title}"?`)) {
+      return;
+    }
+    try {
+      await this.datahandler.deleteStep(step.id);
+      this.browserLog.info('Journey step deleted', { stepId: step.id });
+      await this.refreshSelectedGoal();
+    } catch (error) {
+      this.browserLog.error('Journey delete step failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to delete step', error);
+    }
+  }
+
+  async addTask(step: StepWithTasks): Promise<void> {
+    try {
+      const taskId = await this.datahandler.createTask(step.id);
+      this.browserLog.info('Journey task created', { stepId: step.id, taskId });
+      await this.refreshSelectedGoal();
+    } catch (error) {
+      this.browserLog.error('Journey create task failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to create task', error);
+    }
+  }
+
+  async saveTask(task: Task): Promise<void> {
+    try {
+      await this.datahandler.updateTask(task);
+      this.browserLog.info('Journey task saved', { taskId: task.id, done: task.done });
+      this.recalculateProgress();
+    } catch (error) {
+      this.browserLog.error('Journey save task failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to save task', error);
+    }
+  }
+
+  async deleteTask(task: Task): Promise<void> {
+    if (!confirm('Delete this task?')) {
+      return;
+    }
+    try {
+      await this.datahandler.deleteTask(task.id);
+      this.browserLog.info('Journey task deleted', { taskId: task.id });
+      await this.refreshSelectedGoal();
+    } catch (error) {
+      this.browserLog.error('Journey delete task failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to delete task', error);
+    }
+  }
+
+  async toggleTask(task: Task): Promise<void> {
+    task.done = !task.done;
+    await this.saveTask(task);
+  }
+
+  async refreshSelectedGoal(): Promise<void> {
+    if (!this.selectedGoal) {
+      return;
+    }
+    await this.selectGoal(this.selectedGoal.id, false);
+    this.goals = await this.datahandler.getGoals();
+  }
+
+  recalculateProgress(): void {
+    if (!this.selectedGoal) {
+      return;
+    }
+
+    this.selectedGoal.steps = this.selectedGoal.steps.map(step => ({
+      ...step,
+      progress: this.datahandler.getProgress(step.tasks, step.statusOverride),
+    }));
+    this.selectedGoal.progress = this.datahandler.getProgress(
+      this.selectedGoal.steps.flatMap(step => step.tasks),
+      this.selectedGoal.statusOverride
     );
   }
 
-
-  redirectTo(uri: string) {
-    this.router.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
-      this.router.navigate([uri])});
+  private toErrorMessage(prefix: string, error: unknown): string {
+    const message = error instanceof Error ? error.message : String(error);
+    return `${prefix}: ${message}`;
   }
 
-
-  async onBrancaChange(): Promise<void> {
-    this.dhs.setSelectedBranca(this.selectedBranca);
-    this.dhs.setSelectedTappa(this.selectedBranca + "-1");
-    this.getFreshValues();
+  trackById(_: number, item: { id: number }): number {
+    return item.id;
   }
-  
-  async getFreshValues(){
-    this.selectedBranca = await this.dhs.getSelectedBranca();
-    this.selectedTappa = await this.dhs.getSelectedTappa();
-    this.database = await this.dhs.getDatabase();
-
-    this.cdr.detectChanges();
-    this.branche = this.dhs.branche;
-    this.tappeBranco = this.dhs.tappeBranco;
-    this.tappeReparto = this.dhs.tappeReparto;
-    this.tappeClan = this.dhs.tappeClan;
-
-    await this.getSelectedTappaObjectives();
-  }
-
-  async previwsTappa(): Promise<void> {
-    const selectedTappaNumber: number = Number(this.selectedTappa.slice(-1))
-
-    if(selectedTappaNumber === 1){
-      console.log("ultimo")
-      return;
-    }
-    const newTappa = this.selectedTappa.slice(0, -1) + (selectedTappaNumber - 1);
-    console.log(newTappa);
-    this.dhs.setSelectedTappa(newTappa);
-    this.getFreshValues();
-  }
-  
-  async nextTappa(): Promise<void> {
-    const selectedTappaNumber: number = Number(this.selectedTappa.slice(-1));
-
-    if (selectedTappaNumber >= 3) {
-        console.log("ultimo");
-
-        if (this.selectedBranca === "clan") {
-            if (selectedTappaNumber > 7) {
-                console.log("ultimo clan");
-                return;
-            }
-
-            console.log("clanaaaaa");
-        } else {
-            return; // Ensures only "clan" goes beyond 3
-        }
-    }
-
-    const newTappa = this.selectedTappa.slice(0, -1) + (selectedTappaNumber + 1);
-    this.dhs.setSelectedTappa(newTappa);
-    this.getFreshValues();
 }
-
-}
-
