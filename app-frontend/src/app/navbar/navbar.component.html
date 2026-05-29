@@ -1,12 +1,21 @@
 <nav>
   <mat-button-toggle-group [hideSingleSelectionIndicator]="hideSingleSelectionIndicator()">
-    <mat-button-toggle routerLink="/journey">
+    <mat-button-toggle
+      routerLink="/journey"
+      routerLinkActive="nav-toggle-active"
+      [routerLinkActiveOptions]="{ exact: true }">
         <mat-icon aria-hidden="false" aria-label="Journey" fontIcon="route"></mat-icon>
     </mat-button-toggle>
-    <mat-button-toggle routerLink="/archive">
+    <mat-button-toggle
+      routerLink="/archive"
+      routerLinkActive="nav-toggle-active"
+      [routerLinkActiveOptions]="{ exact: true }">
         <mat-icon aria-hidden="false" aria-label="Archive" fontIcon="collections_bookmark"></mat-icon>
     </mat-button-toggle>
-    <mat-button-toggle routerLink="/settings">
+    <mat-button-toggle
+      routerLink="/settings"
+      routerLinkActive="nav-toggle-active"
+      [routerLinkActiveOptions]="{ exact: true }">
         <mat-icon aria-hidden="false" aria-label="Settings" fontIcon="settings"></mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>

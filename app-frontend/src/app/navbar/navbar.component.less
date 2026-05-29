@@ -1,19 +1,18 @@
 //------------------------------ START NAV ------------------------------
 
 // Variables
-@base-height: 25px;
-@high-dpi-height: 50px;
-@higher-dpi-height: 75px;
+@nav-height: 56px;
 @nav-bg-color: rgb(13, 28, 114);
-
-// Mixin to set toolbar height
-.set-toolbar-height(@height) {
-    height: @height;
-}
+@nav-selected-color: rgba(255, 255, 255, 0.18);
 
 // Base Styles
+:host {
+    display: block;
+    flex-shrink: 0;
+}
+
 nav {
-    .set-toolbar-height(@base-height);
+    min-height: @nav-height;
     width: 100%;
     position: sticky;
     left: 0;
@@ -30,57 +29,78 @@ nav {
 
     mat-button-toggle-group{
         flex-grow: 1;
+        min-height: @nav-height;
         text-align: center;
+        display: flex;
+        background-color: transparent;
+        border-radius: 0;
+        overflow: hidden;
 
         --mat-standard-button-toggle-shape: 0px;
         --mat-standard-button-toggle-divider-color: transparent;
+        --mat-standard-button-toggle-selected-state-background-color: @nav-selected-color;
+        --mat-standard-button-toggle-selected-state-text-color: black;
         border: none;
     }
 
     mat-button-toggle{
-        flex-grow: 1;
+        flex: 1 1 0;
+        min-height: @nav-height;
         border: none;
+        border-radius: 0;
         text-align: center;
         display: flex;
         color: white;
+        overflow: hidden;
+    }
+
+    mat-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        line-height: 24px;
     }
 }
 
-// Media Queries
-// Low DPI
-@media only screen and (-webkit-min-device-pixel-ratio: 1),
-       only screen and (min--moz-device-pixel-ratio: 1),
-       only screen and (-o-min-device-pixel-ratio: 1/1),
-       only screen and (min-device-pixel-ratio: 1),
-       only screen and (min-resolution: 96dpi),
-       only screen and (min-resolution: 1dppx) {
-    nav {
-        .set-toolbar-height(@base-height);
-    }
+::ng-deep app-navbar .mat-button-toggle-group,
+::ng-deep app-navbar .mat-button-toggle-standalone {
+    border-radius: 0 !important;
 }
 
-// High DPI (e.g., Retina displays)
-@media only screen and (-webkit-min-device-pixel-ratio: 2),
-       only screen and (min--moz-device-pixel-ratio: 2),
-       only screen and (-o-min-device-pixel-ratio: 2/1),
-       only screen and (min-device-pixel-ratio: 2),
-       only screen and (min-resolution: 192dpi),
-       only screen and (min-resolution: 2dppx) {
-    nav {
-        .set-toolbar-height(@high-dpi-height);
-    }
+::ng-deep app-navbar .mat-button-toggle,
+::ng-deep app-navbar .mat-button-toggle:first-child,
+::ng-deep app-navbar .mat-button-toggle:last-child {
+    border-radius: 0 !important;
 }
 
-// Higher DPI (e.g., Ultra HD displays)
-@media only screen and (-webkit-min-device-pixel-ratio: 3),
-       only screen and (min--moz-device-pixel-ratio: 3),
-       only screen and (-o-min-device-pixel-ratio: 3/1),
-       only screen and (min-device-pixel-ratio: 3),
-       only screen and (min-resolution: 288dpi),
-       only screen and (min-resolution: 3dppx) {
-    nav {
-        .set-toolbar-height(@higher-dpi-height);
-    }
+::ng-deep app-navbar .mat-button-toggle-button {
+    width: 100%;
+    height: 100%;
+    border-radius: 0 !important;
+}
+
+::ng-deep app-navbar .mat-button-toggle-label-content {
+    width: 100%;
+    min-height: @nav-height;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+::ng-deep app-navbar .mat-button-toggle-checked {
+    background-color: @nav-selected-color;
+    color: black;
+}
+
+::ng-deep app-navbar .nav-toggle-active {
+    background-color: @nav-selected-color;
+    color: black !important;
+}
+
+::ng-deep app-navbar .nav-toggle-active mat-icon {
+    color: black !important;
 }
 
 //------------------------------ END NAV ------------------------------

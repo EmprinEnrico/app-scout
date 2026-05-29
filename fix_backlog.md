@@ -7,7 +7,7 @@ Codex should read this file before starting app changes and may read it again wh
 ## Pending
 New requested changes here.
 
-- The menu bar is too thin in the browser, it looks squashed. The icons are partially hidden.
-
 ## Done
 Move completed items here only when the user agrees or when the related change is clearly implemented.
+
+- The menu bar is too thin in the browser, it looks squashed. The icons are partially hidden.
