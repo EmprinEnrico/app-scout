@@ -7,7 +7,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+import {
+  AlertController,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  ToastController,
+} from '@ionic/angular/standalone';
 import {
   DatahandlerService,
   Goal,
@@ -42,6 +49,10 @@ type ReminderPreset =
     MatDividerModule,
     MatIconModule,
     MatProgressBarModule,
+    IonItem,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
   ],
   templateUrl: './jurney.component.html',
   styleUrl: './jurney.component.less',

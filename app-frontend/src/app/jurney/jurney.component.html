@@ -63,62 +63,76 @@
     </div>
 
     <section class="step-list">
-      <article class="step-panel" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
-        <div class="step-header">
-          <input
-            class="step-title-editor"
-            aria-label="Step title"
-            [(ngModel)]="step.title"
-            (blur)="saveStep(step)"
-          >
+      <ion-item-sliding class="step-swipe" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
+        <ion-item lines="none" class="step-slide-item">
+          <article class="step-panel">
+            <div class="step-header">
+              <input
+                class="step-title-editor"
+                aria-label="Step title"
+                [(ngModel)]="step.title"
+                (blur)="saveStep(step)"
+              >
 
-          <button
-            mat-icon-button
-            type="button"
-            [attr.aria-label]="isStepCollapsed(step) ? 'Expand step' : 'Collapse step'"
-            (click)="toggleStepCollapsed(step)"
-            class="collapse-step"
-          >
-            <mat-icon>{{ isStepCollapsed(step) ? 'expand_more' : 'expand_less' }}</mat-icon>
-          </button>
-        </div>
-
-        <div class="task-list" *ngIf="!isStepCollapsed(step)">
-          <div
-            class="task-row"
-            *ngFor="let task of step.tasks; trackBy: trackById"
-            [class.is-done]="task.done"
-            [class.is-placeholder]="task.body.trim() === ''"
-          >
-            <mat-checkbox [ngModel]="task.done" (change)="toggleTask(task)"></mat-checkbox>
-
-            <textarea
-              class="task-body"
-              cdkTextareaAutosize
-              [cdkAutosizeMinRows]="1"
-              [cdkAutosizeMaxRows]="12"
-              aria-label="Task"
-              placeholder="New task"
-              [(ngModel)]="task.body"
-              (blur)="handleTaskBlur(step, task)"
-            ></textarea>
-
-            <div class="task-actions">
               <button
-                *ngIf="task.body.trim() !== ''"
                 mat-icon-button
                 type="button"
-                class="reminder-button"
-                [class.has-reminder]="task.reminderFrequency !== 'none'"
-                [attr.aria-label]="reminderLabel(task)"
-                [title]="reminderLabel(task)"
-                (click)="configureReminder(task)">
-                <mat-icon>{{ task.reminderFrequency === 'none' ? 'notifications_none' : 'notifications_active' }}</mat-icon>
+                [attr.aria-label]="isStepCollapsed(step) ? 'Expand step' : 'Collapse step'"
+                (click)="toggleStepCollapsed(step)"
+                class="collapse-step"
+              >
+                <mat-icon>{{ isStepCollapsed(step) ? 'expand_more' : 'expand_less' }}</mat-icon>
               </button>
             </div>
-          </div>
-        </div>
-      </article>
+
+            <div class="task-list" *ngIf="!isStepCollapsed(step)">
+              <div
+                class="task-row"
+                *ngFor="let task of step.tasks; trackBy: trackById"
+                [class.is-done]="task.done"
+                [class.is-placeholder]="task.body.trim() === ''"
+              >
+                <mat-checkbox [ngModel]="task.done" (change)="toggleTask(task)"></mat-checkbox>
+
+                <textarea
+                  class="task-body"
+                  cdkTextareaAutosize
+                  [cdkAutosizeMinRows]="1"
+                  [cdkAutosizeMaxRows]="12"
+                  aria-label="Task"
+                  placeholder="New task"
+                  [(ngModel)]="task.body"
+                  (blur)="handleTaskBlur(step, task)"
+                ></textarea>
+
+                <div class="task-actions">
+                  <button
+                    *ngIf="task.body.trim() !== ''"
+                    mat-icon-button
+                    type="button"
+                    class="reminder-button"
+                    [class.has-reminder]="task.reminderFrequency !== 'none'"
+                    [attr.aria-label]="reminderLabel(task)"
+                    [title]="reminderLabel(task)"
+                    (click)="configureReminder(task)">
+                    <mat-icon>{{ task.reminderFrequency === 'none' ? 'notifications_none' : 'notifications_active' }}</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option
+            class="step-delete-action"
+            aria-label="Delete step"
+            (click)="deleteStep(step)"
+          >
+            <mat-icon>delete</mat-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
     </section>
 
     <button mat-stroked-button type="button" class="add-step-button" (click)="addStep()">
