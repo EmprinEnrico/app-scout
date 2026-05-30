@@ -17,14 +17,15 @@
 
     display: flex;
     flex-flow: column;
+    background: transparent;
 
 }
 
 .content{
     // Expand the containing page
     flex-grow: 1;
-    
-    padding: 5px;
+
+    padding: 14px 12px 0;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -38,4 +39,10 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
     overflow-y: scroll;
+}
+
+@media (min-width: 720px) {
+    .content {
+        padding: 18px 18px 0;
+    }
 }

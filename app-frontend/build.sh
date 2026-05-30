@@ -8,7 +8,8 @@ LOG_FILE="build-log.txt"
   echo "Started: $(date -Is)"
   echo
 
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "npm run build"
+  # powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "npm run build"
+  npm run build
 
   EXIT_CODE=$?
   echo

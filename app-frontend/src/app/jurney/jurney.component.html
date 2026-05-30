@@ -17,7 +17,6 @@
     <button
       *ngIf="selectedGoal && !loading"
       mat-icon-button
-      color="warn"
       type="button"
       class="delete-goal"
       aria-label="Delete goal"
@@ -57,7 +56,8 @@
   <article class="goal-detail" *ngIf="selectedGoal && !loading">
     <div class="progress-block">
       <div>
-        <span>{{ selectedGoal.progress.completedTasks }}/{{ selectedGoal.progress.totalTasks }} tasks completed</span>
+        <span>Progress</span>
+        <strong>{{ selectedGoal.progress.completedTasks }}/{{ selectedGoal.progress.totalTasks }} tasks completed</strong>
       </div>
       <mat-progress-bar mode="determinate" [value]="selectedGoal.progress.percent"></mat-progress-bar>
     </div>
@@ -77,6 +77,7 @@
             type="button"
             [attr.aria-label]="isStepCollapsed(step) ? 'Expand step' : 'Collapse step'"
             (click)="toggleStepCollapsed(step)"
+            class="collapse-step"
           >
             <mat-icon>{{ isStepCollapsed(step) ? 'expand_more' : 'expand_less' }}</mat-icon>
           </button>

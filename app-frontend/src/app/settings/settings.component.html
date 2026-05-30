@@ -1,24 +1,43 @@
-<h1 class="title-1 title">Settings</h1>
-<mat-divider></mat-divider>
+<section class="settings-shell">
+  <header class="settings-header">
+    <p class="eyebrow">Preferences</p>
+    <h1>Settings</h1>
+  </header>
 
-<p class="title-2 section-title">Path Tracker</p>
-<div class="section-container">
-  <mat-list>
-    <mat-list-item>Local-first goals, steps, and tasks.</mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>Data is stored on this device.</mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>Language and export settings are planned for later.</mat-list-item>
-  </mat-list>
-</div>
+  <section class="settings-group">
+    <h2>Path Tracker</h2>
+    <mat-list>
+      <mat-list-item>
+        <mat-icon matListItemIcon>route</mat-icon>
+        <span matListItemTitle>Local-first goals, steps, and tasks.</span>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <mat-icon matListItemIcon>storage</mat-icon>
+        <span matListItemTitle>Data is stored on this device.</span>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <mat-icon matListItemIcon>tune</mat-icon>
+        <span matListItemTitle>Language and export settings are planned for later.</span>
+      </mat-list-item>
+    </mat-list>
+  </section>
 
-<p class="title-2 section-title">About</p>
-<div class="section-container">
-  <mat-list>
-    <mat-list-item>Project links will be updated after final naming.</mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>Working name: Path Tracker.</mat-list-item>
-  </mat-list>
-</div>
+  <section class="settings-group">
+    <h2>About</h2>
+    <mat-list>
+      <mat-list-item>
+        <mat-icon matListItemIcon>link</mat-icon>
+        <span matListItemTitle>Project links will be updated after final naming.</span>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+      <mat-list-item>
+        <mat-icon matListItemIcon>label</mat-icon>
+        <span matListItemTitle>Working name: Path Tracker.</span>
+      </mat-list-item>
+    </mat-list>
+  </section>
+</section>
 
 <div class="end-page-spacer"></div>

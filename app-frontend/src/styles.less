@@ -1,28 +1,129 @@
-/* You can add global styles to this file, and also import other style files */
-:root{
-    --section-color: rgba(223, 235, 255, 0.8);
+/* Calm Notes visual system */
+:root {
+  --app-bg: #f6f1e8;
+  --app-bg-strong: #efe6d7;
+  --surface: #fffaf0;
+  --surface-raised: #fffdf7;
+  --surface-muted: #f1eadc;
+  --ink: #252018;
+  --ink-soft: #4f483c;
+  --muted: #7a7164;
+  --line: #ded4c1;
+  --line-strong: #c8b99f;
+  --accent: #4f7d5a;
+  --accent-strong: #356445;
+  --accent-soft: #e2eddd;
+  --amber: #b2772d;
+  --amber-soft: #f4e3c2;
+  --danger: #9d3b31;
+  --danger-soft: #f5ded8;
+  --shadow-soft: 0 10px 28px rgba(58, 48, 34, 0.08);
+  --shadow-tight: 0 4px 14px rgba(58, 48, 34, 0.08);
+  --radius-sm: 7px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --focus-ring: 0 0 0 3px rgba(79, 125, 90, 0.18);
+  --section-color: var(--surface-muted);
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-.end-page-spacer{
-    width: 100%;
-    height: 2em;
+html,
+body {
+  height: 100%;
 }
 
-
-.title-1{
-    font-size: 1.5em !important;
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 250, 240, 0.88), transparent 32rem),
+    linear-gradient(180deg, #f8f4ed 0%, var(--app-bg) 48%, #efe6d7 100%);
+  color: var(--ink);
+  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  letter-spacing: 0;
 }
 
-
-.title-2{
-    font-size: 1.2em !important;
-    font-weight: bold !important;
+button,
+input,
+textarea {
+  font: inherit;
 }
 
+button {
+  color: inherit;
+}
 
-.title-3{
-    font-size: 1.1em !important;
+::selection {
+  background: rgba(79, 125, 90, 0.22);
+}
+
+.end-page-spacer {
+  width: 100%;
+  height: 1.2rem;
+}
+
+.title-1 {
+  font-size: 1.55rem !important;
+  line-height: 1.15 !important;
+}
+
+.title-2 {
+  font-size: 1.08rem !important;
+  font-weight: 700 !important;
+}
+
+.title-3 {
+  font-size: 0.98rem !important;
+}
+
+.mat-mdc-progress-bar {
+  --mdc-linear-progress-active-indicator-color: var(--accent);
+  --mdc-linear-progress-track-color: var(--accent-soft);
+}
+
+.mat-mdc-checkbox {
+  --mdc-checkbox-selected-checkmark-color: #fffaf0;
+  --mdc-checkbox-selected-focus-icon-color: var(--accent);
+  --mdc-checkbox-selected-hover-icon-color: var(--accent);
+  --mdc-checkbox-selected-icon-color: var(--accent);
+  --mdc-checkbox-selected-pressed-icon-color: var(--accent);
+  --mdc-checkbox-unselected-focus-icon-color: var(--line-strong);
+  --mdc-checkbox-unselected-hover-icon-color: var(--accent);
+  --mdc-checkbox-unselected-icon-color: var(--line-strong);
+}
+
+.mat-mdc-icon-button {
+  --mdc-icon-button-icon-color: currentColor;
+}
+
+ion-toast.app-toast {
+  --width: auto;
+  --max-width: min(84vw, 280px);
+  --border-radius: var(--radius-sm);
+  --box-shadow: 0 5px 16px rgba(58, 48, 34, 0.12);
+  --background: var(--surface-raised);
+  --color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+ion-toast.app-toast::part(container) {
+  min-height: 0;
+  padding: 7px 11px;
+  border: 0;
+}
+
+ion-toast.app-toast::part(message) {
+  padding: 0;
+  line-height: 1.2;
+}
+
+ion-toast.app-toast-success {
+  --background: var(--accent-soft);
+  --color: var(--accent-strong);
+}
+
+ion-toast.app-toast-danger {
+  --background: var(--danger-soft);
+  --color: var(--danger);
 }

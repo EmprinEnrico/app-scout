@@ -1,9 +1,9 @@
 //------------------------------ START NAV ------------------------------
 
 // Variables
-@nav-height: 56px;
-@nav-bg-color: rgb(13, 28, 114);
-@nav-selected-color: rgba(255, 255, 255, 0.18);
+@nav-height: 58px;
+@nav-bg-color: var(--surface-raised);
+@nav-selected-color: var(--accent-soft);
 
 // Base Styles
 :host {
@@ -18,40 +18,44 @@ nav {
     left: 0;
     bottom: 0;
 
-    padding-bottom: var(--safe-area-inset-bottom);
+    box-sizing: border-box;
+    padding: 7px 12px calc(7px + var(--safe-area-inset-bottom));
 
     display: flex;
     justify-content: stretch;
-    gap: 1px;
+    gap: 0;
     background-color: @nav-bg-color;
-    border-radius: 10px 10px 0px 0px;
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -8px 24px rgba(58, 48, 34, 0.08);
     overflow: hidden;
 
     mat-button-toggle-group{
         flex-grow: 1;
-        min-height: @nav-height;
+        min-height: 44px;
         text-align: center;
         display: flex;
         background-color: transparent;
-        border-radius: 0;
-        overflow: hidden;
+        border-radius: 10px;
+        overflow: visible;
+        gap: 4px;
 
-        --mat-standard-button-toggle-shape: 0px;
+        --mat-standard-button-toggle-shape: 8px;
         --mat-standard-button-toggle-divider-color: transparent;
         --mat-standard-button-toggle-selected-state-background-color: @nav-selected-color;
-        --mat-standard-button-toggle-selected-state-text-color: black;
+        --mat-standard-button-toggle-selected-state-text-color: var(--accent-strong);
         border: none;
     }
 
     mat-button-toggle{
         flex: 1 1 0;
-        min-height: @nav-height;
+        min-height: 44px;
         border: none;
-        border-radius: 0;
+        border-radius: 8px;
         text-align: center;
         display: flex;
-        color: white;
+        color: var(--muted);
         overflow: hidden;
+        background: transparent;
     }
 
     mat-icon {
@@ -64,24 +68,31 @@ nav {
 
 ::ng-deep app-navbar .mat-button-toggle-group,
 ::ng-deep app-navbar .mat-button-toggle-standalone {
-    border-radius: 0 !important;
+    border-radius: 10px !important;
 }
 
 ::ng-deep app-navbar .mat-button-toggle,
 ::ng-deep app-navbar .mat-button-toggle:first-child,
 ::ng-deep app-navbar .mat-button-toggle:last-child {
-    border-radius: 0 !important;
+    border-radius: 8px !important;
+    border-left: 0 !important;
+    border-inline-start: 0 !important;
+}
+
+::ng-deep app-navbar .mat-button-toggle-group-appearance-standard .mat-button-toggle-appearance-standard + .mat-button-toggle-appearance-standard {
+    border-left: 0 !important;
+    border-inline-start: 0 !important;
 }
 
 ::ng-deep app-navbar .mat-button-toggle-button {
     width: 100%;
     height: 100%;
-    border-radius: 0 !important;
+    border-radius: 8px !important;
 }
 
 ::ng-deep app-navbar .mat-button-toggle-label-content {
     width: 100%;
-    min-height: @nav-height;
+    min-height: 44px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -91,19 +102,17 @@ nav {
 
 ::ng-deep app-navbar .mat-button-toggle-checked {
     background-color: @nav-selected-color;
-    color: black;
+    color: var(--accent-strong);
 }
 
 ::ng-deep app-navbar .nav-toggle-active {
     background-color: @nav-selected-color;
-    color: black !important;
+    color: var(--accent-strong) !important;
+    box-shadow: none;
 }
 
 ::ng-deep app-navbar .nav-toggle-active mat-icon {
-    color: black !important;
+    color: var(--accent-strong) !important;
 }
 
 //------------------------------ END NAV ------------------------------
-
-
-

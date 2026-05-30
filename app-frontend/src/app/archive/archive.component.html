@@ -19,12 +19,12 @@
         <h2>{{ goal.title }}</h2>
         <small *ngIf="goal.statusOverride !== 'auto'">Manual status: {{ goal.statusOverride }}</small>
       </div>
+      <strong>{{ goal.progress.percent }}%</strong>
     </div>
 
     <div class="metrics">
-      <span><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
-      <span><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
-      <span><mat-icon>notifications_active</mat-icon>{{ goal.upcomingTasks }} reminders</span>
+      <span class="metric-done"><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
+      <span class="metric-open"><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
     </div>
 
     <mat-divider></mat-divider>

@@ -414,9 +414,9 @@ export class JurneyComponent implements OnInit {
   private async showToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
     const toast = await this.toastController.create({
       message,
-      color,
-      duration: 1600,
-      position: 'bottom',
+      cssClass: ['app-toast', `app-toast-${color}`],
+      duration: 900,
+      position: 'top',
     });
     await toast.present();
   }
