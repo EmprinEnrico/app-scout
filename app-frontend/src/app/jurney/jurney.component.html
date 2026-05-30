@@ -94,16 +94,15 @@
               >
                 <mat-checkbox [ngModel]="task.done" (change)="toggleTask(task)"></mat-checkbox>
 
-                <textarea
+                <ion-textarea
                   class="task-body"
-                  cdkTextareaAutosize
-                  [cdkAutosizeMinRows]="1"
-                  [cdkAutosizeMaxRows]="12"
                   aria-label="Task"
                   placeholder="New task"
+                  rows="1"
+                  [autoGrow]="true"
                   [(ngModel)]="task.body"
-                  (blur)="handleTaskBlur(step, task)"
-                ></textarea>
+                  (ionBlur)="handleTaskBlur(step, task)"
+                ></ion-textarea>
 
                 <div class="task-actions">
                   <button

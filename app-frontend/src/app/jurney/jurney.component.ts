@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { TextFieldModule } from '@angular/cdk/text-field';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,6 +12,7 @@ import {
   IonItemOption,
   IonItemOptions,
   IonItemSliding,
+  IonTextarea,
   ToastController,
 } from '@ionic/angular/standalone';
 import {
@@ -42,7 +42,6 @@ type ReminderPreset =
   standalone: true,
   imports: [
     CommonModule,
-    TextFieldModule,
     FormsModule,
     MatButtonModule,
     MatCheckboxModule,
@@ -53,6 +52,7 @@ type ReminderPreset =
     IonItemOption,
     IonItemOptions,
     IonItemSliding,
+    IonTextarea,
   ],
   templateUrl: './jurney.component.html',
   styleUrl: './jurney.component.less',
