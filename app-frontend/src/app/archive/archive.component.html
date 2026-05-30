@@ -1,8 +1,8 @@
 <section class="archive-shell">
   <div class="archive-hero">
     <header class="archive-header">
-      <p class="eyebrow">Read-only review</p>
-      <h1>Archive</h1>
+      <p class="page-eyebrow">Read-only review</p>
+      <h1 class="page-title">Archive</h1>
     </header>
 
     <div class="heading-lottie">
@@ -13,9 +13,9 @@
   <p class="state-message" *ngIf="loading">Loading summary...</p>
   <p class="state-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-  <ion-item-sliding class="goal-swipe" *ngFor="let goal of summaries; trackBy: trackById">
-    <ion-item lines="none" class="goal-slide-item">
-      <article class="goal-summary">
+  <ion-item-sliding class="goal-swipe sliding-card" *ngFor="let goal of summaries; trackBy: trackById">
+    <ion-item lines="none" class="goal-slide-item sliding-card-item">
+      <article class="goal-summary note-card">
         <div class="goal-title-row">
           <div>
             <div class="goal-heading-line">
@@ -57,7 +57,7 @@
 
     <ion-item-options side="end">
       <ion-item-option
-        class="goal-delete-action"
+        class="goal-delete-action swipe-delete-action"
         aria-label="Delete goal"
         (click)="deleteGoal(goal)"
       >

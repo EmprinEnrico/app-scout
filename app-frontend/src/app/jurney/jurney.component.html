@@ -1,7 +1,7 @@
 <section class="journey-shell">
   <header class="journey-header">
     <div>
-      <p class="eyebrow">Path Tracker</p>
+      <p class="page-eyebrow">Path Tracker</p>
       <input
         *ngIf="selectedGoal && !loading; else journeyTitle"
         class="goal-title-editor"
@@ -10,7 +10,7 @@
         (blur)="saveGoal()"
       >
       <ng-template #journeyTitle>
-        <h1>Journey</h1>
+        <h1 class="page-title">Journey</h1>
       </ng-template>
     </div>
 
@@ -63,9 +63,9 @@
     </div>
 
     <section class="step-list">
-      <ion-item-sliding class="step-swipe" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
-        <ion-item lines="none" class="step-slide-item">
-          <article class="step-panel">
+      <ion-item-sliding class="step-swipe sliding-card" *ngFor="let step of selectedGoal.steps; trackBy: trackById">
+        <ion-item lines="none" class="step-slide-item sliding-card-item">
+          <article class="step-panel note-card">
             <div class="step-header">
               <input
                 class="step-title-editor"
@@ -127,7 +127,7 @@
 
         <ion-item-options side="end">
           <ion-item-option
-            class="step-delete-action"
+            class="step-delete-action swipe-delete-action"
             aria-label="Delete step"
             (click)="deleteStep(step)"
           >

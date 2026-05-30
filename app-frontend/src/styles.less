@@ -127,3 +127,425 @@ ion-toast.app-toast-danger {
   --background: var(--danger-soft);
   --color: var(--danger);
 }
+
+.page-eyebrow {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.55rem, 4vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.note-card {
+  background: linear-gradient(180deg, var(--surface-raised), var(--surface));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-tight);
+}
+
+.sliding-card {
+  border-radius: var(--radius-md);
+  background: transparent;
+  overflow: hidden;
+}
+
+.sliding-card-item {
+  --background: transparent;
+  --border-width: 0;
+  --inner-border-width: 0;
+  --inner-padding-end: 0;
+  --min-height: 0;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  --ripple-color: transparent;
+}
+
+.sliding-card-item::part(native) {
+  padding: 0;
+}
+
+.swipe-delete-action {
+  --background: var(--danger-soft);
+  --color: var(--danger);
+}
+
+.swipe-delete-action mat-icon {
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
+}
+
+.goal-title-editor,
+.step-title-editor,
+.task-body {
+  box-sizing: border-box;
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+}
+
+.goal-title-editor {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  font-size: clamp(1.55rem, 4vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.goal-title-editor:focus {
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.goal-chip {
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 253, 247, 0.72);
+  color: var(--ink-soft);
+  padding: 7px 11px;
+  font: inherit;
+  font-weight: 650;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.goal-chip.is-selected {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.add-goal-button.mat-mdc-mini-fab {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  box-shadow: none;
+  --mat-fab-small-container-color: var(--accent-soft);
+  --mat-fab-small-container-shape: var(--radius-sm);
+  --mat-fab-small-foreground-color: var(--accent-strong);
+}
+
+.task-body {
+  min-width: 0;
+  min-height: 48px;
+  color: var(--ink);
+  line-height: 1.42;
+  --background: transparent;
+  --border-radius: var(--radius-sm);
+  --border-width: 0;
+  --color: var(--ink);
+  --highlight-color-focused: transparent;
+  --padding-bottom: 8px;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 10px;
+  --placeholder-color: #a79b88;
+  --placeholder-opacity: 1;
+}
+
+.task-body::part(native) {
+  border-radius: var(--radius-sm);
+  min-height: 30px;
+  overflow: hidden;
+  line-height: 1.42;
+}
+
+.reminder-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.reminder-button mat-icon {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+.reminder-button.has-reminder {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.add-step-button {
+  margin-top: 0;
+  align-self: center;
+  border-color: transparent;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  --mdc-outlined-button-outline-color: transparent;
+  --mdc-outlined-button-container-shape: var(--radius-sm);
+}
+
+.state-message {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--danger);
+}
+
+app-navbar .mat-button-toggle-group,
+app-navbar .mat-button-toggle-standalone {
+  border-radius: 10px !important;
+}
+
+app-navbar .mat-button-toggle,
+app-navbar .mat-button-toggle:first-child,
+app-navbar .mat-button-toggle:last-child {
+  border-radius: 8px !important;
+  border-left: 0 !important;
+  border-inline-start: 0 !important;
+}
+
+app-navbar .mat-button-toggle-group-appearance-standard .mat-button-toggle-appearance-standard + .mat-button-toggle-appearance-standard {
+  border-left: 0 !important;
+  border-inline-start: 0 !important;
+}
+
+app-navbar .mat-button-toggle-button {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px !important;
+}
+
+app-navbar .mat-button-toggle-label-content {
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+app-navbar .mat-button-toggle-checked {
+  background-color: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+app-navbar .nav-toggle-active {
+  background-color: var(--accent-soft);
+  color: var(--accent-strong) !important;
+  box-shadow: none;
+}
+
+app-navbar .nav-toggle-active mat-icon {
+  color: var(--accent-strong) !important;
+}
+
+.archive-shell .archive-badge {
+  border-radius: var(--radius-sm);
+  padding: 3px 6px;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.archive-shell small {
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.archive-shell .metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.archive-shell .metrics span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 8px;
+  color: var(--ink-soft);
+  background: rgba(255, 253, 247, 0.72);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.archive-shell .metrics .metric-done {
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  border-color: rgba(79, 125, 90, 0.22);
+}
+
+.archive-shell .metrics mat-icon,
+.archive-shell li mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+.archive-shell ul {
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+}
+
+.archive-shell li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  list-style: none;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.archive-shell li span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.archive-shell li.is-done span {
+  color: var(--muted);
+}
+
+.archive-shell time {
+  margin-left: auto;
+  color: var(--amber);
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .archive-shell time {
+    margin-left: 0;
+    white-space: normal;
+  }
+}
+
+.journey-shell .progress-block {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 2px;
+  padding: 2px 2px 4px;
+}
+
+.journey-shell .progress-block div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.journey-shell .progress-block span {
+  color: var(--muted);
+}
+
+.journey-shell .progress-block strong {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.journey-shell .error-panel {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(157, 59, 49, 0.22);
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 12px;
+}
+
+.journey-shell .error-panel span {
+  color: var(--danger);
+}
+
+.journey-shell .error-panel button {
+  justify-self: start;
+}
+
+.journey-shell .task-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: start;
+  gap: 2px;
+  min-height: 48px;
+  padding: 0;
+}
+
+.journey-shell .task-row + .task-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: rgba(222, 212, 193, 0.72);
+}
+
+.journey-shell .task-row.is-done .task-body {
+  color: var(--muted);
+  opacity: 0.66;
+}
+
+.journey-shell .task-row mat-checkbox {
+  align-self: start;
+  justify-self: center;
+  margin-top: 0;
+}
+
+.journey-shell .task-main {
+  display: grid;
+  min-width: 0;
+}
+
+.journey-shell .task-reminder-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: -6px;
+  min-height: 28px;
+  padding-bottom: 6px;
+}
+
+.journey-shell .task-reminder-label {
+  color: var(--amber);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: right;
+}
