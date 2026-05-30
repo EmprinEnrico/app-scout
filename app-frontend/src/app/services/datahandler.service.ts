@@ -36,6 +36,7 @@ export interface Goal {
   statusOverride: StatusOverride;
   sortOrder: number;
   createdAt: string;
+  archivedAt: string | null;
   updatedAt: string;
 }
 
@@ -63,6 +64,7 @@ export interface Task {
   notificationId: number | null;
   sortOrder: number;
   createdAt: string;
+  completedAt: string | null;
   updatedAt: string;
 }
 
@@ -128,17 +130,21 @@ export class DatahandlerService {
     return this.initPromise;
   }
 
-  async getGoals(): Promise<Goal[]> {
+  async getGoals(includeArchived = false): Promise<Goal[]> {
     if (this.useLocalStore) {
       const store = await this.getLocalStore();
-      return [...store.goals].sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
+      return store.goals
+        .filter(goal => includeArchived || !goal.archivedAt)
+        .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id);
     }
 
     const db = await this.getDb();
     const result = await db.query(
-      `SELECT id, title, description, status_override, sort_order, created_at, updated_at
+      `SELECT id, title, description, status_override, sort_order, created_at, archived_at, updated_at
        FROM goals
-       ORDER BY sort_order, id`
+       WHERE ? = 1 OR archived_at IS NULL
+       ORDER BY sort_order, id`,
+      [includeArchived ? 1 : 0]
     );
     return (result.values ?? []).map(row => this.mapGoal(row));
   }
@@ -165,8 +171,8 @@ export class DatahandlerService {
     await this.preferencesService.set(this.selectedGoalKey, goalId);
   }
 
-  async getGoalWithSteps(goalId: number): Promise<GoalWithSteps | undefined> {
-    const goal = (await this.getGoals()).find(item => item.id === goalId);
+  async getGoalWithSteps(goalId: number, includeArchived = false): Promise<GoalWithSteps | undefined> {
+    const goal = (await this.getGoals(includeArchived)).find(item => item.id === goalId);
     if (!goal) {
       return undefined;
     }
@@ -194,10 +200,10 @@ export class DatahandlerService {
   }
 
   async getGoalSummaries(): Promise<GoalSummary[]> {
-    const goals = await this.getGoals();
+    const goals = await this.getGoals(true);
     const summaries = await Promise.all(
       goals.map(async goal => {
-        const goalWithSteps = await this.getGoalWithSteps(goal.id);
+        const goalWithSteps = await this.getGoalWithSteps(goal.id, true);
         if (!goalWithSteps) {
           throw new Error(`Goal ${goal.id} could not be loaded`);
         }
@@ -226,6 +232,7 @@ export class DatahandlerService {
         statusOverride: 'auto',
         sortOrder: this.getNextLocalSortOrder(store.goals),
         createdAt: now,
+        archivedAt: null,
         updatedAt: now,
       });
       await this.saveLocalStore(store);
@@ -271,6 +278,41 @@ export class DatahandlerService {
       [goal.title, goal.description, goal.statusOverride, this.now(), goal.id]
     );
     await this.persistWebStore();
+  }
+
+  async archiveGoal(goalId: number): Promise<void> {
+    const now = this.now();
+    if (this.useLocalStore) {
+      const store = await this.getLocalStore();
+      const goal = store.goals.find(item => item.id === goalId);
+      if (goal) {
+        goal.archivedAt = now;
+        goal.updatedAt = now;
+        await this.saveLocalStore(store);
+      }
+      const remainingGoals = await this.getGoals();
+      if (remainingGoals.length === 0) {
+        await this.seedStarterGoal();
+        return;
+      }
+      await this.setSelectedGoalId(remainingGoals[0].id);
+      return;
+    }
+
+    const db = await this.getDb();
+    await db.run(
+      `UPDATE goals
+       SET archived_at = ?, updated_at = ?
+       WHERE id = ?`,
+      [now, now, goalId]
+    );
+    await this.persistWebStore();
+    const remainingGoals = await this.getGoals();
+    if (remainingGoals.length === 0) {
+      await this.seedStarterGoal();
+      return;
+    }
+    await this.setSelectedGoalId(remainingGoals[0].id);
   }
 
   async deleteGoal(goalId: number): Promise<void> {
@@ -391,6 +433,7 @@ export class DatahandlerService {
         notificationId: this.getNotificationId(taskId),
         sortOrder: this.getNextLocalSortOrder(store.tasks.filter(task => task.stepId === stepId)),
         createdAt: now,
+        completedAt: null,
         updatedAt: now,
       });
       await this.saveLocalStore(store);
@@ -401,9 +444,9 @@ export class DatahandlerService {
     const now = this.now();
     const sortOrder = await this.getNextSortOrder('tasks', 'WHERE step_id = ?', [stepId]);
     const result = await db.run(
-      `INSERT INTO tasks (step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [stepId, body, 0, null, 'none', null, null, null, null, sortOrder, now, now]
+      `INSERT INTO tasks (step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, completed_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [stepId, body, 0, null, 'none', null, null, null, null, sortOrder, now, null, now]
     );
     await this.persistWebStore();
     return Number(result.changes?.lastId);
@@ -414,6 +457,7 @@ export class DatahandlerService {
       const store = await this.getLocalStore();
       const storedTask = store.tasks.find(item => item.id === task.id);
       if (storedTask) {
+        const wasDone = storedTask.done;
         storedTask.body = task.body;
         storedTask.done = task.done;
         storedTask.dueDate = task.dueDate;
@@ -422,6 +466,11 @@ export class DatahandlerService {
         storedTask.reminderWeekday = task.reminderWeekday;
         storedTask.reminderRule = task.reminderRule;
         storedTask.notificationId = task.notificationId;
+        if (task.done && !wasDone) {
+          storedTask.completedAt = this.today();
+        } else if (!task.done) {
+          storedTask.completedAt = null;
+        }
         storedTask.updatedAt = this.now();
         await this.saveLocalStore(store);
       }
@@ -429,9 +478,14 @@ export class DatahandlerService {
     }
 
     const db = await this.getDb();
+    const existing = await db.query('SELECT done, completed_at FROM tasks WHERE id = ?', [task.id]);
+    const existingTask = existing.values?.[0];
+    const wasDone = Number(existingTask?.done ?? 0) === 1;
+    const currentCompletedAt = existingTask?.completed_at ? String(existingTask.completed_at) : null;
+    const completedAt = task.done ? (wasDone ? currentCompletedAt : this.today()) : null;
     await db.run(
       `UPDATE tasks
-       SET body = ?, done = ?, due_date = ?, reminder_frequency = ?, reminder_time = ?, reminder_weekday = ?, reminder_rule = ?, notification_id = ?, updated_at = ?
+       SET body = ?, done = ?, due_date = ?, reminder_frequency = ?, reminder_time = ?, reminder_weekday = ?, reminder_rule = ?, notification_id = ?, completed_at = ?, updated_at = ?
       WHERE id = ?`,
       [
         task.body,
@@ -442,6 +496,7 @@ export class DatahandlerService {
         task.reminderWeekday,
         this.stringifyReminderRule(task.reminderRule),
         task.notificationId,
+        completedAt,
         this.now(),
         task.id,
       ]
@@ -577,6 +632,7 @@ export class DatahandlerService {
         status_override TEXT NOT NULL DEFAULT 'auto',
         sort_order INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
+        archived_at TEXT,
         updated_at TEXT NOT NULL,
         deleted_at TEXT
       );
@@ -607,12 +663,22 @@ export class DatahandlerService {
         notification_id INTEGER,
         sort_order INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
+        completed_at TEXT,
         updated_at TEXT NOT NULL,
         deleted_at TEXT,
         FOREIGN KEY(step_id) REFERENCES steps(id) ON DELETE CASCADE
       );
     `);
+    await this.ensureGoalArchiveColumns(db);
     await this.ensureTaskReminderColumns(db);
+  }
+
+  private async ensureGoalArchiveColumns(db: SQLiteDBConnection): Promise<void> {
+    const result = await db.query('PRAGMA table_info(goals)');
+    const columns = new Set((result.values ?? []).map(row => String(row.name)));
+    if (!columns.has('archived_at')) {
+      await db.execute('ALTER TABLE goals ADD COLUMN archived_at TEXT');
+    }
   }
 
   private async ensureTaskReminderColumns(db: SQLiteDBConnection): Promise<void> {
@@ -624,6 +690,7 @@ export class DatahandlerService {
       { name: 'reminder_weekday', sql: 'ALTER TABLE tasks ADD COLUMN reminder_weekday INTEGER' },
       { name: 'reminder_rule', sql: 'ALTER TABLE tasks ADD COLUMN reminder_rule TEXT' },
       { name: 'notification_id', sql: 'ALTER TABLE tasks ADD COLUMN notification_id INTEGER' },
+      { name: 'completed_at', sql: 'ALTER TABLE tasks ADD COLUMN completed_at TEXT' },
     ];
 
     for (const addition of additions) {
@@ -672,10 +739,10 @@ export class DatahandlerService {
         [goalId, stepTitles[i], '', 'auto', i + 1, now, now]
       );
       const stepId = Number(stepResult.changes?.lastId);
-    await db.run(
-      `INSERT INTO tasks (step_id, body, done, due_date, sort_order, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [stepId, 'Write one concrete action for this step.', 0, null, 1, now, now]
+      await db.run(
+        `INSERT INTO tasks (step_id, body, done, due_date, sort_order, created_at, completed_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [stepId, 'Write one concrete action for this step.', 0, null, 1, now, null, now]
       );
     }
 
@@ -712,7 +779,7 @@ export class DatahandlerService {
 
     const db = await this.getDb();
     const result = await db.query(
-      `SELECT id, step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, updated_at
+      `SELECT id, step_id, body, done, due_date, reminder_frequency, reminder_time, reminder_weekday, reminder_rule, notification_id, sort_order, created_at, completed_at, updated_at
        FROM tasks
        WHERE step_id = ?
        ORDER BY sort_order, id`,
@@ -752,6 +819,7 @@ export class DatahandlerService {
       statusOverride: 'auto',
       sortOrder: this.getNextLocalSortOrder(store.goals),
       createdAt: now,
+      archivedAt: null,
       updatedAt: now,
     });
 
@@ -782,6 +850,7 @@ export class DatahandlerService {
         notificationId: this.getNotificationId(taskId),
         sortOrder: 1,
         createdAt: now,
+        completedAt: null,
         updatedAt: now,
       });
     }
@@ -800,6 +869,7 @@ export class DatahandlerService {
       steps: [],
       tasks: [],
     };
+    store.goals = store.goals.map(goal => this.normalizeLocalGoal(goal));
     store.tasks = store.tasks.map(task => this.normalizeLocalTask(task));
     return store;
   }
@@ -812,6 +882,14 @@ export class DatahandlerService {
     return Math.max(0, ...items.map(item => item.sortOrder)) + 1;
   }
 
+  private normalizeLocalGoal(goal: Partial<Goal> & Pick<Goal, 'id' | 'title' | 'description' | 'statusOverride' | 'sortOrder' | 'createdAt' | 'updatedAt'>): Goal {
+    return {
+      ...goal,
+      statusOverride: this.mapStatus(goal.statusOverride),
+      archivedAt: goal.archivedAt ?? null,
+    };
+  }
+
   private mapGoal(row: any): Goal {
     return {
       id: Number(row.id),
@@ -820,6 +898,7 @@ export class DatahandlerService {
       statusOverride: this.mapStatus(row.status_override),
       sortOrder: Number(row.sort_order),
       createdAt: String(row.created_at),
+      archivedAt: row.archived_at ? String(row.archived_at) : null,
       updatedAt: String(row.updated_at),
     };
   }
@@ -851,6 +930,7 @@ export class DatahandlerService {
       notificationId: row.notification_id ? Number(row.notification_id) : this.getNotificationId(Number(row.id)),
       sortOrder: Number(row.sort_order),
       createdAt: String(row.created_at),
+      completedAt: row.completed_at ? String(row.completed_at) : null,
       updatedAt: String(row.updated_at),
     };
   }
@@ -864,6 +944,7 @@ export class DatahandlerService {
       reminderWeekday: task.reminderWeekday ?? null,
       reminderRule: this.normalizeReminderRule(task.reminderRule ?? null),
       notificationId: task.notificationId ?? this.getNotificationId(task.id),
+      completedAt: task.completedAt ?? null,
     };
   }
 

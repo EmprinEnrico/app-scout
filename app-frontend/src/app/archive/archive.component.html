@@ -13,40 +13,58 @@
   <p class="state-message" *ngIf="loading">Loading summary...</p>
   <p class="state-message error" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-  <article class="goal-summary" *ngFor="let goal of summaries; trackBy: trackById">
-    <div class="goal-title-row">
-      <div>
-        <h2>{{ goal.title }}</h2>
-        <small *ngIf="goal.statusOverride !== 'auto'">Manual status: {{ goal.statusOverride }}</small>
-      </div>
-    </div>
-
-    <div class="metrics">
-      <span class="metric-done"><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
-      <span class="metric-open"><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <section class="step-summary" *ngFor="let step of goal.steps; trackBy: trackById">
-      <div class="step-title-row">
-        <div>
-          <h3>{{ step.title }}</h3>
-          <small *ngIf="step.statusOverride !== 'auto'">Manual status: {{ step.statusOverride }}</small>
+  <ion-item-sliding class="goal-swipe" *ngFor="let goal of summaries; trackBy: trackById">
+    <ion-item lines="none" class="goal-slide-item">
+      <article class="goal-summary">
+        <div class="goal-title-row">
+          <div>
+            <div class="goal-heading-line">
+              <h2>{{ goal.title }}</h2>
+              <span class="archive-badge" *ngIf="goal.archivedAt">Archived</span>
+            </div>
+            <small>Created {{ formatDate(goal.createdAt) }}</small>
+            <small *ngIf="goal.statusOverride !== 'auto'">Manual status: {{ goal.statusOverride }}</small>
+          </div>
         </div>
-      </div>
 
-      <ul>
-        <ng-container *ngFor="let task of step.tasks; trackBy: trackById">
-          <li *ngIf="task.body.trim() !== ''" [class.is-done]="task.done">
-            <mat-icon>{{ task.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-            <span>{{ task.body }}</span>
-            <time *ngIf="task.reminderFrequency !== 'none'">{{ reminderLabel(task) }}</time>
-          </li>
-        </ng-container>
-      </ul>
-    </section>
-  </article>
+        <div class="metrics">
+          <span class="metric-done"><mat-icon>check_circle</mat-icon>{{ goal.progress.completedTasks }} done</span>
+          <span class="metric-open"><mat-icon>radio_button_unchecked</mat-icon>{{ goal.openTasks }} open</span>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <section class="step-summary" *ngFor="let step of goal.steps; trackBy: trackById">
+          <div class="step-title-row">
+            <div>
+              <h3>{{ step.title }}</h3>
+              <small *ngIf="step.statusOverride !== 'auto'">Manual status: {{ step.statusOverride }}</small>
+            </div>
+          </div>
+
+          <ul>
+            <ng-container *ngFor="let task of step.tasks; trackBy: trackById">
+              <li *ngIf="task.body.trim() !== ''" [class.is-done]="task.done">
+                <mat-icon>{{ task.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ task.body }}</span>
+                <time *ngIf="task.done && task.completedAt">Completed {{ formatDate(task.completedAt) }}</time>
+              </li>
+            </ng-container>
+          </ul>
+        </section>
+      </article>
+    </ion-item>
+
+    <ion-item-options side="end">
+      <ion-item-option
+        class="goal-delete-action"
+        aria-label="Delete goal"
+        (click)="deleteGoal(goal)"
+      >
+        <mat-icon>delete</mat-icon>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
 
   <p class="state-message" *ngIf="!loading && summaries.length === 0">No goals yet.</p>
 </section>

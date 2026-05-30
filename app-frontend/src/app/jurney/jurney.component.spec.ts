@@ -14,6 +14,7 @@ describe('JurneyComponent', () => {
     statusOverride: 'auto',
     sortOrder: 1,
     createdAt: '',
+    archivedAt: null,
     updatedAt: '',
     progress: {
       totalTasks: 1,
@@ -39,6 +40,7 @@ describe('JurneyComponent', () => {
             getGoalWithSteps: async () => goal,
             createGoal: async () => goal.id,
             updateGoal: async () => undefined,
+            archiveGoal: async () => undefined,
             deleteGoal: async () => undefined,
             createStep: async () => 1,
             updateStep: async () => undefined,

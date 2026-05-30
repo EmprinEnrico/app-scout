@@ -151,8 +151,8 @@
   font-weight: 800;
 }
 
-.delete-goal {
-  color: var(--danger);
+.archive-goal {
+  color: var(--accent-strong);
 }
 
 .error {
@@ -253,7 +253,7 @@
 .task-row {
   position: relative;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  grid-template-columns: 48px minmax(0, 1fr);
   align-items: start;
   gap: 2px;
   min-height: 48px;
@@ -281,6 +281,11 @@
   margin-top: 0;
 }
 
+.task-main {
+  display: grid;
+  min-width: 0;
+}
+
 .task-body {
   flex: 1 1 auto;
   min-width: 0;
@@ -300,6 +305,24 @@
   line-height: 1.42;
 }
 
+.task-reminder-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: -6px;
+  min-height: 28px;
+  padding-bottom: 6px;
+}
+
+.task-reminder-label {
+  color: var(--amber);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: right;
+}
+
 .task-body.has-focus,
 .task-body.ion-focused {
   --border-radius: var(--radius-sm);
@@ -312,26 +335,15 @@
   line-height: 1.42;
 }
 
-.task-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.task-actions button {
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  margin-top: 4px;
-  color: var(--muted);
-}
-
 .reminder-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
   padding: 0;
+  color: var(--muted);
   line-height: 1;
 }
 

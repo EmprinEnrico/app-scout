@@ -160,6 +160,23 @@ export class JurneyComponent implements OnInit {
     }
   }
 
+  async archiveGoal(): Promise<void> {
+    if (!this.selectedGoal) {
+      return;
+    }
+    try {
+      const goalId = this.selectedGoal.id;
+      await this.datahandler.archiveGoal(goalId);
+      this.browserLog.info('Journey goal archived', { goalId });
+      await this.load();
+      await this.showToast('Goal archived');
+    } catch (error) {
+      this.browserLog.error('Journey archive goal failed', error);
+      this.errorMessage = this.toErrorMessage('Unable to archive goal', error);
+      await this.showToast('Unable to archive goal', 'danger');
+    }
+  }
+
   async addStep(): Promise<void> {
     if (!this.selectedGoal) {
       return;

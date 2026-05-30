@@ -2,14 +2,31 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { DatahandlerService, GoalSummary, ReminderIntervalUnit, Task } from '../services/datahandler.service';
+import {
+  AlertController,
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  ToastController,
+} from '@ionic/angular/standalone';
+import { DatahandlerService, GoalSummary } from '../services/datahandler.service';
 import { LottieAnimationComponent } from '../lottie-animation/lottie-animation.component';
 import { BrowserLogService } from '../services/browser-log.service';
 
 @Component({
   selector: 'app-archive',
   standalone: true,
-  imports: [CommonModule, LottieAnimationComponent, MatDivider, MatIconModule],
+  imports: [
+    CommonModule,
+    LottieAnimationComponent,
+    MatDivider,
+    MatIconModule,
+    IonItem,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
+  ],
   templateUrl: './archive.component.html',
   styleUrl: './archive.component.less',
 })
@@ -21,6 +38,8 @@ export class ArchiveComponent implements OnInit {
   constructor(
     private datahandler: DatahandlerService,
     private browserLog: BrowserLogService,
+    private alertController: AlertController,
+    private toastController: ToastController,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -47,45 +66,64 @@ export class ArchiveComponent implements OnInit {
     return item.id;
   }
 
-  reminderLabel(task: Task): string {
-    const rule = task.reminderRule;
-    if (rule) {
-      if (rule.frequency === 'once') return `${this.formatDate(rule.date)} ${rule.time}`;
-      if (rule.frequency === 'daily') return `Ogni giorno ${rule.time}`;
-      if (rule.frequency === 'weekly') return `${this.weekdayLabel(rule.weekday ?? null)} ${rule.time}`;
-      if (rule.frequency === 'yearly') return `Ogni anno ${this.pad(rule.dayOfMonth)}/${this.pad(rule.month)} ${rule.time}`;
-      if (rule.frequency === 'weekdays') return `Lun-ven ${rule.time}`;
-      if (rule.frequency === 'custom') return `Ogni ${rule.interval ?? 1} ${this.intervalUnitLabel(rule.intervalUnit)} ${rule.time}`;
+  async deleteGoal(goal: GoalSummary): Promise<void> {
+    const shouldDelete = await this.confirmDelete(
+      'Delete goal',
+      `Delete "${goal.title}" and all of its steps and tasks?`
+    );
+    if (!shouldDelete) {
+      return;
     }
 
-    if (task.reminderFrequency === 'daily' && task.reminderTime) {
-      return `Ogni giorno ${task.reminderTime}`;
+    try {
+      await this.datahandler.deleteGoal(goal.id);
+      this.browserLog.info('Archive goal deleted', { goalId: goal.id });
+      await this.load();
+      await this.showToast('Goal deleted');
+    } catch (error) {
+      this.browserLog.error('Archive delete goal failed', { goalId: goal.id, error });
+      this.errorMessage = `Unable to delete goal: ${error}`;
+      await this.showToast('Unable to delete goal', 'danger');
     }
-    if (task.reminderFrequency === 'weekly' && task.reminderTime) {
-      return `${this.weekdayLabel(task.reminderWeekday)} ${task.reminderTime}`;
-    }
-    return '';
   }
 
-  private weekdayLabel(weekday: number | null): string {
-    return ['Domenica', 'Lunedi', 'Martedi', 'Mercoledi', 'Giovedi', 'Venerdi', 'Sabato'][(weekday ?? 1) - 1] ?? 'Settimanale';
-  }
-
-  private formatDate(date: string | undefined): string {
+  formatDate(date: string | null | undefined): string {
     if (!date) {
-      return 'Non si ripete';
+      return '';
     }
-    const [year, month, day] = date.split('-');
+    const [year, month, day] = date.slice(0, 10).split('-');
     return day && month && year ? `${day}/${month}/${year}` : date;
   }
 
-  private intervalUnitLabel(unit: ReminderIntervalUnit | undefined): string {
-    if (unit === 'month') return 'mesi';
-    if (unit === 'year') return 'anni';
-    return 'settimane';
+  private async confirmDelete(header: string, message: string): Promise<boolean> {
+    let confirmed = false;
+    const alert = await this.alertController.create({
+      header,
+      message,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            confirmed = true;
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+    await alert.onDidDismiss();
+    return confirmed;
   }
 
-  private pad(value: number | undefined): string {
-    return String(value ?? '').padStart(2, '0');
+  private async showToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
+    const toast = await this.toastController.create({
+      message,
+      cssClass: ['app-toast', `app-toast-${color}`],
+      duration: 900,
+      position: 'top',
+    });
+    await toast.present();
   }
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { ArchiveComponent } from './archive.component';
 import { DatahandlerService } from '../services/datahandler.service';
@@ -11,11 +12,13 @@ describe('ArchiveComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ArchiveComponent],
       providers: [
+        provideIonicAngular(),
         {
           provide: DatahandlerService,
           useValue: {
             initialize: async () => undefined,
             getGoalSummaries: async () => [],
+            deleteGoal: async () => undefined,
           },
         },
       ],
