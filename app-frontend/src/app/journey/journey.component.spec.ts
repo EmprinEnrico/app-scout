@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 
-import { JurneyComponent } from './jurney.component';
+import { JourneyComponent } from './journey.component';
 import { DatahandlerService, GoalWithSteps } from '../services/datahandler.service';
 
-describe('JurneyComponent', () => {
-  let component: JurneyComponent;
-  let fixture: ComponentFixture<JurneyComponent>;
+describe('JourneyComponent', () => {
+  let component: JourneyComponent;
+  let fixture: ComponentFixture<JourneyComponent>;
   const goal: GoalWithSteps = {
     id: 1,
     title: 'Test goal',
@@ -27,7 +27,7 @@ describe('JurneyComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [JurneyComponent],
+      imports: [JourneyComponent],
       providers: [
         provideIonicAngular(),
         {
@@ -54,7 +54,7 @@ describe('JurneyComponent', () => {
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(JurneyComponent);
+    fixture = TestBed.createComponent(JourneyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

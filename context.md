@@ -37,7 +37,7 @@ This file stores durable project knowledge for future Codex sessions and for man
 
 - `fix_backlog.md`: read this first before making app changes. The user may edit it before or while Codex works.
 - `app-frontend/src/app/services/datahandler.service.ts`: current repository/service entry point for goals, steps, tasks, native SQLite initialization, browser Preferences fallback, and selected-goal persistence.
-- `app-frontend/src/app/jurney`: still misspelled at file/folder/class level, but now implements the Journey UI.
+- `app-frontend/src/app/journey`: still misspelled at file/folder/class level, but now implements the Journey UI.
 - `app-frontend/src/app/archive`: read-only archive summary UI.
 - `app-frontend/src/app/settings`: generic app/settings copy.
 - `app-frontend/src/main.ts`: defines the `jeep-sqlite` custom elements for web fallback.
@@ -50,7 +50,7 @@ This file stores durable project knowledge for future Codex sessions and for man
 
 ## Current Implementation Notes
 
-- The old `/jurney` route is still kept as a compatibility alias.
+- The old `/journey` route is still kept as a compatibility alias.
 - The default route now points to `/journey`.
 - The old `/dummy` refresh route is no longer part of active routing.
 - The old dummy component has been removed.
@@ -90,7 +90,7 @@ This file stores durable project knowledge for future Codex sessions and for man
 
 - Final app name.
 - Final native package identifiers.
-- Whether to rename the `jurney` folder/component/class or leave compatibility aliases.
+- Whether to rename the `journey` folder/component/class or leave compatibility aliases.
 - Whether to add language selection in settings.
 - Whether task ordering should be drag-and-drop or simple append-only for v1.
 - Whether archive should eventually support filters/search.

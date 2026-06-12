@@ -8,9 +8,14 @@
 .archive-hero {
   position: relative;
   min-height: 178px;
+  height: auto;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
+  border-bottom: 0px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  margin-bottom: -17px;
   background: linear-gradient(135deg, var(--surface-raised) 0%, var(--surface) 58%, var(--accent-soft) 100%);
   box-shadow: var(--shadow-soft);
 }
@@ -23,13 +28,12 @@
 }
 
 .heading-lottie {
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: min(64%, 520px);
-  max-height: 178px;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  width: 100%;
   overflow: hidden;
   opacity: 0.9;
-  transform: translateX(4%);
 }
 
 .goal-summary h2,
@@ -75,17 +79,4 @@
 .step-summary {
   display: grid;
   gap: 7px;
-}
-
-@media (max-width: 620px) {
-  .archive-hero {
-    min-height: 150px;
-  }
-
-  .heading-lottie {
-    width: 78%;
-    opacity: 0.78;
-    transform: translateX(22%);
-  }
-
 }

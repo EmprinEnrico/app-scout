@@ -27,7 +27,7 @@ Build a complete local-first app for structured personal progress. The app shoul
 - Rebuilt Archive as a read-only progress summary with completed/open/overdue/scheduled counts.
 - Removed active use of the dummy refresh route.
 - Removed the stale dummy component files.
-- Added `/journey` while keeping `/jurney` as a compatibility alias.
+- Added `/journey` while keeping `/journey` as a compatibility alias.
 - Removed visible scout-specific copy from README, docs, settings, Journey, and Archive.
 - Added web SQLite custom element setup in `main.ts`.
 - Added the SQLite web wasm asset configuration in `angular.json`.
@@ -54,7 +54,7 @@ Build a complete local-first app for structured personal progress. The app shoul
 - Verify native SQLite path separately on Android/iOS after the browser UX settles.
 - Sync native projects with `npx cap sync` when native config/package work is intentionally being handled.
 - Decide final app name and native package identifiers.
-- Rename `jurney` folder/component/class if desired.
+- Rename `journey` folder/component/class if desired.
 - Add a proper settings screen for language, export, and storage maintenance later.
 - Consider drag-and-drop ordering for goals, steps, and tasks.
 - Decide whether to keep the browser Preferences fallback, repair `jeep-sqlite`, or replace web storage with another browser-safe persistence layer.

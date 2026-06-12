@@ -12,7 +12,7 @@ Move completed items here only when the user agrees or when the related change i
 
 - A completed task should not be crossed out only a bit graied out.
 - There is a problem in the text boxes. The last line is partially hidden. (textarea)
-- The jurney title should be replaced with the active goal title.
+- The journey title should be replaced with the active goal title.
 - I don't like the goal title to be a filed like that. The title itslef should be modifiable when you click on it.
 - Let's remove the status from goal and remove goal description. (the status can exist but only in the backend for archive visualization)
 - For steps also no text box for it but editable. The idea is that it should feal like a note line.

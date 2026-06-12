@@ -6,7 +6,6 @@ import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,7 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideIonicAngular(),
     provideRouter(routes), 
     provideClientHydration(), 
-    provideAnimationsAsync(),
     provideLottieOptions({ player: () => player }),
     provideCacheableAnimationLoader(),
   ],

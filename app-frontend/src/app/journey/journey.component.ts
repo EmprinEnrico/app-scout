@@ -38,7 +38,7 @@ type ReminderPreset =
   | 'custom';
 
 @Component({
-  selector: 'app-jurney',
+  selector: 'app-journey',
   standalone: true,
   imports: [
     CommonModule,
@@ -54,10 +54,10 @@ type ReminderPreset =
     IonItemSliding,
     IonTextarea,
   ],
-  templateUrl: './jurney.component.html',
-  styleUrl: './jurney.component.less',
+  templateUrl: './journey.component.html',
+  styleUrl: './journey.component.less',
 })
-export class JurneyComponent implements OnInit {
+export class JourneyComponent implements OnInit {
   goals: Goal[] = [];
   selectedGoal: GoalWithSteps | undefined;
   loading = true;
