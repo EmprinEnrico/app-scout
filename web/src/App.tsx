@@ -18,7 +18,7 @@ function Faro() {
   return <div className="app-shell">
     <a className="skip-link" href="#main-content">Vai al contenuto</a>
     <header className="site-header">
-      <div className="brand" aria-label="Faro, il tuo spazio per gli obiettivi"><span className="brand-mark"><Compass size={23} /></span><span>faro<span className="brand-dot">.</span></span></div>
+      <div className="brand" aria-label="Faro, il tuo spazio per gli obiettivi"><span className="brand-mark"><img src="/icon-192.png" alt="" /></span><span>faro<span className="brand-dot">.</span></span></div>
       <span className="header-date">{today}</span>
     </header>
     <main className="main-content" id="main-content">
