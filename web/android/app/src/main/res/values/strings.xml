@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Faro</string>
+    <string name="title_activity_main">Faro</string>
+    <string name="package_name">app.faro.mobile</string>
+    <string name="custom_url_scheme">app.faro.mobile</string>
+</resources>

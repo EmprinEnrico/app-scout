@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Faro lighthouse">
+  <rect width="512" height="512" rx="112" fill="#102a3a"/>
+  <path d="M256 91 112 179l144-38 144 38z" fill="#f5c76a"/>
+  <path d="m256 104-118 86 118-34 118 34z" fill="#fff0c9"/>
+  <path d="M218 153h76l-9 47h-58z" fill="#f5c76a"/>
+  <path d="M209 200h94l29 190H180z" fill="#f6f4ee"/>
+  <path d="m209 200 7 47h80l7-47z" fill="#e46f50"/>
+  <path d="m192 313-12 77h152l-12-77z" fill="#e46f50"/>
+  <path d="M241 271a15 15 0 0 1 30 0v24h-30z" fill="#102a3a"/>
+  <path d="M241 354a15 15 0 0 1 30 0v36h-30z" fill="#102a3a"/>
+  <path d="M152 397h208v19H152z" fill="#f5c76a"/>
+</svg>
