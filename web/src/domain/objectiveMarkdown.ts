@@ -153,13 +153,30 @@ export function objectiveLineEndPosition(
 
   for (const [stageIndex, stage] of orderedStages.entries()) {
     position += stage.name.length;
-    if (stage.id === target?.stageId) return position;
+    if (!target?.goalId && stage.id === target?.stageId) return position;
     const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
     for (const goal of stageGoals) {
       position += 1;
       position += `- ${goal.title}`.length;
       if (goal.id === target?.goalId) return position;
     }
+    if (stageIndex < orderedStages.length - 1) position += 2;
+  }
+  return position;
+}
+
+export function objectiveStageEndPosition(
+  stages: Stage[],
+  goals: Goal[],
+  stageId: string,
+): number {
+  const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
+  let position = 0;
+  for (const [stageIndex, stage] of orderedStages.entries()) {
+    position += stage.name.length;
+    const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
+    for (const goal of stageGoals) position += 1 + `- ${goal.title}`.length;
+    if (stage.id === stageId) return position;
     if (stageIndex < orderedStages.length - 1) position += 2;
   }
   return position;

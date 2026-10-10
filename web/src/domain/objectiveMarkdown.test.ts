@@ -2,6 +2,8 @@
 import { describe, expect, it } from "vitest";
 import type { Area, Goal, Stage } from "./contracts";
 import {
+  objectiveLineEndPosition,
+  objectiveStageEndPosition,
   objectiveToMarkdownFile,
   parseObjectiveFile,
   parseObjectiveMarkdown,
@@ -36,5 +38,13 @@ describe("objective Markdown files", () => {
       { name: "Milestone 1", goals: ["Read", "Practice"] },
       { name: "Milestone 2", goals: [] },
     ]);
+  });
+
+  it("places the caret at the end of the selected line", () => {
+    expect(objectiveLineEndPosition(stages, goals, { stageId: stages[0]!.id })).toBe(11);
+    expect(objectiveLineEndPosition(stages, goals, {
+      stageId: stages[0]!.id, goalId: goals[0]!.id,
+    })).toBe(25);
+    expect(objectiveStageEndPosition(stages, goals, stages[0]!.id)).toBe(25);
   });
 });

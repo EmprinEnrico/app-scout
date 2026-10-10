@@ -5,6 +5,7 @@ import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
 import {
   objectiveLineEndPosition,
+  objectiveStageEndPosition,
   objectiveToMarkdown,
   parseObjectiveMarkdown,
 } from "../domain/objectiveMarkdown";
@@ -87,6 +88,13 @@ function ObjectiveCard({
       value: markdown,
       caret: Math.min(markdown.length, linePosition),
     });
+  }
+
+  function enterEditForNewTask(stageId: string) {
+    const markdown = objectiveToMarkdown(areaStages, areaGoals);
+    const caret = objectiveStageEndPosition(areaStages, areaGoals, stageId);
+    const value = `${markdown.slice(0, caret)}\n${markdown.slice(caret)}`;
+    setEditSession({ value, caret: caret + 1 });
   }
 
   function handleBodyClick(event: MouseEvent<HTMLDivElement>) {
@@ -178,6 +186,15 @@ function ObjectiveCard({
                     </li>
                   ))}
                 </ul>
+                <button
+                  className="task-entry"
+                  type="button"
+                  aria-label={`Aggiungi una task a ${stage.name}`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    enterEditForNewTask(stage.id);
+                  }}
+                />
               </section>
             ))}
             <button

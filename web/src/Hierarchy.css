@@ -75,6 +75,12 @@
 .simple-goal-row:hover { background: #f7faf4; }
 .simple-goal-row .task-check { margin-top: 1px; }
 .simple-goal-row .task-title { display: block; width: 0; }
+.task-entry {
+  display: block; width: 100%; min-height: 27px; margin-top: 5px; padding: 0 8px;
+  border: 0; border-top: 1px solid #eef1ec; border-radius: 0; background: transparent;
+  cursor: text;
+}
+.task-entry:hover { background: #fbfcf9; }
 .swipe-objective {
   position: relative; min-width: 0; max-width: 100%; overflow: hidden; border-radius: 17px;
 }
