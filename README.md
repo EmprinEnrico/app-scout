@@ -1,6 +1,6 @@
-# Faro
+# Scout Journey
 
-Faro aiuta a scrivere obiettivi, organizzarli in aree e fasi e segnare i progressi. La nuova app è sviluppata in React, TypeScript e Vite. La stessa build web alimenta la PWA e i progetti Capacitor per iOS e Android.
+Scout Journey aiuta a scrivere obiettivi, organizzarli in aree e fasi e segnare i progressi. L’app è sviluppata in React, TypeScript e Vite. La stessa build web alimenta la PWA e i progetti Capacitor per iOS e Android.
 
 Il codice attivo si trova in [`web/`](web/). La ricostruzione vive nel branch `rebuild/react-capacitor`; la versione precedente rimane recuperabile nella cronologia Git. Per le decisioni tecniche e le regole del prodotto, consulta [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) e [`docs/PRODUCT.md`](docs/PRODUCT.md).
 

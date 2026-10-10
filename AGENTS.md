@@ -1,4 +1,4 @@
-# Faro repository guide
+# Scout Journey repository guide
 
 - The app lives in `web/` (React, Vite, TypeScript). Keep product UI and goal logic there; use `web/src/domain/contracts.ts` for shared contracts. The old Angular app remains available in Git history, not in the new source tree.
 - From `web/`, run `npm ci`, `npm run dev`, `npm run test`, `npm run check`, and `npm run build`. The build writes to root `dist/`, matching `.openai/hosting.json`.

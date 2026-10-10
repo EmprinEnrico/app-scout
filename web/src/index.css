@@ -8,8 +8,8 @@
 }
 
 * { box-sizing: border-box; }
-html { min-width: 320px; scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; }
+html { min-width: 320px; scroll-behavior: smooth; height: 100%; }
+body { margin: 0; min-width: 320px; min-height: 100%; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }

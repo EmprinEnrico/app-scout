@@ -9,7 +9,7 @@ import './App.css'
 type Tab = 'goals' | 'journey' | 'settings'
 const today = new Intl.DateTimeFormat('it-IT', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
 
-function Faro() {
+function ScoutJourney() {
   const { ready, error } = useGoals()
   const [tab, setTab] = useState<Tab>('goals')
 
@@ -18,7 +18,7 @@ function Faro() {
   return <div className="app-shell">
     <a className="skip-link" href="#main-content">Vai al contenuto</a>
     <header className="site-header">
-      <div className="brand" aria-label="Faro, il tuo spazio per gli obiettivi"><span className="brand-mark"><img src="/icon-192.png" alt="" /></span><span>faro<span className="brand-dot">.</span></span></div>
+      <div className="brand" aria-label="Scout Journey, il tuo spazio per gli obiettivi"><span className="brand-mark"><img src="/icon-192.png" alt="" /></span><span>Scout Journey</span></div>
       <span className="header-date">{today}</span>
     </header>
     <main className="main-content" id="main-content">
@@ -36,7 +36,7 @@ function Faro() {
 }
 
 function App() {
-  return <GoalsProvider><Faro /></GoalsProvider>
+  return <GoalsProvider><ScoutJourney /></GoalsProvider>
 }
 
 export default App

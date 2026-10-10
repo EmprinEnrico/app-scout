@@ -10,8 +10,8 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Faro',
-        short_name: 'Faro',
+        name: 'Scout Journey',
+        short_name: 'Scout Journey',
         description: 'Annota i tuoi obiettivi e segui i progressi.',
         start_url: '/',
         scope: '/',

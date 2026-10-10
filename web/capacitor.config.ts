@@ -2,8 +2,13 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'app.faro.mobile',
-  appName: 'Faro',
+  appName: 'Scout Journey',
   webDir: '../dist',
+  plugins: {
+    PushNotifications: {
+      presentationOptions: ['badge', 'sound', 'banner', 'list'],
+    },
+  },
 }
 
 export default config

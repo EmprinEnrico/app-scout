@@ -1,5 +1,5 @@
 #root { min-height: 100svh; }
-.app-shell { min-height: 100svh; padding-bottom: 118px; }
+.app-shell { min-height: 100svh; padding-bottom: calc(118px + env(safe-area-inset-bottom)); }
 .skip-link { position: fixed; z-index: 20; left: 16px; top: -100px; padding: 10px 14px; border-radius: 8px; background: #fff; color: #224a39; font-size: 13px; font-weight: 700; box-shadow: 0 3px 16px #1a402344; }
 .skip-link:focus { top: 12px; }
 .site-header { height: 84px; padding: 0 max(28px, calc((100vw - 1100px)/2)); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e9ece6; background: #fff; }
@@ -150,7 +150,7 @@
 .import-message.success { color: #32633b; background: #eaf5e7; }
 .import-message.failure, .notice-error { color: #994c42; background: #fff0ec; }
 .notice { padding: 12px 15px; border-radius: 9px; margin-bottom: 20px; font-size: 13px; }
-.bottom-nav { position: fixed; z-index: 5; left: 50%; bottom: 19px; transform: translateX(-50%); display: flex; gap: 5px; padding: 6px; background: #fff; border: 1px solid #e5e9e0; border-radius: 15px; box-shadow: 0 15px 40px #1a402322; }
+.bottom-nav { position: fixed; z-index: 5; left: 50%; bottom: calc(19px + env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; gap: 5px; padding: 6px; background: #fff; border: 1px solid #e5e9e0; border-radius: 15px; box-shadow: 0 15px 40px #1a402322; }
 .bottom-nav button { border: 0; border-radius: 10px; color: #607265; background: transparent; min-width: 132px; min-height: 52px; padding: 8px 15px; display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; }
 .bottom-nav button:hover { color: #2b5a3d; background: #f5f8f1; }
 .bottom-nav button.active { color: #315d42; background: #eaf2dc; }
@@ -208,6 +208,11 @@
   .settings-panel { padding: 21px 17px; }
   .data-actions { align-items: flex-start; flex-direction: column; gap: 11px; }
   .data-actions .button { min-width: 0; }
+}
+@media (max-width: 360px) {
+  .header-date { display: none; }
+  .brand { font-size: 22px; gap: 8px; }
+  .brand-mark { width: 30px; height: 30px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
 
