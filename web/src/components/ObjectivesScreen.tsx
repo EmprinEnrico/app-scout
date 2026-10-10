@@ -1,9 +1,10 @@
-// Objectives screen: a live text editor for objectives, milestones, and goals.
-import { useLayoutEffect, useRef, useState, type FormEvent } from "react";
+// Objectives screen: edits each objective as one Markdown-like text document.
+import { useRef, useState, type FormEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
-import { GoalRow } from "./GoalRow";
+import { objectiveToMarkdown, parseObjectiveMarkdown } from "../domain/objectiveMarkdown";
+import { syncObjective } from "../domain/objectiveSync";
 import { SwipeObjective } from "./SwipeObjective";
 import "../Hierarchy.css";
 import "../Screens.css";
@@ -11,15 +12,11 @@ import "../Screens.css";
 function InlineTitle({
   value,
   label,
-  className,
   onUpdate,
-  onFocus,
 }: {
   value: string;
   label: string;
-  className?: string;
   onUpdate: (value: string) => void;
-  onFocus?: () => void;
 }) {
   const [draft, setDraft] = useState(value);
 
@@ -34,67 +31,12 @@ function InlineTitle({
 
   return (
     <input
-      className={`hierarchy-title ${className ?? ""}`}
+      className="hierarchy-title objective-title"
       aria-label={label}
       value={draft}
-      onFocus={onFocus}
       onChange={(event) => change(event.target.value)}
       onBlur={restoreIfEmpty}
     />
-  );
-}
-
-function LiveEntry({
-  hasMilestone,
-  onCommit,
-}: {
-  hasMilestone: boolean;
-  onCommit: (value: string) => void;
-}) {
-  const [value, setValue] = useState("");
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useLayoutEffect(() => {
-    const input = inputRef.current;
-    if (!input) return;
-    input.style.height = "auto";
-    input.style.height = `${input.scrollHeight}px`;
-  }, [value]);
-
-  function commit() {
-    const nextValue = value.trim();
-    if (!nextValue) return;
-    onCommit(value);
-    setValue("");
-  }
-
-  return (
-    <div className="live-entry">
-      <textarea
-        ref={inputRef}
-        className="live-entry-input"
-        aria-label="Scrivi un milestone o una task"
-        placeholder={hasMilestone
-          ? "Scrivi… vai a capo; - all’inizio crea una task"
-          : "Scrivi un milestone…"}
-        rows={1}
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === "Escape" || event.key === "Esc" || event.code === "Escape") {
-            event.preventDefault();
-            commit();
-          }
-        }}
-        onKeyUp={(event) => {
-          if (event.key === "Escape" || event.key === "Esc" || event.code === "Escape") {
-            event.preventDefault();
-            commit();
-          }
-        }}
-        onBlur={commit}
-      />
-    </div>
   );
 }
 
@@ -107,10 +49,10 @@ function ObjectiveCard({
   onRenameStage,
   onDeleteStage,
   onToggleGoal,
-  onUpdateGoal,
-  onDeleteGoal,
   onAddStage,
   onAddGoal,
+  onUpdateGoal,
+  onDeleteGoal,
 }: {
   area: Area;
   stages: Stage[];
@@ -120,35 +62,38 @@ function ObjectiveCard({
   onRenameStage: (id: string, name: string) => void;
   onDeleteStage: (id: string) => void;
   onToggleGoal: (id: string) => void;
-  onUpdateGoal: (id: string, title: string) => void;
-  onDeleteGoal: (id: string) => void;
   onAddStage: (areaId: string, name: string) => string;
   onAddGoal: (input: { title: string; areaId: string; stageId: string }) => void;
+  onUpdateGoal: (id: string, patch: { title: string; stageId: string }) => void;
+  onDeleteGoal: (id: string) => void;
 }) {
-  const areaStages = stages
-    .filter((stage) => stage.areaId === area.id)
-    .sort((left, right) => left.position - right.position);
-  const [activeStageId, setActiveStageId] = useState(areaStages[0]?.id ?? "");
-  function commitEntry(value: string) {
-    let currentStageId = areaStages.find((stage) => stage.id === activeStageId)?.id
-      ?? areaStages.at(-1)?.id
-      ?? "";
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const areaStages = stages.filter((stage) => stage.areaId === area.id);
+  const areaGoals = goals.filter((goal) => goal.areaId === area.id);
 
-    for (const rawLine of value.split(/\r?\n/)) {
-      const line = rawLine.trim();
-      if (!line) continue;
-      if (line.startsWith("-")) {
-        const title = line.slice(1).trim();
-        if (!title) continue;
-        if (!currentStageId) {
-          currentStageId = onAddStage(area.id, "Primi passi");
-        }
-        onAddGoal({ title, areaId: area.id, stageId: currentStageId });
-      } else {
-        currentStageId = onAddStage(area.id, line);
-      }
-    }
-    if (currentStageId) setActiveStageId(currentStageId);
+  function enterEdit() {
+    setDraft(objectiveToMarkdown(areaStages, areaGoals));
+    setEditing(true);
+    requestAnimationFrame(() => editorRef.current?.focus());
+  }
+
+  function exitEdit() {
+    if (!editing) return;
+    setEditing(false);
+    syncObjective({
+      area,
+      blocks: parseObjectiveMarkdown(draft),
+      stages,
+      goals,
+      renameStage: onRenameStage,
+      deleteStage: onDeleteStage,
+      addStage: onAddStage,
+      addGoal: onAddGoal,
+      updateGoal: onUpdateGoal,
+      deleteGoal: onDeleteGoal,
+    });
   }
 
   function deleteObjective() {
@@ -160,59 +105,77 @@ function ObjectiveCard({
   return (
     <SwipeObjective name={area.name} onDelete={deleteObjective}>
       <div className="hierarchy-objective">
-      <header className="hierarchy-objective-heading">
-        <span className="area-dot large" style={{ backgroundColor: area.color }} />
-        <InlineTitle
-          value={area.name}
-          label="Nome dell’obiettivo"
-          className="objective-title"
-          onUpdate={(name) => onRenameArea(area.id, name)}
-        />
-      </header>
-      <div className="hierarchy-milestones">
-        {areaStages.map((stage) => {
-          const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
-          return (
-            <section className="hierarchy-milestone" key={stage.id}>
-              <header className="hierarchy-heading">
-                <InlineTitle
-                  value={stage.name}
-                  label="Nome del milestone"
-                  className="milestone-title"
-                  onFocus={() => setActiveStageId(stage.id)}
-                  onUpdate={(name) => onRenameStage(stage.id, name)}
-                />
-                <button
-                  className="icon-button danger-hover"
-                  type="button"
-                  aria-label={`Elimina ${stage.name}`}
-                  onClick={() => {
-                    if (window.confirm(
-                      `Eliminare “${stage.name}”? Le pratiche saranno spostate nel primo milestone.`,
-                    )) {
-                      onDeleteStage(stage.id);
-                    }
-                  }}
-                >
-                  <Trash2 size={15} />
-                </button>
-              </header>
-              <ul className="hierarchy-task-list">
-                {stageGoals.map((goal: Goal) => (
-                  <GoalRow
-                    key={goal.id}
-                    goal={goal}
-                    onToggle={() => onToggleGoal(goal.id)}
-                    onUpdate={(title) => onUpdateGoal(goal.id, title)}
-                    onDelete={() => onDeleteGoal(goal.id)}
-                  />
-                ))}
-              </ul>
-            </section>
-          );
-        })}
-      </div>
-      <LiveEntry hasMilestone={areaStages.length > 0} onCommit={commitEntry} />
+        <header className="hierarchy-objective-heading">
+          <span className="area-dot large" style={{ backgroundColor: area.color }} />
+          <InlineTitle
+            value={area.name}
+            label="Nome dell’obiettivo"
+            onUpdate={(name) => onRenameArea(area.id, name)}
+          />
+        </header>
+        {editing ? (
+          <textarea
+            ref={editorRef}
+            className="markdown-editor"
+            aria-label={`Testo dell’obiettivo ${area.name}`}
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            onBlur={exitEdit}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" || event.key === "Esc") {
+                event.preventDefault();
+                exitEdit();
+              }
+            }}
+          />
+        ) : (
+          <div className="hierarchy-milestones" onClick={enterEdit}>
+            {areaStages.map((stage) => (
+              <section className="hierarchy-milestone" key={stage.id}>
+                <header className="hierarchy-heading">
+                  <h3>{stage.name}</h3>
+                  <button
+                    className="icon-button danger-hover"
+                    type="button"
+                    aria-label={`Elimina ${stage.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      if (window.confirm(
+                        `Eliminare “${stage.name}”? Le pratiche saranno spostate nel primo milestone.`,
+                      )) onDeleteStage(stage.id);
+                    }}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </header>
+                <ul className="hierarchy-task-list">
+                  {goals.filter((goal) => goal.stageId === stage.id).map((goal) => (
+                    <li className="simple-goal-row" key={goal.id}>
+                      <button
+                        className="task-check"
+                        type="button"
+                        aria-label={goal.completed ? `Riattiva ${goal.title}` : `Completa ${goal.title}`}
+                        aria-pressed={goal.completed}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onToggleGoal(goal.id);
+                        }}
+                      >
+                        {goal.completed ? "✓" : ""}
+                      </button>
+                      <span className={goal.completed ? "task-title is-complete" : "task-title"}>
+                        {goal.title}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+            <button className="live-entry" type="button" onClick={enterEdit}>
+              Scrivi un milestone o una task…
+            </button>
+          </div>
+        )}
       </div>
     </SwipeObjective>
   );
@@ -224,9 +187,9 @@ export function ObjectivesScreen() {
     addArea,
     renameArea,
     deleteArea,
-    addStage,
     renameStage,
     deleteStage,
+    addStage,
     addGoal,
     updateGoal,
     toggleGoal,
@@ -255,10 +218,10 @@ export function ObjectivesScreen() {
             onRenameStage={renameStage}
             onDeleteStage={deleteStage}
             onToggleGoal={toggleGoal}
-            onUpdateGoal={(id, title) => updateGoal(id, { title })}
-            onDeleteGoal={deleteGoal}
             onAddStage={addStage}
             onAddGoal={addGoal}
+            onUpdateGoal={updateGoal}
+            onDeleteGoal={deleteGoal}
           />
         ))}
       </div>

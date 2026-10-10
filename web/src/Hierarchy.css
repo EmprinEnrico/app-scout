@@ -45,6 +45,7 @@
 .hierarchy-objective-heading .hierarchy-title { font-size: 18px; font-weight: 750; }
 .hierarchy-heading { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .hierarchy-heading .hierarchy-title { font-size: 13px; font-weight: 750; }
+.hierarchy-heading h3 { margin: 0; color: #344f3f; font-size: 16px; font-weight: 750; }
 .hierarchy-objective-heading .icon-button, .hierarchy-heading .icon-button { flex: none; }
 .hierarchy-title {
   min-width: 0; width: 0; flex: 1; border: 1px solid transparent; border-radius: 7px; padding: 7px 5px;
@@ -85,21 +86,26 @@
 .swipe-objective-content {
   position: relative; z-index: 1; min-width: 0; transition: transform .18s ease; touch-action: pan-y;
 }
-.live-entry { margin: 5px 25px 20px; border-top: 1px solid #eef1ec; }
-.live-entry-input {
-  width: 100%; min-height: 27px; resize: none; overflow: hidden; border: 0; outline: 0;
-  background: transparent; color: #304c3b; padding: 13px 5px 7px; font-size: 14px; line-height: 1.45;
+.live-entry {
+  display: block; width: calc(100% - 50px); margin: 5px 25px 20px; padding: 13px 5px 7px;
+  border: 0; border-top: 1px solid #eef1ec; background: transparent; color: #9aaa9b;
+  font: inherit; font-size: 14px; line-height: 1.45; text-align: left;
 }
-.live-entry-input::placeholder { color: #9aaa9b; }
-.live-entry-input:focus { background: #fbfcf9; }
-
+.live-entry:hover { background: #fbfcf9; color: #617367; }
+.markdown-editor {
+  display: block; width: calc(100% - 50px); min-height: 240px; margin: 5px 25px 20px; padding: 17px 5px;
+  resize: none; overflow: hidden; border: 0; outline: 0; background: transparent; color: #304c3b;
+  font: inherit; font-size: 17px; line-height: 1.75; white-space: pre-wrap;
+}
+.markdown-editor:focus { background: #fbfcf9; }
 @media (max-width: 560px) {
   .page-intro h1 { font-size: 28px; }
   .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
   .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
-  .task-title, .live-entry-input { font-size: 16px; }
+  .task-title { font-size: 16px; }
   .hierarchy-objective-heading .hierarchy-title, .hierarchy-heading .hierarchy-title { font-size: 16px; }
-  .live-entry { margin: 5px 17px 18px; }
+  .live-entry { width: calc(100% - 34px); margin: 5px 17px 18px; }
+  .markdown-editor { width: calc(100% - 34px); margin: 5px 17px 18px; font-size: 16px; }
   .new-objective { align-items: stretch; flex-direction: column; }
   .new-objective .button { width: 100%; }
 }
