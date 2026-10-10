@@ -1,3 +1,5 @@
+// Runtime validation for imported and persisted goal-state JSON data.
+
 import type { GoalState } from './contracts'
 
 function record(value: unknown): value is Record<string, unknown> {
@@ -9,7 +11,8 @@ function nonEmpty(value: unknown): value is string {
 }
 
 function timestamp(value: unknown): value is string {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) return false
+  const isoPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+  if (typeof value !== 'string' || !isoPattern.test(value)) return false
   const date = new Date(value)
   return !Number.isNaN(date.getTime()) && date.toISOString() === value
 }
@@ -29,7 +32,8 @@ export function assertGoalState(value: unknown): asserts value is GoalState {
   const stageAreas = new Map<string, string>()
   const positions = new Map<string, Set<number>>()
   for (const area of value.areas) {
-    if (!record(area) || !nonEmpty(area.id) || !nonEmpty(area.name) || !nonEmpty(area.color) || !timestamp(area.createdAt)) invalid()
+    if (!record(area) || !nonEmpty(area.id) || !nonEmpty(area.name)
+      || !nonEmpty(area.color) || !timestamp(area.createdAt)) invalid()
     if (ids.has(area.id)) invalid()
     ids.add(area.id)
     areaIds.add(area.id)
@@ -52,8 +56,9 @@ export function assertGoalState(value: unknown): asserts value is GoalState {
     }
   }
   for (const goal of value.goals) {
-    if (!record(goal) || !nonEmpty(goal.id) || !nonEmpty(goal.areaId) || !nonEmpty(goal.stageId)
-      || !nonEmpty(goal.title) || typeof goal.note !== 'string' || typeof goal.completed !== 'boolean'
+    if (!record(goal) || !nonEmpty(goal.id) || !nonEmpty(goal.areaId)
+      || !nonEmpty(goal.stageId) || !nonEmpty(goal.title)
+      || typeof goal.note !== 'string' || typeof goal.completed !== 'boolean'
       || !timestamp(goal.createdAt) || !timestamp(goal.updatedAt)
       || (goal.completedAt !== null && !timestamp(goal.completedAt))) invalid()
     if (ids.has(goal.id) || !areaIds.has(goal.areaId) || stageAreas.get(goal.stageId) !== goal.areaId) invalid()
@@ -61,7 +66,8 @@ export function assertGoalState(value: unknown): asserts value is GoalState {
     ids.add(goal.id)
   }
   if (!nonEmpty(value.selectedAreaId) || !nonEmpty(value.selectedStageId)
-    || !areaIds.has(value.selectedAreaId) || stageAreas.get(value.selectedStageId) !== value.selectedAreaId) invalid()
+    || !areaIds.has(value.selectedAreaId)
+    || stageAreas.get(value.selectedStageId) !== value.selectedAreaId) invalid()
 }
 
 export function parseGoalState(json: string): GoalState {

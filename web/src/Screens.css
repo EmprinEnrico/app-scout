@@ -1,0 +1,116 @@
+/* Secondary screens and shared form styles for the Scout Journey interface. */
+
+.journey-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.journey-summary > div {
+  min-height: 137px; padding: 23px 27px; display: flex; flex-direction: column; border: 1px solid #e8ece4;
+  border-radius: 14px; background: white;
+}
+.journey-summary strong { font-size: 36px; letter-spacing: -1.5px; color: #2d513a; margin: 5px 0 0; }
+.journey-summary span:last-child { color: #617367; font-size: 11px; }
+.journey-list { display: grid; gap: 18px; }
+.journey-area { border: 1px solid #e5eae3; background: #fff; border-radius: 17px; padding: 25px 28px 8px; }
+.journey-area-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 17px; }
+.journey-area-heading > div { flex: 1; }
+.journey-area-heading h2 { margin: 0 0 3px; font-size: 19px; letter-spacing: -.4px; color: #2a4938; }
+.journey-area-heading p { margin: 0; color: #617367; font-size: 11px; }
+.journey-percent { color: #547b52; font-size: 20px; font-weight: 700; }
+.journey-stages { margin-top: 22px; }
+.journey-stage { border-top: 1px solid #eef1ec; padding: 17px 0; }
+.journey-stage-heading { display: flex; align-items: center; gap: 12px; }
+.step-badge, .manage-number {
+  width: 27px; height: 27px; border-radius: 8px; background: #eef3e8; color: #52734e; display: grid;
+  place-items: center; flex: none; font-size: 10px; font-weight: 800;
+}
+.journey-stage-heading > div { flex: 1; }
+.journey-stage-heading h3 { margin: 0 0 3px; color: #344f3f; font-size: 13px; }
+.journey-stage-heading p, .stage-fraction { margin: 0; color: #617367; font-size: 11px; }
+.archive-list { margin: 12px 0 0 40px; display: grid; gap: 8px; }
+.archive-list li { display: flex; align-items: center; gap: 9px; color: #405a47; font-size: 12px; min-height: 27px; }
+.archive-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.archive-icon {
+  width: 18px; height: 18px; display: grid; place-items: center; flex: none; border-radius: 50%;
+  border: 1.5px solid #b4c6b3; color: #fff;
+}
+.archive-list li.completed .archive-icon { background: #75a26e; border-color: #75a26e; }
+.archive-list li.completed .archive-title { color: #5c7563; }
+.journey-status { color: #556b59; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.archive-list li.completed .journey-status { color: #4e794e; }
+.stage-empty-note { margin: 12px 0 0 40px; color: #617367; font-size: 11px; }
+.stage-empty-note.no-stages { margin: 22px 0; }
+.wide-empty { min-height: 310px; }
+
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+.settings-panel { border: 1px solid #e5eae2; border-radius: 16px; background: white; padding: 25px; }
+.panel-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 22px; }
+.panel-icon {
+  width: 40px; height: 40px; background: #edf3e6; color: #689363; border-radius: 12px; display: grid;
+  place-items: center; flex: none;
+}
+.panel-heading h2 { margin: 0 0 4px; color: #2b4c39; font-size: 18px; letter-spacing: -.5px; }
+.panel-heading p { margin: 0; color: #617367; font-size: 11px; }
+.manage-list li { display: flex; gap: 10px; align-items: center; border-top: 1px solid #f0f2ee; min-height: 48px; }
+.manage-list li strong { flex: 1; min-width: 0; font-size: 12px; color: #415847; overflow-wrap: anywhere; }
+.manage-list li .icon-button { width: 29px; height: 29px; }
+.manage-list li .icon-button:first-of-type { margin-left: auto; }
+.rename-form { display: flex; align-items: center; width: 100%; gap: 4px; }
+.rename-form input { min-width: 0; flex: 1; }
+.add-form { border-top: 1px solid #eef2ec; padding-top: 15px; display: flex; gap: 8px; }
+.add-form input, .rename-form input, .field input, .field select, .field textarea {
+  border: 1px solid #dfe7db; border-radius: 8px; background: #fbfcf9; color: #2d4c37; padding: 10px 12px;
+  font-size: 12px; width: 100%;
+}
+.add-form input { flex: 1; min-width: 0; }
+.add-form input::placeholder, .field input::placeholder, .field textarea::placeholder { color: #687b6c; }
+.inline-empty { color: #617367; font-size: 12px; line-height: 1.5; }
+.field { display: flex; flex-direction: column; gap: 7px; color: #4b604f; font-size: 11px; font-weight: 700; }
+.compact-field { margin-bottom: 13px; }
+.data-panel { margin-top: 18px; }
+.data-panel .panel-heading { margin-bottom: 11px; }
+.data-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #edf0eb;
+  padding: 19px 0;
+}
+.data-actions strong { display: block; margin-bottom: 4px; color: #405a47; font-size: 12px; }
+.data-actions p { color: #617367; font-size: 11px; line-height: 1.5; margin: 0; }
+.data-actions .button { min-width: 100px; }
+.legacy-action .text-link { white-space: normal; max-width: 210px; justify-content: flex-start; }
+.reset-action { padding-bottom: 0; }
+.file-button { position: relative; cursor: pointer; overflow: hidden; }
+.file-button input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.import-message { font-size: 12px; border-radius: 8px; padding: 11px 13px; margin: 0 0 8px; }
+.import-message.success { color: #32633b; background: #eaf5e7; }
+.import-message.failure { color: #994c42; background: #fff0ec; }
+.notice-error { color: #994c42; background: #fff0ec; }
+.notice { padding: 12px 15px; border-radius: 9px; margin-bottom: 20px; font-size: 13px; }
+
+.goal-dialog {
+  width: min(500px, calc(100vw - 30px)); max-height: min(90svh, 800px); overflow: auto; border: 1px solid #e3eae0;
+  border-radius: 18px; box-shadow: 0 25px 70px #122b1f36; padding: 27px; color: #2b4836;
+}
+.goal-dialog::backdrop { background: #152a21a3; backdrop-filter: blur(3px); }
+.dialog-heading { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.dialog-heading h2 { font-size: 24px; letter-spacing: -.8px; margin: 6px 0 0; }
+.goal-dialog .field { margin-bottom: 17px; }
+.goal-dialog textarea { resize: vertical; }
+.field-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.loading-screen {
+  min-height: 100svh; display: flex; align-items: center; justify-content: center; gap: 12px; color: #315d42;
+}
+.loading-screen p { margin: 0; }
+
+@media (max-width: 700px) {
+  .settings-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 460px) {
+  .journey-summary { gap: 7px; }
+  .journey-summary > div { padding: 14px 10px; min-height: 112px; }
+  .journey-summary strong { font-size: 29px; }
+  .journey-summary .eyebrow { letter-spacing: 1px; font-size: 9px; }
+  .journey-summary span:last-child { font-size: 10px; }
+  .journey-area { padding: 22px 18px 7px; }
+  .settings-panel { padding: 21px 17px; }
+  .data-actions { align-items: flex-start; flex-direction: column; gap: 11px; }
+  .data-actions .button { min-width: 0; }
+}

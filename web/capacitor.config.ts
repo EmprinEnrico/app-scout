@@ -1,3 +1,4 @@
+// Capacitor configuration shared by the iOS and Android shells.
 import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {

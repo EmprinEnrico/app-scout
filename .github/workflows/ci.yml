@@ -1,3 +1,4 @@
+# Continuous integration for the web app and its type-safe test/build check.
 name: CI
 
 on:

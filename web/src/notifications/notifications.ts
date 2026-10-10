@@ -1,3 +1,5 @@
+// Capacitor notification boundary for local reminders and future remote push.
+
 import { Capacitor, type PermissionState } from '@capacitor/core'
 import { LocalNotifications, type LocalNotificationSchema } from '@capacitor/local-notifications'
 import { PushNotifications, type PushNotificationSchema } from '@capacitor/push-notifications'
@@ -25,7 +27,11 @@ export type NotificationHandlers = {
   onError?: (error: unknown) => void
 }
 
-const unsupported: NotificationStatus = { supported: false, push: 'unsupported', local: 'unsupported' }
+const unsupported: NotificationStatus = {
+  supported: false,
+  push: 'unsupported',
+  local: 'unsupported',
+}
 
 function native(): boolean {
   return Capacitor.isNativePlatform()
@@ -70,14 +76,28 @@ export async function registerForPushNotifications(handlers: NotificationHandler
   const status = await requestNotificationPermissions()
   if (!status.supported || status.push !== 'granted') return status
   const registration = await PushNotifications.addListener('registration', ({ value }) => handlers.onToken?.(value))
-  const registrationError = await PushNotifications.addListener('registrationError', (error) => handlers.onError?.(error))
-  const received = await PushNotifications.addListener('pushNotificationReceived', (notification) => handlers.onPush?.(notification))
-  const opened = await PushNotifications.addListener('pushNotificationActionPerformed', ({ notification }) => handlers.onOpen?.(notification))
+  const registrationError = await PushNotifications.addListener(
+    'registrationError',
+    (error) => handlers.onError?.(error),
+  )
+  const received = await PushNotifications.addListener(
+    'pushNotificationReceived',
+    (notification) => handlers.onPush?.(notification),
+  )
+  const opened = await PushNotifications.addListener(
+    'pushNotificationActionPerformed',
+    ({ notification }) => handlers.onOpen?.(notification),
+  )
   try {
     await PushNotifications.register()
   } catch (error) {
     handlers.onError?.(error)
-    await Promise.all([registration.remove(), registrationError.remove(), received.remove(), opened.remove()])
+    await Promise.all([
+      registration.remove(),
+      registrationError.remove(),
+      received.remove(),
+      opened.remove(),
+    ])
   }
   return status
 }
@@ -110,6 +130,8 @@ export async function cancelAllReminders(): Promise<void> {
   if (!native()) return
   const pending = await LocalNotifications.getPending()
   if (pending.notifications.length) {
-    await LocalNotifications.cancel({ notifications: pending.notifications.map(({ id }) => ({ id })) })
+    await LocalNotifications.cancel({
+      notifications: pending.notifications.map(({ id }) => ({ id })),
+    })
   }
 }

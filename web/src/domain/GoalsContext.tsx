@@ -1,3 +1,5 @@
+// React context that exposes goal state, persistence, imports, and mutations.
+
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { GoalPatch, GoalsContextValue, GoalState, NewGoal } from './contracts'
 import { createInitialState, newId, reduceGoals, type GoalAction } from './goalState'
@@ -83,14 +85,25 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     ready,
     error,
     legacyDataAvailable: available,
-    addArea: (name: string) => dispatch({ type: 'addArea', id: newId(), stageId: newId(), name, createdAt: new Date().toISOString() }),
+    addArea: (name: string) => dispatch({
+      type: 'addArea', id: newId(), stageId: newId(), name,
+      createdAt: new Date().toISOString(),
+    }),
     renameArea: (id: string, name: string) => dispatch({ type: 'renameArea', id, name }),
-    deleteArea: (id: string) => dispatch({ type: 'deleteArea', id, replacementIds: [newId(), newId(), newId(), newId()], createdAt: new Date().toISOString() }),
+    deleteArea: (id: string) => dispatch({
+      type: 'deleteArea', id,
+      replacementIds: [newId(), newId(), newId(), newId()],
+      createdAt: new Date().toISOString(),
+    }),
     addStage: (areaId: string, name: string) => dispatch({ type: 'addStage', id: newId(), areaId, name }),
     renameStage: (id: string, name: string) => dispatch({ type: 'renameStage', id, name }),
     deleteStage: (id: string) => dispatch({ type: 'deleteStage', id, replacementId: newId() }),
-    addGoal: (input: NewGoal) => dispatch({ type: 'addGoal', id: newId(), input, now: new Date().toISOString() }),
-    updateGoal: (id: string, patch: GoalPatch) => dispatch({ type: 'updateGoal', id, patch, now: new Date().toISOString() }),
+    addGoal: (input: NewGoal) => dispatch({
+      type: 'addGoal', id: newId(), input, now: new Date().toISOString(),
+    }),
+    updateGoal: (id: string, patch: GoalPatch) => dispatch({
+      type: 'updateGoal', id, patch, now: new Date().toISOString(),
+    }),
     toggleGoal: (id: string) => dispatch({ type: 'toggleGoal', id, now: new Date().toISOString() }),
     deleteGoal: (id: string) => dispatch({ type: 'deleteGoal', id }),
     selectArea: (id: string) => dispatch({ type: 'selectArea', id }),
@@ -103,7 +116,9 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
       return JSON.stringify(stateRef.current, null, 2)
     },
     importData,
-    importLegacyData: () => storage ? runLegacyImport({ state: stateRef.current, ready: readyRef.current, importData }, storage) : { ok: false, message: 'Archivio precedente non accessibile.' },
+    importLegacyData: () => storage
+      ? runLegacyImport({ state: stateRef.current, ready: readyRef.current, importData }, storage)
+      : { ok: false, message: 'Archivio precedente non accessibile.' },
     resetData: () => {
       if (!readyRef.current) {
         setError('Attendere il caricamento dei dati.')

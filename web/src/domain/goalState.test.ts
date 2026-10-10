@@ -1,3 +1,5 @@
+// Focused regression tests for goal-state creation and reducer transitions.
+
 import { describe, expect, it } from 'vitest'
 import { createInitialState, reduceGoals } from './goalState'
 import { convertLegacyData, importLegacyData, legacyDataAvailable } from './legacyMigration'
@@ -24,28 +26,56 @@ describe('goal state', () => {
     const base = initial()
     const areaId = base.selectedAreaId
     const stageId = base.selectedStageId
-    const withGoal = reduceGoals(base, { type: 'addGoal', id: 'goal', input: { areaId, stageId, title: '  Read  ', note: 'memo' }, now })
+    const withGoal = reduceGoals(base, {
+      type: 'addGoal',
+      id: 'goal',
+      input: { areaId, stageId, title: '  Read  ', note: 'memo' },
+      now,
+    })
     expect(withGoal.goals[0]?.title).toBe('Read')
     const completed = reduceGoals(withGoal, { type: 'toggleGoal', id: 'goal', now: later })
     expect(completed.goals[0]?.completedAt).toBe(later)
-    const moved = reduceGoals(completed, { type: 'updateGoal', id: 'goal', patch: { stageId: base.stages[1]!.id }, now: later })
+    const moved = reduceGoals(completed, {
+      type: 'updateGoal',
+      id: 'goal',
+      patch: { stageId: base.stages[1]!.id },
+      now: later,
+    })
     expect(moved.goals[0]?.stageId).toBe(base.stages[1]!.id)
     const reopened = reduceGoals(moved, { type: 'toggleGoal', id: 'goal', now: later })
     expect(reopened.goals[0]?.completedAt).toBeNull()
-    expect(() => reduceGoals(base, { type: 'addGoal', id: 'bad', input: { areaId, stageId: 'missing', title: 'X' }, now })).toThrow()
-    expect(() => reduceGoals(base, { type: 'addGoal', id: 'bad', input: { areaId, stageId, title: '  ' }, now })).toThrow()
+    expect(() => reduceGoals(base, {
+      type: 'addGoal', id: 'bad', input: { areaId, stageId: 'missing', title: 'X' }, now,
+    })).toThrow()
+    expect(() => reduceGoals(base, {
+      type: 'addGoal', id: 'bad', input: { areaId, stageId, title: '  ' }, now,
+    })).toThrow()
   })
 
   it('reassigns goals when a stage is deleted and cascades when an area is deleted', () => {
     const base = initial()
     const withGoal = reduceGoals(base, {
-      type: 'addGoal', id: 'goal', input: { areaId: base.selectedAreaId, stageId: base.selectedStageId, title: 'Keep me' }, now,
+      type: 'addGoal',
+      id: 'goal',
+      input: { areaId: base.selectedAreaId, stageId: base.selectedStageId, title: 'Keep me' },
+      now,
     })
-    const withoutStage = reduceGoals(withGoal, { type: 'deleteStage', id: base.selectedStageId, replacementId: 'replacement' })
+    const withoutStage = reduceGoals(withGoal, {
+      type: 'deleteStage',
+      id: base.selectedStageId,
+      replacementId: 'replacement',
+    })
     expect(withoutStage.goals[0]?.stageId).toBe(withoutStage.selectedStageId)
     expect(parseGoalState(JSON.stringify(withoutStage))).toEqual(withoutStage)
-    const extra = reduceGoals(withoutStage, { type: 'addArea', id: 'extra', stageId: 'extra-stage', name: 'Other', createdAt: now })
-    const withoutArea = reduceGoals(extra, { type: 'deleteArea', id: base.selectedAreaId, replacementIds: ['a', 'b', 'c', 'd'], createdAt: later })
+    const extra = reduceGoals(withoutStage, {
+      type: 'addArea', id: 'extra', stageId: 'extra-stage', name: 'Other', createdAt: now,
+    })
+    const withoutArea = reduceGoals(extra, {
+      type: 'deleteArea',
+      id: base.selectedAreaId,
+      replacementIds: ['a', 'b', 'c', 'd'],
+      createdAt: later,
+    })
     expect(withoutArea.goals).toEqual([])
     expect(withoutArea.selectedAreaId).toBe('extra')
     expect(parseGoalState(JSON.stringify(withoutArea))).toEqual(withoutArea)
@@ -54,10 +84,19 @@ describe('goal state', () => {
   it('keeps a usable default after deleting the only area or final stage', () => {
     const base = initial()
     const soleStage = { ...base, stages: [base.stages[0]!] }
-    const replaced = reduceGoals(soleStage, { type: 'deleteStage', id: soleStage.selectedStageId, replacementId: 'new-stage' })
+    const replaced = reduceGoals(soleStage, {
+      type: 'deleteStage',
+      id: soleStage.selectedStageId,
+      replacementId: 'new-stage',
+    })
     expect(replaced.selectedStageId).toBe('new-stage')
     expect(parseGoalState(JSON.stringify(replaced))).toEqual(replaced)
-    const reset = reduceGoals(base, { type: 'deleteArea', id: base.selectedAreaId, replacementIds: ['a', 'b', 'c', 'd'], createdAt: later })
+    const reset = reduceGoals(base, {
+      type: 'deleteArea',
+      id: base.selectedAreaId,
+      replacementIds: ['a', 'b', 'c', 'd'],
+      createdAt: later,
+    })
     expect(reset.goals).toEqual([])
     expect(reset.stages).toHaveLength(3)
     expect(parseGoalState(JSON.stringify(reset))).toEqual(reset)
@@ -71,7 +110,10 @@ describe('goal state', () => {
       id: 'orphan', areaId: state.selectedAreaId, stageId: 'missing', title: 'X', note: '',
       completed: false, createdAt: now, updatedAt: now, completedAt: null,
     }] }))).toThrow()
-    expect(() => parseGoalState(JSON.stringify({ ...state, stages: [...state.stages, { ...state.stages[0], id: 'duplicate' }] }))).toThrow()
+    expect(() => parseGoalState(JSON.stringify({
+      ...state,
+      stages: [...state.stages, { ...state.stages[0], id: 'duplicate' }],
+    }))).toThrow()
   })
 })
 
@@ -79,7 +121,10 @@ describe('legacy migration', () => {
   it('appends only nonempty entries under numbered stages and keeps modern goals', () => {
     const current = initial()
     const existing = reduceGoals(current, {
-      type: 'addGoal', id: 'modern', input: { areaId: current.selectedAreaId, stageId: current.selectedStageId, title: 'Modern' }, now,
+      type: 'addGoal',
+      id: 'modern',
+      input: { areaId: current.selectedAreaId, stageId: current.selectedStageId, title: 'Modern' },
+      now,
     })
     let number = 0
     const converted = convertLegacyData(existing, JSON.stringify({

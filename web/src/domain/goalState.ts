@@ -1,3 +1,5 @@
+// Pure reducer and helpers for creating and changing the goal-tracking state.
+
 import type { Area, Goal, GoalPatch, GoalState, NewGoal, Stage } from './contracts'
 
 export type GoalAction =
@@ -57,7 +59,9 @@ function requireGoal(state: GoalState, id: string): Goal {
 }
 
 function firstStage(state: GoalState, areaId: string): Stage {
-  const stage = state.stages.filter((item) => item.areaId === areaId).sort((left, right) => left.position - right.position)[0]
+  const stage = state.stages
+    .filter((item) => item.areaId === areaId)
+    .sort((left, right) => left.position - right.position)[0]
   if (!stage) throw new Error('L’area non ha fasi.')
   return stage
 }
@@ -74,12 +78,23 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
       uniqueId(state, action.id)
       uniqueId(state, action.stageId)
       if (action.id === action.stageId) throw new Error('Identificativo già in uso.')
-      const area: Area = { id: action.id, name: name(action.name, 'Il nome'), color: '#6366f1', createdAt: action.createdAt }
-      return { ...state, areas: [...state.areas, area], stages: [...state.stages, { id: action.stageId, areaId: area.id, name: 'Primi passi', position: 0 }] }
+      const area: Area = {
+        id: action.id,
+        name: name(action.name, 'Il nome'),
+        color: '#6366f1',
+        createdAt: action.createdAt,
+      }
+      const stage = { id: action.stageId, areaId: area.id, name: 'Primi passi', position: 0 }
+      return { ...state, areas: [...state.areas, area], stages: [...state.stages, stage] }
     }
     case 'renameArea':
       requireArea(state, action.id)
-      return { ...state, areas: state.areas.map((area) => area.id === action.id ? { ...area, name: name(action.name, 'Il nome') } : area) }
+      return {
+        ...state,
+        areas: state.areas.map((area) => area.id === action.id
+          ? { ...area, name: name(action.name, 'Il nome') }
+          : area),
+      }
     case 'deleteArea': {
       requireArea(state, action.id)
       const areas = state.areas.filter((area) => area.id !== action.id)
@@ -91,18 +106,31 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
         return replacement
       }
       const selectedAreaId = state.selectedAreaId === action.id ? areas[0]!.id : state.selectedAreaId
-      const selectedStageId = state.selectedAreaId === action.id ? stages.find((stage) => stage.areaId === selectedAreaId)!.id : state.selectedStageId
+      const selectedStageId = state.selectedAreaId === action.id
+        ? stages.find((stage) => stage.areaId === selectedAreaId)!.id
+        : state.selectedStageId
       return { ...state, areas, stages, goals, selectedAreaId, selectedStageId }
     }
     case 'addStage': {
       requireArea(state, action.areaId)
       uniqueId(state, action.id)
       const position = state.stages.filter((stage) => stage.areaId === action.areaId).length
-      return { ...state, stages: [...state.stages, { id: action.id, areaId: action.areaId, name: name(action.name, 'Il nome'), position }] }
+      const stage = {
+        id: action.id,
+        areaId: action.areaId,
+        name: name(action.name, 'Il nome'),
+        position,
+      }
+      return { ...state, stages: [...state.stages, stage] }
     }
     case 'renameStage':
       requireStage(state, action.id)
-      return { ...state, stages: state.stages.map((stage) => stage.id === action.id ? { ...stage, name: name(action.name, 'Il nome') } : stage) }
+      return {
+        ...state,
+        stages: state.stages.map((stage) => stage.id === action.id
+          ? { ...stage, name: name(action.name, 'Il nome') }
+          : stage),
+      }
     case 'deleteStage': {
       const target = requireStage(state, action.id)
       const remaining = state.stages.filter((stage) => stage.id !== action.id && stage.areaId === target.areaId)
@@ -111,12 +139,20 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
       if (!remaining.length) uniqueId(state, action.replacementId)
       const stages = state.stages.filter((stage) => stage.id !== action.id)
       if (!remaining.length) stages.push(fallback)
-      const positions = new Map(stages.filter((stage) => stage.areaId === target.areaId)
-        .sort((left, right) => left.position - right.position).map((stage, position) => [stage.id, position]))
+      const positions = new Map(
+        stages
+          .filter((stage) => stage.areaId === target.areaId)
+          .sort((left, right) => left.position - right.position)
+          .map((stage, position) => [stage.id, position]),
+      )
       return {
         ...state,
-        stages: stages.map((stage) => stage.areaId === target.areaId ? { ...stage, position: positions.get(stage.id)! } : stage),
-        goals: state.goals.map((goal) => goal.stageId === action.id ? { ...goal, stageId: fallback.id } : goal),
+        stages: stages.map((stage) => stage.areaId === target.areaId
+          ? { ...stage, position: positions.get(stage.id)! }
+          : stage),
+        goals: state.goals.map((goal) => goal.stageId === action.id
+          ? { ...goal, stageId: fallback.id }
+          : goal),
         selectedStageId: state.selectedStageId === action.id ? fallback.id : state.selectedStageId,
       }
     }
@@ -134,21 +170,36 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
     }
     case 'updateGoal': {
       const existing = requireGoal(state, action.id)
-      const areaId = action.patch.areaId ?? (action.patch.stageId ? requireStage(state, action.patch.stageId).areaId : existing.areaId)
+      const areaId = action.patch.areaId
+        ?? (action.patch.stageId ? requireStage(state, action.patch.stageId).areaId : existing.areaId)
       requireArea(state, areaId)
-      const stageId = action.patch.stageId ?? (areaId === existing.areaId ? existing.stageId : firstStage(state, areaId).id)
+      const stageId = action.patch.stageId
+        ?? (areaId === existing.areaId ? existing.stageId : firstStage(state, areaId).id)
       if (requireStage(state, stageId).areaId !== areaId) throw new Error('La fase non appartiene all’area.')
       const updated: Goal = {
-        ...existing, areaId, stageId,
-        title: action.patch.title === undefined ? existing.title : name(action.patch.title, 'Il titolo'),
-        note: action.patch.note ?? existing.note, updatedAt: action.now,
+        ...existing,
+        areaId,
+        stageId,
+        title: action.patch.title === undefined
+          ? existing.title
+          : name(action.patch.title, 'Il titolo'),
+        note: action.patch.note ?? existing.note,
+        updatedAt: action.now,
       }
-      return { ...state, goals: state.goals.map((goal) => goal.id === action.id ? updated : goal) }
+      return {
+        ...state,
+        goals: state.goals.map((goal) => goal.id === action.id ? updated : goal),
+      }
     }
     case 'toggleGoal': {
       const existing = requireGoal(state, action.id)
       const completed = !existing.completed
-      return { ...state, goals: state.goals.map((goal) => goal.id === action.id ? { ...goal, completed, updatedAt: action.now, completedAt: completed ? action.now : null } : goal) }
+      return {
+        ...state,
+        goals: state.goals.map((goal) => goal.id === action.id
+          ? { ...goal, completed, updatedAt: action.now, completedAt: completed ? action.now : null }
+          : goal),
+      }
     }
     case 'deleteGoal':
       requireGoal(state, action.id)

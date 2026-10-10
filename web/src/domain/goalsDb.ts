@@ -1,3 +1,5 @@
+// Dexie database wrapper that persists one validated goal-state snapshot.
+
 import Dexie, { type Table } from 'dexie'
 import type { GoalState } from './contracts'
 import { assertGoalState } from './validation'

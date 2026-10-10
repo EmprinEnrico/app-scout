@@ -1,3 +1,5 @@
+// Regression tests for notification fallbacks available in the web runtime.
+
 import { describe, expect, it } from 'vitest'
 import { cancelAllReminders, cancelReminder, getNotificationStatus, scheduleReminder } from './notifications'
 

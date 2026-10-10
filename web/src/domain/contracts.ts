@@ -1,3 +1,5 @@
+// Domain contracts shared by the goal state, persistence, and UI layers.
+
 export type Area = {
   id: string
   name: string

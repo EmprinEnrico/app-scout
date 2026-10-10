@@ -1,5 +1,13 @@
+/* Global reset, typography, and focus styles for Scout Journey. */
+
 :root {
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   color: #263b34;
   background: #f8f8f4;
   font-synthesis: none;
@@ -7,15 +15,47 @@
   -webkit-font-smoothing: antialiased;
 }
 
-* { box-sizing: border-box; }
-html { min-width: 320px; scroll-behavior: smooth; height: 100%; }
-body { margin: 0; min-width: 320px; min-height: 100%; }
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-button:disabled { cursor: not-allowed; }
-button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .file-button:focus-within {
+* {
+  box-sizing: border-box;
+}
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  height: 100%;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100%;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.file-button:focus-within {
   outline: 3px solid #b4cc79;
   outline-offset: 3px;
 }
-h1, h2, h3, p { margin-top: 0; }
-::selection { background: #d7e897; color: #193c30; }
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+::selection {
+  background: #d7e897;
+  color: #193c30;
+}
+/* Global document defaults and accessible control styles for Scout Journey. */

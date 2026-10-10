@@ -1,3 +1,5 @@
+// Safe, explicit conversion of data from the previous Scout Journey version.
+
 import type { Goal, GoalState, GoalsContextValue, Stage } from './contracts'
 import { newId } from './goalState'
 
@@ -87,7 +89,10 @@ export function convertLegacyData(
 }
 
 // Invoke with the active context from Settings. The old storage is only read.
-export function importLegacyData(context: Pick<GoalsContextValue, 'state' | 'ready' | 'importData'>, storage: LegacyStorage): ImportResult {
+export function importLegacyData(
+  context: Pick<GoalsContextValue, 'state' | 'ready' | 'importData'>,
+  storage: LegacyStorage,
+): ImportResult {
   if (!context.ready) return { ok: false, message: 'Attendere il caricamento dei dati.' }
   try {
     const raw = readLegacyRaw(storage)
@@ -96,6 +101,9 @@ export function importLegacyData(context: Pick<GoalsContextValue, 'state' | 'rea
     if (!converted.ok || !converted.state) return converted
     return context.importData(JSON.stringify(converted.state))
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : 'Importazione non riuscita.' }
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : 'Importazione non riuscita.',
+    }
   }
 }
