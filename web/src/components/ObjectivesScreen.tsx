@@ -1,9 +1,13 @@
 // Objectives screen: edits each objective as one Markdown-like text document.
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type MouseEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
-import { objectiveToMarkdown, parseObjectiveMarkdown } from "../domain/objectiveMarkdown";
+import {
+  objectiveCursorPosition,
+  objectiveToMarkdown,
+  parseObjectiveMarkdown,
+} from "../domain/objectiveMarkdown";
 import { syncObjective } from "../domain/objectiveSync";
 import { SwipeObjective } from "./SwipeObjective";
 import "../Hierarchy.css";
@@ -73,10 +77,24 @@ function ObjectiveCard({
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
 
-  function enterEdit() {
-    setDraft(objectiveToMarkdown(areaStages, areaGoals));
+  function enterEdit(stageId?: string, goalId?: string) {
+    const markdown = objectiveToMarkdown(areaStages, areaGoals);
+    const cursorPosition = objectiveCursorPosition(areaStages, areaGoals, { stageId, goalId });
+    setDraft(markdown);
     setEditing(true);
-    requestAnimationFrame(() => editorRef.current?.focus());
+    requestAnimationFrame(() => {
+      const editor = editorRef.current;
+      if (!editor) return;
+      editor.focus();
+      editor.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  }
+
+  function handleBodyClick(event: MouseEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+    const goalId = target.closest<HTMLElement>("[data-goal-id]")?.dataset.goalId;
+    const stageId = target.closest<HTMLElement>("[data-stage-id]")?.dataset.stageId;
+    enterEdit(stageId, goalId);
   }
 
   function exitEdit() {
@@ -129,9 +147,9 @@ function ObjectiveCard({
             }}
           />
         ) : (
-          <div className="hierarchy-milestones" onClick={enterEdit}>
+          <div className="hierarchy-milestones" onClick={handleBodyClick}>
             {areaStages.map((stage) => (
-              <section className="hierarchy-milestone" key={stage.id}>
+              <section className="hierarchy-milestone" key={stage.id} data-stage-id={stage.id}>
                 <header className="hierarchy-heading">
                   <h3>{stage.name}</h3>
                   <button
@@ -150,7 +168,7 @@ function ObjectiveCard({
                 </header>
                 <ul className="hierarchy-task-list">
                   {goals.filter((goal) => goal.stageId === stage.id).map((goal) => (
-                    <li className="simple-goal-row" key={goal.id}>
+                    <li className="simple-goal-row" key={goal.id} data-goal-id={goal.id}>
                       <button
                         className="task-check"
                         type="button"
@@ -171,7 +189,14 @@ function ObjectiveCard({
                 </ul>
               </section>
             ))}
-            <button className="live-entry" type="button" onClick={enterEdit}>
+            <button
+              className="live-entry"
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                enterEdit();
+              }}
+            >
               Scrivi un milestone o una task…
             </button>
           </div>
