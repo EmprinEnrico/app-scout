@@ -37,6 +37,13 @@ export type GoalState = {
 
 export type NewGoal = Pick<Goal, 'title' | 'areaId' | 'stageId'> & { note?: string }
 
+export type ObjectiveBlock = {
+  id: string | null
+  kind: 'milestone' | 'task'
+  text: string
+  completed?: boolean
+}
+
 export type GoalPatch = Partial<Pick<Goal, 'title' | 'note' | 'areaId' | 'stageId'>>
 
 export type GoalsContextValue = {
@@ -53,6 +60,7 @@ export type GoalsContextValue = {
   updateGoal(id: string, patch: GoalPatch): void
   toggleGoal(id: string): void
   deleteGoal(id: string): void
+  replaceObjective(areaId: string, blocks: ObjectiveBlock[]): void
   selectArea(id: string): void
   selectStage(id: string): void
   exportData(): string

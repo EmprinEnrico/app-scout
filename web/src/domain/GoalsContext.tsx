@@ -1,7 +1,7 @@
 // React context that exposes goal state, persistence, imports, and mutations.
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import type { GoalPatch, GoalsContextValue, GoalState, NewGoal } from './contracts'
+import type { GoalPatch, GoalsContextValue, GoalState, NewGoal, ObjectiveBlock } from './contracts'
 import { createInitialState, newId, reduceGoals, type GoalAction } from './goalState'
 import { loadGoalState, saveGoalState } from './goalsDb'
 import { parseGoalState } from './validation'
@@ -98,6 +98,9 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     }),
     toggleGoal: (id: string) => dispatch({ type: 'toggleGoal', id, now: new Date().toISOString() }),
     deleteGoal: (id: string) => dispatch({ type: 'deleteGoal', id }),
+    replaceObjective: (areaId: string, blocks: ObjectiveBlock[]) => dispatch({
+      type: 'replaceObjective', areaId, blocks, now: new Date().toISOString(),
+    }),
     selectArea: (id: string) => dispatch({ type: 'selectArea', id }),
     selectStage: (id: string) => dispatch({ type: 'selectStage', id }),
     exportData: () => {

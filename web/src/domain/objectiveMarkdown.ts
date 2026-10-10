@@ -2,23 +2,11 @@
 import type { Area, Goal, Stage } from "./contracts";
 import { newId } from "./goalState";
 
-export type MarkdownBlock = {
-  name: string;
-  goals: string[];
-};
-
-export type ObjectiveLineTarget = {
-  stageId?: string;
-  goalId?: string;
-};
-
 export type ParsedObjectiveFile = {
   area: Area;
   stages: Stage[];
   goals: Goal[];
 };
-
-export type ObjectiveEditorMetadata = string[][];
 
 type Metadata = Record<string, unknown>;
 
@@ -44,51 +32,6 @@ function booleanValue(value: Metadata, key: string): boolean {
 
 function nullableText(value: Metadata, key: string): string | null {
   return typeof value[key] === "string" ? value[key] as string : null;
-}
-
-export function objectiveToMarkdown(stages: Stage[], goals: Goal[]): string {
-  return stages
-    .slice()
-    .sort((left, right) => left.position - right.position)
-    .map((stage) => {
-      const stageGoals = goals
-        .filter((goal) => goal.stageId === stage.id)
-        .map((goal) => `- ${goal.title}`);
-      return [stage.name, ...stageGoals].join("\n");
-    })
-    .join("\n\n");
-}
-
-function shortDate(value: string): string {
-  return value.slice(0, 10);
-}
-
-export function objectiveEditorMetadata(
-  area: Area,
-  stages: Stage[],
-  goals: Goal[],
-): ObjectiveEditorMetadata {
-  const body = objectiveToMarkdown(stages, goals);
-  const metadata = body.split("\n").map(() => [] as string[]);
-  metadata[0]?.push(`[objective created: ${shortDate(area.createdAt)}]`);
-  const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
-  let line = 0;
-  orderedStages.forEach((stage, stageIndex) => {
-    metadata[line]?.push(
-      `[milestone created: ${shortDate(area.createdAt)}]`,
-    );
-    line += 1;
-    const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
-    stageGoals.forEach((goal) => {
-      const completed = goal.completed ? "true" : "false";
-      metadata[line]?.push(
-        `[task created: ${shortDate(goal.createdAt)}, completed: ${completed}]`,
-      );
-      line += 1;
-    });
-    if (stageIndex < orderedStages.length - 1) line += 1;
-  });
-  return metadata;
 }
 
 export function objectiveToMarkdownFile(area: Area, stages: Stage[], goals: Goal[]): string {
@@ -175,64 +118,4 @@ export function parseObjectiveFile(content: string): ParsedObjectiveFile {
     id: areaId, name: areaName, color: textValue(areaMeta ?? {}, "color", "#6366f1"), createdAt,
   };
   return { area, stages: stages.map((stage) => ({ ...stage, areaId })), goals };
-}
-
-export function objectiveLineEndPosition(
-  stages: Stage[],
-  goals: Goal[],
-  target?: ObjectiveLineTarget,
-): number {
-  const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
-  let position = 0;
-
-  for (const [stageIndex, stage] of orderedStages.entries()) {
-    position += stage.name.length;
-    if (!target?.goalId && stage.id === target?.stageId) return position;
-    const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
-    for (const goal of stageGoals) {
-      position += 1;
-      position += `- ${goal.title}`.length;
-      if (goal.id === target?.goalId) return position;
-    }
-    if (stageIndex < orderedStages.length - 1) position += 2;
-  }
-  return position;
-}
-
-export function objectiveStageEndPosition(
-  stages: Stage[],
-  goals: Goal[],
-  stageId: string,
-): number {
-  const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
-  let position = 0;
-  for (const [stageIndex, stage] of orderedStages.entries()) {
-    position += stage.name.length;
-    const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
-    for (const goal of stageGoals) position += 1 + `- ${goal.title}`.length;
-    if (stage.id === stageId) return position;
-    if (stageIndex < orderedStages.length - 1) position += 2;
-  }
-  return position;
-}
-
-export function parseObjectiveMarkdown(value: string): MarkdownBlock[] {
-  const blocks: MarkdownBlock[] = [];
-  let current: MarkdownBlock | undefined;
-
-  for (const rawLine of value.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (line.startsWith("-")) {
-      const title = line.slice(1).trim();
-      if (!title) continue;
-      current ??= { name: "Primi passi", goals: [] };
-      if (!blocks.includes(current)) blocks.push(current);
-      current.goals.push(title);
-      continue;
-    }
-    current = { name: line, goals: [] };
-    blocks.push(current);
-  }
-  return blocks;
 }

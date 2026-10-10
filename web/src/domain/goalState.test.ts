@@ -114,4 +114,22 @@ describe('goal state', () => {
       stages: [...state.stages, { ...state.stages[0], id: 'duplicate' }],
     }))).toThrow()
   })
+
+  it('preserves block ids when the continuous editor inserts a task', () => {
+    const base = initial()
+    const withGoal = reduceGoals(base, {
+      type: 'addGoal', id: 'task-old',
+      input: { areaId: base.selectedAreaId, stageId: base.selectedStageId, title: 'Read' }, now,
+    })
+    const updated = reduceGoals(withGoal, {
+      type: 'replaceObjective', areaId: base.selectedAreaId, now,
+      blocks: [
+        { id: base.selectedStageId, kind: 'milestone', text: 'Primi passi' },
+        { id: 'task-new', kind: 'task', text: 'Practice' },
+        { id: 'task-old', kind: 'task', text: 'Read' },
+      ],
+    })
+    expect(updated.goals.map((goal) => goal.id)).toEqual(['task-new', 'task-old'])
+    expect(updated.goals[1]?.createdAt).toBe(now)
+  })
 })

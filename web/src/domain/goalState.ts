@@ -1,6 +1,8 @@
 // Pure reducer and helpers for creating and changing the goal-tracking state.
 
 import type { Area, Goal, GoalPatch, GoalState, NewGoal, Stage } from './contracts'
+import type { ObjectiveBlock } from './contracts'
+import { replaceObjective } from './objectiveReducer'
 
 export type GoalAction =
   | { type: 'addArea'; id: string; stageId: string; name: string; createdAt: string }
@@ -13,6 +15,7 @@ export type GoalAction =
   | { type: 'updateGoal'; id: string; patch: GoalPatch; now: string }
   | { type: 'toggleGoal'; id: string; now: string }
   | { type: 'deleteGoal'; id: string }
+  | { type: 'replaceObjective'; areaId: string; blocks: ObjectiveBlock[]; now: string }
   | { type: 'selectArea'; id: string }
   | { type: 'selectStage'; id: string }
 
@@ -204,6 +207,8 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
     case 'deleteGoal':
       requireGoal(state, action.id)
       return { ...state, goals: state.goals.filter((goal) => goal.id !== action.id) }
+    case 'replaceObjective':
+      return replaceObjective(state, action.areaId, action.blocks, action.now)
     case 'selectArea': {
       requireArea(state, action.id)
       return { ...state, selectedAreaId: action.id, selectedStageId: firstStage(state, action.id).id }

@@ -1,17 +1,9 @@
 // Objectives screen: edits each objective as one Markdown-like text document.
-import { useState, type FormEvent, type MouseEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
-import type { Area, Goal, Stage } from "../domain/contracts";
-import {
-  objectiveEditorMetadata,
-  objectiveLineEndPosition,
-  objectiveStageEndPosition,
-  objectiveToMarkdown,
-  parseObjectiveMarkdown,
-} from "../domain/objectiveMarkdown";
-import { syncObjective } from "../domain/objectiveSync";
-import { MarkdownEditor } from "./MarkdownEditor";
+import type { Area, Goal, ObjectiveBlock, Stage } from "../domain/contracts";
+import { ContinuousObjectiveEditor } from "./ContinuousObjectiveEditor";
 import "../Hierarchy.css";
 import "../Screens.css";
 
@@ -52,82 +44,17 @@ function ObjectiveCard({
   goals,
   onRenameArea,
   onDeleteArea,
-  onRenameStage,
-  onDeleteStage,
-  onToggleGoal,
-  onAddStage,
-  onAddGoal,
-  onUpdateGoal,
-  onDeleteGoal,
+  onReplaceObjective,
 }: {
   area: Area;
   stages: Stage[];
   goals: Goal[];
   onRenameArea: (id: string, name: string) => void;
   onDeleteArea: (id: string) => void;
-  onRenameStage: (id: string, name: string) => void;
-  onDeleteStage: (id: string) => void;
-  onToggleGoal: (id: string) => void;
-  onAddStage: (areaId: string, name: string) => string;
-  onAddGoal: (input: { title: string; areaId: string; stageId: string }) => void;
-  onUpdateGoal: (id: string, patch: { title: string; stageId: string }) => void;
-  onDeleteGoal: (id: string) => void;
+  onReplaceObjective: (areaId: string, blocks: ObjectiveBlock[]) => void;
 }) {
-  const [editSession, setEditSession] = useState<{
-    value: string;
-    caret: number;
-    metadata?: string[][];
-  } | null>(null);
-  const editing = editSession !== null;
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
-
-  function enterEdit(stageId?: string, goalId?: string) {
-    const markdown = objectiveToMarkdown(areaStages, areaGoals);
-    const linePosition = objectiveLineEndPosition(areaStages, areaGoals, { stageId, goalId });
-    setEditSession({
-      value: markdown,
-      caret: Math.min(markdown.length, linePosition),
-    });
-  }
-
-  function enterEditForNewTask(stageId: string) {
-    const markdown = objectiveToMarkdown(areaStages, areaGoals);
-    const caret = objectiveStageEndPosition(areaStages, areaGoals, stageId);
-    const value = `${markdown.slice(0, caret)}\n${markdown.slice(caret)}`;
-    const metadata = objectiveEditorMetadata(area, areaStages, areaGoals);
-    const insertedLine = value.slice(0, caret + 1).split("\n").length - 1;
-    metadata.splice(insertedLine, 0, []);
-    setEditSession({ value, caret: caret + 1, metadata });
-  }
-
-  function handleBodyMouseDown(event: MouseEvent<HTMLDivElement>) {
-    const target = event.target as HTMLElement;
-    if (target.closest("button") || target.closest(".live-entry") || target.closest(".task-entry")) {
-      return;
-    }
-    event.preventDefault();
-    const goalId = target.closest<HTMLElement>("[data-goal-id]")?.dataset.goalId;
-    const stageId = target.closest<HTMLElement>("[data-stage-id]")?.dataset.stageId;
-    enterEdit(stageId, goalId);
-  }
-
-  function exitEdit(value: string) {
-    if (!editing) return;
-    setEditSession(null);
-    syncObjective({
-      area,
-      blocks: parseObjectiveMarkdown(value),
-      stages,
-      goals,
-      renameStage: onRenameStage,
-      deleteStage: onDeleteStage,
-      addStage: onAddStage,
-      addGoal: onAddGoal,
-      updateGoal: onUpdateGoal,
-      deleteGoal: onDeleteGoal,
-    });
-  }
 
   function deleteObjective() {
     if (window.confirm(`Eliminare “${area.name}” e tutto il suo contenuto?`)) {
@@ -136,96 +63,29 @@ function ObjectiveCard({
   }
 
   return (
-      <div className="hierarchy-objective">
-        <header className="hierarchy-objective-heading">
-          <span className="area-dot large" style={{ backgroundColor: area.color }} />
-          <InlineTitle
-            value={area.name}
-            label="Nome dell’obiettivo"
-            onUpdate={(name) => onRenameArea(area.id, name)}
-          />
-          <button
-            className="icon-button danger-hover"
-            type="button"
-            aria-label={`Elimina ${area.name}`}
-            onClick={deleteObjective}
-          >
-            <Trash2 size={15} />
-          </button>
-        </header>
-        {editing && editSession ? (
-          <MarkdownEditor
-            initialValue={editSession.value}
-            initialCaret={editSession.caret}
-            metadata={editSession.metadata ?? objectiveEditorMetadata(area, areaStages, areaGoals)}
-            ariaLabel={`Testo dell’obiettivo ${area.name}`}
-            onExit={exitEdit}
-          />
-        ) : (
-          <div className="hierarchy-milestones" onMouseDown={handleBodyMouseDown}>
-            {areaStages.map((stage) => (
-              <section className="hierarchy-milestone" key={stage.id} data-stage-id={stage.id}>
-                <header className="hierarchy-heading">
-                  <h3>{stage.name}</h3>
-                  <button
-                    className="icon-button danger-hover"
-                    type="button"
-                    aria-label={`Elimina ${stage.name}`}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      if (window.confirm(
-                        `Eliminare “${stage.name}”? Le pratiche saranno spostate nel primo milestone.`,
-                      )) onDeleteStage(stage.id);
-                    }}
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </header>
-                <ul className="hierarchy-task-list">
-                  {goals.filter((goal) => goal.stageId === stage.id).map((goal) => (
-                    <li className="simple-goal-row" key={goal.id} data-goal-id={goal.id}>
-                      <button
-                        className="task-check"
-                        type="button"
-                        aria-label={goal.completed ? `Riattiva ${goal.title}` : `Completa ${goal.title}`}
-                        aria-pressed={goal.completed}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          onToggleGoal(goal.id);
-                        }}
-                      >
-                        {goal.completed ? "✓" : ""}
-                      </button>
-                      <span className={goal.completed ? "task-title is-complete" : "task-title"}>
-                        {goal.title}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="task-entry"
-                  type="button"
-                  aria-label={`Aggiungi una task a ${stage.name}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    enterEditForNewTask(stage.id);
-                  }}
-                />
-              </section>
-            ))}
-            <button
-              className="live-entry"
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                enterEdit();
-              }}
-            >
-              Scrivi un milestone o una task…
-            </button>
-          </div>
-        )}
-      </div>
+    <div className="hierarchy-objective">
+      <header className="hierarchy-objective-heading">
+        <span className="area-dot large" style={{ backgroundColor: area.color }} />
+        <InlineTitle
+          value={area.name}
+          label="Nome dell’obiettivo"
+          onUpdate={(name) => onRenameArea(area.id, name)}
+        />
+        <button
+          className="icon-button danger-hover"
+          type="button"
+          aria-label={`Elimina ${area.name}`}
+          onClick={deleteObjective}
+        >
+          <Trash2 size={15} />
+        </button>
+      </header>
+      <ContinuousObjectiveEditor
+        stages={areaStages}
+        goals={areaGoals}
+        onChange={(blocks) => onReplaceObjective(area.id, blocks)}
+      />
+    </div>
   );
 }
 
@@ -235,13 +95,7 @@ export function ObjectivesScreen() {
     addArea,
     renameArea,
     deleteArea,
-    renameStage,
-    deleteStage,
-    addStage,
-    addGoal,
-    updateGoal,
-    toggleGoal,
-    deleteGoal,
+    replaceObjective,
   } = useGoals();
   const [newArea, setNewArea] = useState("");
 
@@ -263,13 +117,7 @@ export function ObjectivesScreen() {
             goals={state.goals}
             onRenameArea={renameArea}
             onDeleteArea={deleteArea}
-            onRenameStage={renameStage}
-            onDeleteStage={deleteStage}
-            onToggleGoal={toggleGoal}
-            onAddStage={addStage}
-            onAddGoal={addGoal}
-            onUpdateGoal={updateGoal}
-            onDeleteGoal={deleteGoal}
+            onReplaceObjective={replaceObjective}
           />
         ))}
       </div>
