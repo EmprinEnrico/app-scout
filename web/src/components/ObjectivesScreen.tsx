@@ -4,7 +4,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
 import {
-  objectiveCursorPosition,
+  objectiveLineEndPosition,
   objectiveToMarkdown,
   parseObjectiveMarkdown,
 } from "../domain/objectiveMarkdown";
@@ -80,40 +80,20 @@ function ObjectiveCard({
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
 
-  function enterEdit(stageId?: string, goalId?: string, characterOffset = 0) {
+  function enterEdit(stageId?: string, goalId?: string) {
     const markdown = objectiveToMarkdown(areaStages, areaGoals);
-    const linePosition = objectiveCursorPosition(areaStages, areaGoals, { stageId, goalId });
+    const linePosition = objectiveLineEndPosition(areaStages, areaGoals, { stageId, goalId });
     setEditSession({
       value: markdown,
-      caret: Math.min(markdown.length, linePosition + characterOffset),
+      caret: Math.min(markdown.length, linePosition),
     });
-  }
-
-  function clickedTextOffset(event: MouseEvent<HTMLDivElement>, line: Element) {
-    const documentWithCaret = document as Document & {
-      caretRangeFromPoint?: (x: number, y: number) => Range | null;
-      caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
-    };
-    const range = documentWithCaret.caretRangeFromPoint?.(event.clientX, event.clientY);
-    if (range && line.contains(range.startContainer)) {
-      return range.startContainer.nodeType === Node.TEXT_NODE ? range.startOffset : 0;
-    }
-    const position = documentWithCaret.caretPositionFromPoint?.(event.clientX, event.clientY);
-    if (position && line.contains(position.offsetNode)) {
-      return position.offsetNode.nodeType === Node.TEXT_NODE ? position.offset : 0;
-    }
-    return 0;
   }
 
   function handleBodyClick(event: MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
     const goalId = target.closest<HTMLElement>("[data-goal-id]")?.dataset.goalId;
     const stageId = target.closest<HTMLElement>("[data-stage-id]")?.dataset.stageId;
-    const line = goalId
-      ? target.closest<HTMLElement>("[data-goal-id]")?.querySelector(".task-title")
-      : target.closest<HTMLElement>("[data-stage-id]")?.querySelector("h3");
-    const characterOffset = line ? clickedTextOffset(event, line) : 0;
-    enterEdit(stageId, goalId, characterOffset);
+    enterEdit(stageId, goalId);
   }
 
   function exitEdit(value: string) {

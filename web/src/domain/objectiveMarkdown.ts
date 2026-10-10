@@ -6,7 +6,7 @@ export type MarkdownBlock = {
   goals: string[];
 };
 
-export type ObjectiveCursorTarget = {
+export type ObjectiveLineTarget = {
   stageId?: string;
   goalId?: string;
 };
@@ -24,22 +24,22 @@ export function objectiveToMarkdown(stages: Stage[], goals: Goal[]): string {
     .join("\n\n");
 }
 
-export function objectiveCursorPosition(
+export function objectiveLineEndPosition(
   stages: Stage[],
   goals: Goal[],
-  target?: ObjectiveCursorTarget,
+  target?: ObjectiveLineTarget,
 ): number {
   const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
   let position = 0;
 
   for (const [stageIndex, stage] of orderedStages.entries()) {
-    if (stage.id === target?.stageId) return position;
     position += stage.name.length;
+    if (stage.id === target?.stageId) return position;
     const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
     for (const goal of stageGoals) {
       position += 1;
-      if (goal.id === target?.goalId) return position + 2;
       position += `- ${goal.title}`.length;
+      if (goal.id === target?.goalId) return position;
     }
     if (stageIndex < orderedStages.length - 1) position += 2;
   }
