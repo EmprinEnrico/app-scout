@@ -1,9 +1,8 @@
-// Objectives screen: edits the objective, milestone, and concrete practice hierarchy.
+// Objectives screen: a live text editor for objectives, milestones, and goals.
 import { useState, type FormEvent } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
-import { GoalComposer } from "./GoalComposer";
 import { SwipeGoalRow } from "./SwipeGoalRow";
 import "../Hierarchy.css";
 import "../Screens.css";
@@ -13,11 +12,13 @@ function InlineTitle({
   label,
   className,
   onUpdate,
+  onFocus,
 }: {
   value: string;
   label: string;
   className?: string;
   onUpdate: (value: string) => void;
+  onFocus?: () => void;
 }) {
   const [draft, setDraft] = useState(value);
 
@@ -35,9 +36,45 @@ function InlineTitle({
       className={`hierarchy-title ${className ?? ""}`}
       aria-label={label}
       value={draft}
+      onFocus={onFocus}
       onChange={(event) => change(event.target.value)}
       onBlur={restoreIfEmpty}
     />
+  );
+}
+
+function LiveEntry({
+  hasMilestone,
+  onCommit,
+}: {
+  hasMilestone: boolean;
+  onCommit: (value: string) => void;
+}) {
+  const [value, setValue] = useState("");
+
+  function commit() {
+    const nextValue = value.trim();
+    if (!nextValue) return;
+    onCommit(nextValue);
+    setValue("");
+  }
+
+  return (
+    <div className="live-entry">
+      <input
+        className="live-entry-input"
+        aria-label="Scrivi un milestone o una task"
+        placeholder={hasMilestone ? "Scrivi… oppure - una task" : "Scrivi un milestone…"}
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            commit();
+          }
+        }}
+      />
+    </div>
   );
 }
 
@@ -53,6 +90,7 @@ function ObjectiveCard({
   onUpdateGoal,
   onDeleteGoal,
   onAddStage,
+  onAddGoal,
 }: {
   area: Area;
   stages: Stage[];
@@ -64,18 +102,26 @@ function ObjectiveCard({
   onToggleGoal: (id: string) => void;
   onUpdateGoal: (id: string, title: string) => void;
   onDeleteGoal: (id: string) => void;
-  onAddStage: (areaId: string, name: string) => void;
+  onAddStage: (areaId: string, name: string) => string;
+  onAddGoal: (input: { title: string; areaId: string; stageId: string }) => void;
 }) {
   const areaStages = stages
     .filter((stage) => stage.areaId === area.id)
     .sort((left, right) => left.position - right.position);
-  const [newStage, setNewStage] = useState("");
+  const [activeStageId, setActiveStageId] = useState(areaStages[0]?.id ?? "");
+  const activeStage = areaStages.find((stage) => stage.id === activeStageId)
+    ?? areaStages.at(-1);
 
-  function addStage(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!newStage.trim()) return;
-    onAddStage(area.id, newStage.trim());
-    setNewStage("");
+  function commitEntry(value: string) {
+    if (value.startsWith("-")) {
+      const title = value.slice(1).trim();
+      if (title && activeStage) {
+        onAddGoal({ title, areaId: area.id, stageId: activeStage.id });
+      }
+      return;
+    }
+    const stageId = onAddStage(area.id, value);
+    setActiveStageId(stageId);
   }
 
   return (
@@ -111,6 +157,7 @@ function ObjectiveCard({
                   value={stage.name}
                   label="Nome del milestone"
                   className="milestone-title"
+                  onFocus={() => setActiveStageId(stage.id)}
                   onUpdate={(name) => onRenameStage(stage.id, name)}
                 />
                 <button
@@ -129,7 +176,7 @@ function ObjectiveCard({
                 </button>
               </header>
               <ul className="hierarchy-task-list">
-                {stageGoals.map((goal) => (
+                {stageGoals.map((goal: Goal) => (
                   <SwipeGoalRow
                     key={goal.id}
                     goal={goal}
@@ -143,17 +190,7 @@ function ObjectiveCard({
           );
         })}
       </div>
-      <form className="hierarchy-add milestone-add" onSubmit={addStage}>
-        <input
-          aria-label={`Aggiungi milestone a ${area.name}`}
-          placeholder="Aggiungi un milestone…"
-          value={newStage}
-          onChange={(event) => setNewStage(event.target.value)}
-        />
-        <button className="button button-secondary" type="submit">
-          <Plus size={16} /> Milestone
-        </button>
-      </form>
+      <LiveEntry hasMilestone={areaStages.length > 0} onCommit={commitEntry} />
     </article>
   );
 }
@@ -174,6 +211,13 @@ export function ObjectivesScreen() {
   } = useGoals();
   const [newArea, setNewArea] = useState("");
 
+  function addObjective(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!newArea.trim()) return;
+    addArea(newArea.trim());
+    setNewArea("");
+  }
+
   return (
     <section className="objectives-page" aria-label="Obiettivi">
       <div className="hierarchy-list">
@@ -191,18 +235,11 @@ export function ObjectivesScreen() {
             onUpdateGoal={(id, title) => updateGoal(id, { title })}
             onDeleteGoal={deleteGoal}
             onAddStage={addStage}
+            onAddGoal={addGoal}
           />
         ))}
       </div>
-      <form
-        className="new-objective"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!newArea.trim()) return;
-          addArea(newArea.trim());
-          setNewArea("");
-        }}
-      >
+      <form className="new-objective" onSubmit={addObjective}>
         <input
           aria-label="Nome del nuovo obiettivo"
           placeholder="Inizia un nuovo obiettivo…"
@@ -213,11 +250,6 @@ export function ObjectivesScreen() {
           <Pencil size={16} /> Obiettivo
         </button>
       </form>
-      <GoalComposer
-        areas={state.areas}
-        stages={state.stages}
-        onAdd={(title, areaId, stageId) => addGoal({ title, areaId, stageId })}
-      />
     </section>
   );
 }

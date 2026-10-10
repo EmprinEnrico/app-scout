@@ -95,7 +95,11 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
       replacementIds: [newId(), newId(), newId(), newId()],
       createdAt: new Date().toISOString(),
     }),
-    addStage: (areaId: string, name: string) => dispatch({ type: 'addStage', id: newId(), areaId, name }),
+    addStage: (areaId: string, name: string) => {
+      const id = newId()
+      dispatch({ type: 'addStage', id, areaId, name })
+      return id
+    },
     renameStage: (id: string, name: string) => dispatch({ type: 'renameStage', id, name }),
     deleteStage: (id: string) => dispatch({ type: 'deleteStage', id, replacementId: newId() }),
     addGoal: (input: NewGoal) => dispatch({

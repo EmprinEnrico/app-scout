@@ -60,10 +60,6 @@
 }
 .hierarchy-add input:focus, .new-objective input:focus { border-color: #a9c38d; outline: 3px solid #eaf2dc; }
 .hierarchy-add input::placeholder, .new-objective input::placeholder { color: #7a897c; }
-.milestone-add {
-  margin: 10px 25px 24px; padding: 12px; border: 1px dashed #d2dfcc;
-  border-radius: 11px; background: #fbfcf9;
-}
 .new-objective {
   display: flex; align-items: center; gap: 8px; padding: 18px; border: 1px dashed #c8d7c2;
   border-radius: 14px; background: #fdfefb;
@@ -87,35 +83,20 @@
 .swipe-goal-content:hover { background: #f7faf4; }
 .swipe-goal-content .task-check { margin-top: 1px; }
 .swipe-goal-content .task-title { display: block; width: 0; }
-.add-goal-trigger {
-  width: 100%; min-height: 48px; margin-top: 18px; border: 1px dashed #b9ceb0; border-radius: 12px;
-  display: flex; align-items: center; justify-content: center; gap: 8px; background: #fdfefb;
-  color: #3e6544; font-size: 12px; font-weight: 750;
+.live-entry { margin: 5px 25px 20px; border-top: 1px solid #eef1ec; }
+.live-entry-input {
+  width: 100%; border: 0; outline: 0; background: transparent; color: #304c3b;
+  padding: 13px 5px 7px; font-size: 14px; line-height: 1.45;
 }
-.add-goal-trigger:hover { border-color: #8eae86; background: #f4f8ef; }
-.goal-composer {
-  display: grid; gap: 10px; margin-top: 18px; padding: 15px; border: 1px solid #dbe5d6;
-  border-radius: 13px; background: #fff;
-}
-.goal-composer > textarea {
-  width: 100%; min-height: 58px; resize: vertical; border: 1px solid #dfe7db; border-radius: 8px;
-  background: #fbfcf9; color: #2d4c37; padding: 10px 11px; font-size: 13px;
-}
-.goal-composer-controls { display: flex; align-items: center; gap: 8px; }
-.goal-composer-controls select {
-  min-width: 0; flex: 1; border: 1px solid #dfe7db; border-radius: 8px; background: #fbfcf9;
-  color: #405a47; padding: 9px 10px; font-size: 11px;
-}
-.goal-composer-controls .button { flex: none; }
+.live-entry-input::placeholder { color: #9aaa9b; }
+.live-entry-input:focus { background: #fbfcf9; }
 
 @media (max-width: 560px) {
   .page-intro h1 { font-size: 28px; }
   .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
   .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
   .task-title { font-size: 14px; }
-  .milestone-add { margin: 8px 17px 18px; padding: 10px; }
-  .goal-composer-controls { align-items: stretch; flex-direction: column; }
-  .goal-composer-controls .button { width: 100%; }
+  .live-entry { margin: 5px 17px 18px; }
   .new-objective { align-items: stretch; flex-direction: column; }
   .new-objective .button { width: 100%; }
 }

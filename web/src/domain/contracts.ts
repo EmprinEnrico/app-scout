@@ -47,7 +47,7 @@ export type GoalsContextValue = {
   addArea(name: string): void
   renameArea(id: string, name: string): void
   deleteArea(id: string): void
-  addStage(areaId: string, name: string): void
+  addStage(areaId: string, name: string): string
   renameStage(id: string, name: string): void
   deleteStage(id: string): void
   addGoal(input: NewGoal): void
