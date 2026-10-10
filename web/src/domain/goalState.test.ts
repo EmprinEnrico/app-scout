@@ -2,7 +2,6 @@
 
 import { describe, expect, it } from 'vitest'
 import { createInitialState, reduceGoals } from './goalState'
-import { convertLegacyData, importLegacyData, legacyDataAvailable } from './legacyMigration'
 import { parseGoalState } from './validation'
 
 const now = '2026-10-09T00:00:00.000Z'
@@ -114,56 +113,5 @@ describe('goal state', () => {
       ...state,
       stages: [...state.stages, { ...state.stages[0], id: 'duplicate' }],
     }))).toThrow()
-  })
-})
-
-describe('legacy migration', () => {
-  it('appends only nonempty entries under numbered stages and keeps modern goals', () => {
-    const current = initial()
-    const existing = reduceGoals(current, {
-      type: 'addGoal',
-      id: 'modern',
-      input: { areaId: current.selectedAreaId, stageId: current.selectedStageId, title: 'Modern' },
-      now,
-    })
-    let number = 0
-    const converted = convertLegacyData(existing, JSON.stringify({
-      'reparto-3': ['Second'], 'branco-2': [], 'branco-1': ['', 'First', '  '],
-    }), () => `legacy-${++number}`, later)
-    expect(converted.ok).toBe(true)
-    expect(converted.state?.areas).toHaveLength(2)
-    expect(converted.state?.stages.slice(-2).map((stage) => stage.name)).toEqual(['Fase 1', 'Fase 2'])
-    expect(converted.state?.goals.map((goal) => goal.title)).toEqual(['Modern', 'First', 'Second'])
-    expect(converted.state?.goals[1]?.note).toBe('Importato dalla versione precedente')
-    expect(parseGoalState(JSON.stringify(converted.state))).toEqual(converted.state)
-    expect(convertLegacyData(converted.state!, JSON.stringify({ 'branco-1': ['First'] })).ok).toBe(false)
-  })
-
-  it('detects the old key and refuses malformed or empty data', () => {
-    const current = initial()
-    const storage = { getItem: (key: string) => key === 'CapacitorStorage.database' ? '{}' : null }
-    expect(legacyDataAvailable(current, storage)).toBe(true)
-    expect(convertLegacyData(current, '{').ok).toBe(false)
-    expect(convertLegacyData(current, JSON.stringify({ 'branco-1': [''] })).ok).toBe(false)
-    expect(convertLegacyData(current, JSON.stringify({ unrelated: ['X'] })).ok).toBe(false)
-  })
-
-  it('imports from the Capacitor key through the modern import callback without removing the old value', () => {
-    const current = initial()
-    const raw = JSON.stringify({ 'branco-10': ['Later'], 'branco-2': ['Earlier'] })
-    let saved: string | null = null
-    const storage = { getItem: (key: string) => key === 'CapacitorStorage.database' ? raw : null }
-    const result = importLegacyData({
-      state: current,
-      ready: true,
-      importData: (json) => { saved = json; return { ok: true, message: 'Dati importati.' } },
-    }, storage)
-    expect(result.ok).toBe(true)
-    expect(saved).not.toBeNull()
-    const imported = parseGoalState(saved!)
-    expect(imported.goals.map((goal) => goal.title)).toEqual(['Earlier', 'Later'])
-    expect(imported.goals.every((goal) => !goal.note.includes('branco'))).toBe(true)
-    expect(storage.getItem('CapacitorStorage.database')).toBe(raw)
-    expect(current.areas).toHaveLength(1)
   })
 })

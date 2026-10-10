@@ -43,7 +43,6 @@ export type GoalsContextValue = {
   state: GoalState
   ready: boolean
   error: string | null
-  legacyDataAvailable: boolean
   addArea(name: string): void
   renameArea(id: string, name: string): void
   deleteArea(id: string): void
@@ -58,6 +57,5 @@ export type GoalsContextValue = {
   selectStage(id: string): void
   exportData(): string
   importData(json: string): { ok: boolean; message: string }
-  importLegacyData(): { ok: boolean; message: string }
   resetData(): void
 }

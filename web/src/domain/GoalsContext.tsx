@@ -4,21 +4,12 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import type { GoalPatch, GoalsContextValue, GoalState, NewGoal } from './contracts'
 import { createInitialState, newId, reduceGoals, type GoalAction } from './goalState'
 import { loadGoalState, saveGoalState } from './goalsDb'
-import { importLegacyData as runLegacyImport, legacyDataAvailable as hasLegacyData } from './legacyMigration'
 import { parseGoalState } from './validation'
 
 const GoalsContext = createContext<GoalsContextValue | null>(null)
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Operazione non riuscita.'
-}
-
-function legacyStorage(): Storage | null {
-  try {
-    return typeof localStorage === 'undefined' ? null : localStorage
-  } catch {
-    return null
-  }
 }
 
 export function GoalsProvider({ children }: { children: ReactNode }) {
@@ -78,13 +69,10 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     }
   }, [commit])
 
-  const storage = legacyStorage()
-  const available = ready && storage !== null && hasLegacyData(state, storage)
   const value: GoalsContextValue = {
     state,
     ready,
     error,
-    legacyDataAvailable: available,
     addArea: (name: string) => dispatch({
       type: 'addArea', id: newId(), stageId: newId(), name,
       createdAt: new Date().toISOString(),
@@ -120,9 +108,6 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
       return JSON.stringify(stateRef.current, null, 2)
     },
     importData,
-    importLegacyData: () => storage
-      ? runLegacyImport({ state: stateRef.current, ready: readyRef.current, importData }, storage)
-      : { ok: false, message: 'Archivio precedente non accessibile.' },
     resetData: () => {
       if (!readyRef.current) {
         setError('Attendere il caricamento dei dati.')

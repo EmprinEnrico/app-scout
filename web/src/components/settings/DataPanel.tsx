@@ -2,22 +2,19 @@
 import { useState } from "react";
 import {
   ArrowDownToLine,
-  ArrowRight,
   ArrowUpFromLine,
   ExternalLink,
   RotateCcw,
 } from "lucide-react";
 
 type DataPanelProps = {
-  legacyDataAvailable: boolean;
   exportData: () => string;
   importData: (json: string) => { ok: boolean; message: string };
-  importLegacyData: () => { ok: boolean; message: string };
   resetData: () => void;
 };
 
 export function DataPanel({
-  legacyDataAvailable, exportData, importData, importLegacyData, resetData,
+  exportData, importData, resetData,
 }: DataPanelProps) {
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -82,25 +79,6 @@ export function DataPanel({
           />
         </label>
       </div>
-      {legacyDataAvailable && (
-        <div className="data-actions legacy-action">
-          <div>
-            <strong>Dalla vecchia app</strong>
-            <p>Importa i dati nella nuova struttura. La copia precedente resta conservata.</p>
-          </div>
-          <button type="button" className="text-link" onClick={() => {
-            if (window.confirm(
-              "Importare gli obiettivi dalla vecchia app in una nuova area di " +
-                "Scout Journey? I dati della vecchia app resteranno conservati.",
-            )) {
-              const result = importLegacyData();
-              setMessage({ ok: result.ok, text: result.message });
-            }
-          }}>
-            Importa obiettivi dalla vecchia app <ArrowRight size={16} />
-          </button>
-        </div>
-      )}
       {message && (
         <p className={`import-message ${message.ok ? "success" : "failure"}`} role="status">
           {message.text}

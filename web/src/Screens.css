@@ -59,7 +59,6 @@
 .data-actions strong { display: block; margin-bottom: 4px; color: #405a47; font-size: 12px; }
 .data-actions p { color: #617367; font-size: 11px; line-height: 1.5; margin: 0; }
 .data-actions .button { min-width: 100px; }
-.legacy-action .text-link { white-space: normal; max-width: 210px; justify-content: flex-start; }
 .reset-action { padding-bottom: 0; }
 .file-button { position: relative; cursor: pointer; overflow: hidden; }
 .file-button input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
