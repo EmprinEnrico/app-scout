@@ -7,7 +7,9 @@ const area: Area = {
   id: "area-1", name: "Learn Spanish", color: "#6366f1", createdAt: "2020-01-01T00:00:00.000Z",
 };
 const stages: Stage[] = [
-  { id: "stage-1", areaId: area.id, name: "Milestone 1", position: 0 },
+  { id: "stage-1", areaId: area.id, name: "Milestone 1", position: 0, content: [
+    { id: "task-1", kind: "task", text: "Read a page", goalId: "task-1" },
+  ] },
 ];
 const goals: Goal[] = [{
   id: "task-1", areaId: area.id, stageId: stages[0]!.id, title: "Read a page",
@@ -25,5 +27,25 @@ describe("objective Markdown files", () => {
     expect(parsed.area).toEqual(area);
     expect(parsed.stages).toEqual(stages);
     expect(parsed.goals).toEqual(goals);
+  });
+
+  it("round-trips text before, between, and after tasks", () => {
+    const content = [
+      "# Learn Spanish",
+      "",
+      "<!-- scout-journey:milestone {\"id\":\"stage-1\",\"position\":0} -->",
+      "# Milestone 1",
+      "Start with a small daily practice.",
+      "<!-- scout-journey:task {\"id\":\"task-1\",\"completed\":false} -->",
+      "- Read a page",
+      "Review the new words every Sunday.",
+      "",
+    ].join("\n");
+    const parsed = parseObjectiveFile(content);
+    expect(parsed.stages[0]?.content?.map((line) => [line.kind, line.text])).toEqual([
+      ["text", "Start with a small daily practice."],
+      ["task", "Read a page"],
+      ["text", "Review the new words every Sunday."],
+    ]);
   });
 });

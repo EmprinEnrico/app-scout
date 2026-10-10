@@ -1,9 +1,9 @@
 // Continuous editor model: converts objective entities to stable editor blocks.
-import type { Goal, ObjectiveBlock, Stage } from './contracts'
+import type { Goal, ObjectiveBlock, Stage, StageLine } from './contracts'
 
 export type ObjectiveEditorNode = {
-  type: 'milestone' | 'task'
-  attrs: { id: string; completed?: boolean }
+  type: 'milestone' | 'paragraph' | 'task'
+  attrs?: { id?: string | null; completed?: boolean }
   content?: Array<{ type: 'text'; text: string }>
 }
 
@@ -14,6 +14,12 @@ export type ObjectiveEditorDocument = {
 
 function textNode(text: string) {
   return text ? [{ type: 'text' as const, text }] : []
+}
+
+function legacyStageLines(stage: Stage, goals: Goal[]): StageLine[] {
+  return goals
+    .filter((goal) => goal.stageId === stage.id)
+    .map((goal) => ({ id: goal.id, kind: 'task' as const, text: goal.title, goalId: goal.id }))
 }
 
 export function objectiveToEditorDocument(
@@ -28,12 +34,17 @@ export function objectiveToEditorDocument(
       content.push({
         type: 'milestone', attrs: { id: stage.id }, content: textNode(stage.name),
       })
-      goals
-        .filter((goal) => goal.stageId === stage.id)
-        .forEach((goal) => content.push({
-          type: 'task', attrs: { id: goal.id, completed: goal.completed },
-          content: textNode(goal.title),
-        }))
+      const lines = stage.content?.length ? stage.content : legacyStageLines(stage, goals)
+      lines.forEach((line) => {
+        const goal = line.goalId ? goals.find((item) => item.id === line.goalId) : undefined
+        content.push({
+          type: line.kind === 'task' ? 'task' : 'paragraph',
+          attrs: line.kind === 'task'
+            ? { id: goal?.id ?? line.goalId ?? line.id, completed: goal?.completed ?? false }
+            : { id: line.id },
+          content: textNode(line.text),
+        })
+      })
     })
   return { type: 'doc', content }
 }
@@ -46,10 +57,10 @@ export function editorDocumentToBlocks(document: unknown): ObjectiveBlock[] {
   return content.flatMap((node) => {
     if (!node || typeof node !== 'object' || !('type' in node)) return []
     const typed = node as ObjectiveEditorNode
-    if (typed.type !== 'milestone' && typed.type !== 'task') return []
+    if (typed.type !== 'milestone' && typed.type !== 'task' && typed.type !== 'paragraph') return []
     const text = typed.content?.map((part) => part.text).join('') ?? ''
     return [{
-      id: typed.attrs?.id ?? null, kind: typed.type, text,
+      id: typed.attrs?.id ?? null, kind: typed.type === 'paragraph' ? 'text' : typed.type, text,
       completed: typed.type === 'task' ? typed.attrs?.completed : undefined,
     }]
   })

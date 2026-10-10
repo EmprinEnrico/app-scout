@@ -12,6 +12,14 @@ export type Stage = {
   areaId: string
   name: string
   position: number
+  content?: StageLine[]
+}
+
+export type StageLine = {
+  id: string
+  kind: 'text' | 'task'
+  text: string
+  goalId?: string
 }
 
 export type Goal = {
@@ -39,7 +47,7 @@ export type NewGoal = Pick<Goal, 'title' | 'areaId' | 'stageId'> & { note?: stri
 
 export type ObjectiveBlock = {
   id: string | null
-  kind: 'milestone' | 'task'
+  kind: 'milestone' | 'text' | 'task'
   text: string
   completed?: boolean
 }

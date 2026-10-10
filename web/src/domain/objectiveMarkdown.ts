@@ -47,8 +47,21 @@ export function objectiveToMarkdownFile(area: Area, stages: Stage[], goals: Goal
       position: stage.position,
       createdAt: area.createdAt,
     }));
-    lines.push(stage.name);
-    goals.filter((goal) => goal.stageId === stage.id).forEach((goal) => {
+    lines.push(`# ${stage.name}`);
+    const stageLines = stage.content
+      ? stage.content.map((line) => ({
+        kind: line.kind, text: line.text,
+        goal: line.goalId ? goals.find((item) => item.id === line.goalId) : undefined,
+      }))
+      : goals.filter((goal) => goal.stageId === stage.id)
+        .map((goal) => ({ kind: "task" as const, text: goal.title, goal }));
+    stageLines.forEach((line) => {
+      if (line.kind === "text") {
+        lines.push(line.text);
+        return;
+      }
+      const goal = line.goal;
+      if (!goal) return;
       lines.push(metadataLine("task", {
         id: goal.id,
         createdAt: goal.createdAt,
@@ -83,7 +96,20 @@ export function parseObjectiveFile(content: string): ParsedObjectiveFile {
     const line = rawLine.trim();
     if (!line) continue;
     if (line.startsWith("# ")) {
-      areaName = line.slice(2).trim();
+      const heading = line.slice(2).trim();
+      if (!areaName) {
+        areaName = heading;
+        continue;
+      }
+      const stageMeta = pending?.kind === "milestone" ? pending.value : {};
+      currentStage = {
+        id: textValue(stageMeta, "id", newId()),
+        areaId: textValue(areaMeta ?? {}, "id", newId()), name: heading,
+        position: typeof stageMeta.position === "number" ? stageMeta.position : stages.length,
+        content: [],
+      };
+      stages.push(currentStage);
+      pending = undefined;
       continue;
     }
     if (line.startsWith("-")) {
@@ -91,24 +117,37 @@ export function parseObjectiveFile(content: string): ParsedObjectiveFile {
       const title = line.slice(1).trim();
       if (!title) continue;
       const taskMeta = pending?.kind === "task" ? pending.value : {};
+      const goalId = textValue(taskMeta, "id", newId());
       goals.push({
-        id: textValue(taskMeta, "id", newId()), areaId: textValue(areaMeta ?? {}, "id", newId()),
+        id: goalId, areaId: textValue(areaMeta ?? {}, "id", newId()),
         stageId: currentStage.id, title, note: textValue(taskMeta, "note", ""),
         completed: booleanValue(taskMeta, "completed"),
         createdAt: textValue(taskMeta, "createdAt", now),
         updatedAt: textValue(taskMeta, "updatedAt", now),
         completedAt: booleanValue(taskMeta, "completed") ? nullableText(taskMeta, "completedAt") : null,
       });
+      currentStage.content ??= [];
+      currentStage.content.push({
+        id: goalId, kind: "task", text: title, goalId,
+      });
       pending = undefined;
       continue;
     }
-    const stageMeta = pending?.kind === "milestone" ? pending.value : {};
-    currentStage = {
-      id: textValue(stageMeta, "id", newId()),
-      areaId: textValue(areaMeta ?? {}, "id", newId()), name: line,
-      position: typeof stageMeta.position === "number" ? stageMeta.position : stages.length,
-    };
-    stages.push(currentStage);
+    if (pending?.kind === "milestone") {
+      const stageMeta = pending.value;
+      currentStage = {
+        id: textValue(stageMeta, "id", newId()),
+        areaId: textValue(areaMeta ?? {}, "id", newId()), name: line,
+        position: typeof stageMeta.position === "number" ? stageMeta.position : stages.length,
+        content: [],
+      };
+      stages.push(currentStage);
+      pending = undefined;
+      continue;
+    }
+    if (!currentStage) continue;
+    currentStage.content ??= [];
+    currentStage.content.push({ id: newId(), kind: "text", text: line });
     pending = undefined;
   }
 

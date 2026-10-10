@@ -1,6 +1,6 @@
 // Continuous objective editor: keeps milestones and tasks in one live document.
 import { useEffect, useRef } from 'react'
-import { Editor, Node, nodeInputRule } from '@tiptap/core'
+import { Editor, Node } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { EditorContent, NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
 import Document from '@tiptap/extension-document'
@@ -17,7 +17,7 @@ function newId(): string {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
-function blockNode(name: 'milestone' | 'task') {
+function blockNode(name: 'milestone' | 'paragraph' | 'task') {
   return Node.create({
     name,
     group: 'block',
@@ -42,12 +42,12 @@ function blockNode(name: 'milestone' | 'task') {
         0,
       ]
     },
-    addInputRules() {
-      return name === 'milestone'
-        ? [nodeInputRule({ find: /^-\s$/, type: this.type })]
-        : []
-    },
+    addInputRules() { return [] },
   })
+}
+
+function paragraphNode() {
+  return blockNode('paragraph')
 }
 
 function handleEditorKeyDown(editor: Editor, event: KeyboardEvent): boolean {
@@ -55,18 +55,21 @@ function handleEditorKeyDown(editor: Editor, event: KeyboardEvent): boolean {
   const { selection } = state
   const parent = selection.$from.parent
   const name = parent.type.name
-  if (name !== 'milestone' && name !== 'task') return false
+  if (name !== 'milestone' && name !== 'paragraph' && name !== 'task') return false
   if (event.key === ' ') {
-    if (name !== 'milestone' || parent.textContent !== '-' || !selection.empty) return false
+    if (!selection.empty || !['milestone', 'paragraph'].includes(name)) return false
+    const marker = parent.textContent
+    const targetName = marker === '#' ? 'milestone' : marker === '-' ? 'task' : null
+    if (!targetName) return false
     const position = selection.$from.before()
-    const task = state.schema.nodes.task!.create({ id: null, completed: false })
-    const transaction = state.tr.replaceWith(position, position + parent.nodeSize, task)
+    const target = state.schema.nodes[targetName]!.create({ id: null, completed: false })
+    const transaction = state.tr.replaceWith(position, position + parent.nodeSize, target)
     transaction.setSelection(TextSelection.create(transaction.doc, position + 1))
     editor.view.dispatch(transaction)
     return true
   }
   if (event.key === 'Backspace' && name === 'task' && !parent.textContent && selection.empty) {
-    return editor.commands.setNode('milestone')
+    return editor.commands.setNode('paragraph')
   }
   if (event.key !== 'Enter' || !selection.empty) return false
   event.preventDefault()
@@ -75,10 +78,18 @@ function handleEditorKeyDown(editor: Editor, event: KeyboardEvent): boolean {
   const before = parent.textContent.slice(0, offset)
   const after = parent.textContent.slice(offset)
   const currentType = state.schema.nodes[name]!
-  const nextType = name === 'task' && !before.trim() ? state.schema.nodes.milestone! : currentType
+  if (name === 'milestone') {
+    const first = currentType.create(parent.attrs, before ? state.schema.text(before) : null)
+    const paragraph = state.schema.nodes.paragraph!.create({ id: null }, after ? state.schema.text(after) : null)
+    const transaction = state.tr.replaceWith(position, position + parent.nodeSize, [first, paragraph])
+    transaction.setSelection(TextSelection.create(transaction.doc, position + first.nodeSize + 1))
+    editor.view.dispatch(transaction)
+    return true
+  }
+  const nextType = name === 'task' && !before.trim() ? state.schema.nodes.paragraph! : currentType
   if (name === 'task' && !before.trim() && !after.trim()) {
-    const milestone = nextType.create({ id: null, completed: false })
-    const transaction = state.tr.replaceWith(position, position + parent.nodeSize, milestone)
+    const paragraph = nextType.create({ id: null })
+    const transaction = state.tr.replaceWith(position, position + parent.nodeSize, paragraph)
     transaction.setSelection(TextSelection.create(transaction.doc, position + 1))
     editor.view.dispatch(transaction)
     return true
@@ -164,6 +175,7 @@ export function ContinuousObjectiveEditor({
     extensions: [
       Document,
       Text,
+      paragraphNode(),
       blockNode('milestone'),
       taskNode(),
     ],
@@ -244,7 +256,7 @@ export function ContinuousObjectiveEditor({
         onMouseDown={(event) => event.preventDefault()}
         onClick={startNewMilestone}
       >
-        Nuovo milestone… · inizia con <code>-</code> per una task
+        Nuovo testo… · <code>#</code> milestone · <code>-</code> task
       </button>
     </>
   )

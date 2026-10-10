@@ -35,12 +35,16 @@ export function replaceObjective(
     if (block.kind === 'milestone') {
       const id = freshId(localUsed, block.id)
       const old = oldStages.find((stage) => stage.id === id)
-      currentStage = { id, areaId, name: text, position: stages.length }
+      currentStage = { id, areaId, name: text, position: stages.length, content: [] }
       if (old) currentStage.position = stages.length
       stages.push(currentStage)
       return
     }
     if (!currentStage) return
+    if (block.kind === 'text') {
+      currentStage.content!.push({ id: freshId(localUsed, block.id), kind: 'text', text })
+      return
+    }
     const id = freshId(localUsed, block.id)
     const old = oldGoals.find((goal) => goal.id === id)
     const completed = block.completed ?? old?.completed ?? false
@@ -49,11 +53,12 @@ export function replaceObjective(
       completed, createdAt: old?.createdAt ?? now, updatedAt: now,
       completedAt: completed ? old?.completedAt ?? now : null,
     })
+    currentStage.content!.push({ id, kind: 'task', text, goalId: id })
   })
 
   if (!stages.length) {
     const id = freshId(localUsed, oldStages[0]?.id ?? null)
-    stages.push({ id, areaId, name: 'Primi passi', position: 0 })
+    stages.push({ id, areaId, name: 'Primi passi', position: 0, content: [] })
   }
   const selectedStageId = stages.some((stage) => stage.id === state.selectedStageId)
     ? state.selectedStageId

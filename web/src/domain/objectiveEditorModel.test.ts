@@ -28,4 +28,21 @@ describe('objective editor model', () => {
     const blocks = editorDocumentToBlocks(document)
     expect(blocks.map((block) => block.id)).toEqual(['stage-1', 'task-new', 'task-1'])
   })
+
+  it('keeps descriptive text interleaved with tasks', () => {
+    const document = objectiveToEditorDocument([{
+      ...stages[0]!,
+      content: [
+        { id: 'text-1', kind: 'text', text: 'Build a daily habit.' },
+        { id: 'task-1', kind: 'task', text: 'Read a page', goalId: 'task-1' },
+        { id: 'text-2', kind: 'text', text: 'Review progress each Sunday.' },
+      ],
+    }], goals)
+    expect(editorDocumentToBlocks(document).map((block) => [block.kind, block.text])).toEqual([
+      ['milestone', 'Spanish'],
+      ['text', 'Build a daily habit.'],
+      ['task', 'Read a page'],
+      ['text', 'Review progress each Sunday.'],
+    ])
+  })
 })

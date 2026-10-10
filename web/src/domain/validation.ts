@@ -43,6 +43,10 @@ export function assertGoalState(value: unknown): asserts value is GoalState {
     if (!record(stage) || !nonEmpty(stage.id) || !nonEmpty(stage.areaId) || !nonEmpty(stage.name)
       || !Number.isSafeInteger(stage.position) || (stage.position as number) < 0) invalid()
     if (ids.has(stage.id) || !areaIds.has(stage.areaId)) invalid()
+    if (stage.content !== undefined && (!Array.isArray(stage.content) || stage.content.some((line) =>
+      !record(line) || !nonEmpty(line.id) || (line.kind !== 'text' && line.kind !== 'task')
+      || typeof line.text !== 'string'
+      || (line.goalId !== undefined && !nonEmpty(line.goalId))))) invalid()
     ids.add(stage.id)
     stageAreas.set(stage.id, stage.areaId)
     const areaPositions = positions.get(stage.areaId)!
