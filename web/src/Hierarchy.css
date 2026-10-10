@@ -42,7 +42,9 @@
 .hierarchy-objective-heading {
   border-bottom: 1px solid #eef1ec; min-width: 0; max-width: 100%; overflow: hidden;
 }
-.hierarchy-objective-heading .hierarchy-title { font-size: 18px; font-weight: 750; }
+.hierarchy-objective-heading .hierarchy-title {
+  font-size: var(--font-title-size); font-weight: 650; font-style: italic; line-height: 1.25;
+}
 .hierarchy-heading { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .hierarchy-heading .hierarchy-title { font-size: 13px; font-weight: 750; }
 .hierarchy-heading h3 { margin: 0; color: #344f3f; font-size: 16px; font-weight: 750; }
@@ -97,11 +99,11 @@
 .continuous-objective-editor { padding: 13px 25px 4px; }
 .continuous-objective-editor .tiptap { outline: 0; color: #304c3b; }
 .continuous-objective-editor .continuous-milestone {
-  margin: 0; color: #344f3f; font-size: 16px; font-weight: 750; line-height: 1.5;
+  margin: 0; color: #344f3f; font-size: var(--font-body-size); font-weight: 750; line-height: 1.5;
 }
 .continuous-objective-editor .continuous-task {
   display: flex; align-items: flex-start; gap: 9px; min-height: 29px; color: #304c3b;
-  font-size: 16px; line-height: 1.5;
+  font-size: var(--font-body-size); line-height: 1.5;
 }
 .continuous-task-checkbox {
   width: 20px; height: 20px; margin-top: 3px; padding: 0; flex: none; border: 1.5px solid #b4c6b3;
@@ -130,7 +132,7 @@
   .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
   .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
   .task-title { font-size: 16px; }
-  .hierarchy-objective-heading .hierarchy-title, .hierarchy-heading .hierarchy-title { font-size: 16px; }
+  .hierarchy-heading .hierarchy-title { font-size: 16px; }
   .live-entry { width: calc(100% - 34px); margin: 5px 17px 18px; }
   .markdown-editor { width: calc(100% - 34px); margin: 5px 17px 18px; font-size: 16px; }
   .continuous-objective-editor { padding-left: 17px; padding-right: 17px; }

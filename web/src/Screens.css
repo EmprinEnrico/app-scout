@@ -4,14 +4,20 @@
 .journey-area { border: 1px solid #e5eae3; background: #fff; border-radius: 17px; padding: 25px 28px 8px; }
 .journey-area-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 17px; }
 .journey-area-heading > div { flex: 1; }
-.journey-area-heading h2 { margin: 0; font-size: 19px; letter-spacing: -.4px; color: #2a4938; }
+.journey-area-heading h2 {
+  margin: 0; color: #2a4938; font-size: var(--font-title-size); font-weight: 650;
+  font-style: italic; letter-spacing: -.4px;
+}
 .journey-stages { margin-top: 22px; }
 .journey-stage { border-top: 1px solid #eef1ec; padding: 17px 0; }
 .journey-stage-heading { display: flex; align-items: center; gap: 12px; }
 .journey-stage-heading > div { flex: 1; }
-.journey-stage-heading h3 { margin: 0; color: #344f3f; font-size: 13px; }
+.journey-stage-heading h3 { margin: 0; color: #344f3f; font-size: var(--font-support-size); }
 .archive-list { margin: 12px 0 0; display: grid; gap: 8px; }
-.archive-list li { display: flex; align-items: center; gap: 9px; color: #405a47; font-size: 12px; min-height: 27px; }
+.archive-list li {
+  display: flex; align-items: center; gap: 9px; color: #405a47;
+  font-size: var(--font-body-size); min-height: 27px;
+}
 .archive-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .archive-icon {
   width: 18px; height: 18px; display: grid; place-items: center; flex: none; border-radius: 50%;
@@ -19,9 +25,9 @@
 }
 .archive-list li.completed .archive-icon { background: #75a26e; border-color: #75a26e; }
 .archive-list li.completed .archive-title { color: #5c7563; }
-.journey-status { color: #556b59; font-size: 10px; font-weight: 700; white-space: nowrap; }
+.journey-status { color: #556b59; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .archive-list li.completed .journey-status { color: #4e794e; }
-.stage-empty-note { margin: 12px 0 0; color: #617367; font-size: 11px; }
+.stage-empty-note { margin: 12px 0 0; color: #617367; font-size: var(--font-support-size); }
 .stage-empty-note.no-stages { margin: 22px 0; }
 .wide-empty { min-height: 310px; }
 
@@ -32,10 +38,14 @@
   width: 40px; height: 40px; background: #edf3e6; color: #689363; border-radius: 12px; display: grid;
   place-items: center; flex: none;
 }
-.panel-heading h2 { margin: 0 0 4px; color: #2b4c39; font-size: 18px; letter-spacing: -.5px; }
-.panel-heading p { margin: 0; color: #617367; font-size: 11px; }
+.panel-heading h2 {
+  margin: 0 0 4px; color: #2b4c39; font-size: var(--font-title-size); letter-spacing: -.5px;
+}
+.panel-heading p { margin: 0; color: #617367; font-size: var(--font-support-size); }
 .manage-list li { display: flex; gap: 10px; align-items: center; border-top: 1px solid #f0f2ee; min-height: 48px; }
-.manage-list li strong { flex: 1; min-width: 0; font-size: 12px; color: #415847; overflow-wrap: anywhere; }
+.manage-list li strong {
+  flex: 1; min-width: 0; font-size: var(--font-body-size); color: #415847; overflow-wrap: anywhere;
+}
 .manage-list li .icon-button { width: 29px; height: 29px; }
 .manage-list li .icon-button:first-of-type { margin-left: auto; }
 .rename-form { display: flex; align-items: center; width: 100%; gap: 4px; }
@@ -47,8 +57,8 @@
 }
 .add-form input { flex: 1; min-width: 0; }
 .add-form input::placeholder, .field input::placeholder, .field textarea::placeholder { color: #687b6c; }
-.inline-empty { color: #617367; font-size: 12px; line-height: 1.5; }
-.field { display: flex; flex-direction: column; gap: 7px; color: #4b604f; font-size: 11px; font-weight: 700; }
+.inline-empty { color: #617367; font-size: var(--font-support-size); line-height: 1.5; }
+.field { display: flex; flex-direction: column; gap: 7px; color: #4b604f; font-size: 12px; font-weight: 700; }
 .compact-field { margin-bottom: 13px; }
 .data-panel { margin-top: 18px; }
 .data-panel .panel-heading { margin-bottom: 11px; }
@@ -56,8 +66,10 @@
   display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #edf0eb;
   padding: 19px 0;
 }
-.data-actions strong { display: block; margin-bottom: 4px; color: #405a47; font-size: 12px; }
-.data-actions p { color: #617367; font-size: 11px; line-height: 1.5; margin: 0; }
+.data-actions strong {
+  display: block; margin-bottom: 4px; color: #405a47; font-size: var(--font-body-size);
+}
+.data-actions p { color: #617367; font-size: var(--font-support-size); line-height: 1.5; margin: 0; }
 .data-actions .button { min-width: 100px; }
 .reset-action { padding-bottom: 0; }
 .file-button { position: relative; cursor: pointer; overflow: hidden; }
