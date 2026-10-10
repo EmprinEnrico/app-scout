@@ -3,6 +3,16 @@ import { ArrowRight, Check, Compass } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
 
+function completionLabel(goal: Goal): string {
+  if (!goal.completedAt) return "Da completare";
+  const date = new Intl.DateTimeFormat("it-IT", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(goal.completedAt));
+  return `Completato il ${date}`;
+}
+
 function JourneyArea({
   area,
   stages,
@@ -56,7 +66,7 @@ function JourneyArea({
                         </span>
                         <span className="archive-title">{goal.title}</span>
                         <span className="journey-status">
-                          {goal.completed ? "Completato" : "Da fare"}
+                          {completionLabel(goal)}
                         </span>
                       </li>
                     ))}
@@ -79,7 +89,7 @@ function JourneyArea({
   );
 }
 
-export function JourneyScreen({ onSettings }: { onSettings: () => void }) {
+export function JourneyScreen({ onObjectives }: { onObjectives: () => void }) {
   const { state } = useGoals();
 
   return (
@@ -102,15 +112,15 @@ export function JourneyScreen({ onSettings }: { onSettings: () => void }) {
           </span>
           <h3>Il tuo percorso comincia da qui</h3>
           <p>
-            Quando creerai le tue aree e le tue pratiche, potrai tornare qui
-            per rileggere ciò che hai provato e imparato.
+            Quando creerai i tuoi obiettivi e le tue pratiche, potrai tornare
+            qui per rileggere ciò che hai completato e quando.
           </p>
           <button
             type="button"
             className="button button-primary"
-            onClick={onSettings}
+            onClick={onObjectives}
           >
-            Crea la prima area <ArrowRight size={16} />
+            Crea il primo obiettivo <ArrowRight size={16} />
           </button>
         </div>
       )}

@@ -36,7 +36,7 @@ export function DataPanel({
 
   async function upload(file?: File) {
     if (!file || !window.confirm(
-      "Importare questo file? Le aree, le tappe e gli obiettivi attuali saranno sostituiti.",
+      "Importare questo file? Gli obiettivi, i milestone e le pratiche attuali saranno sostituiti.",
     )) return;
     try {
       const result = importData(await file.text());
@@ -86,7 +86,7 @@ export function DataPanel({
         <div className="data-actions legacy-action">
           <div>
             <strong>Dalla vecchia app</strong>
-            <p>Importa gli obiettivi in una nuova area. I dati della vecchia app restano conservati.</p>
+            <p>Importa i dati nella nuova struttura. La copia precedente resta conservata.</p>
           </div>
           <button type="button" className="text-link" onClick={() => {
             if (window.confirm(
@@ -121,7 +121,7 @@ export function DataPanel({
         </a>
       </div>
       <div className="data-actions reset-action">
-        <div><strong>Ricomincia da zero</strong><p>Elimina aree, tappe e obiettivi salvati.</p></div>
+        <div><strong>Ricomincia da zero</strong><p>Elimina obiettivi, milestone e pratiche salvati.</p></div>
         <button type="button" className="button button-danger" onClick={() => {
           if (window.confirm(
             "Vuoi eliminare tutti i tuoi dati di Scout Journey? Questa azione non si può annullare.",

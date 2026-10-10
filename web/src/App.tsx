@@ -1,18 +1,19 @@
 // App shell: provides the global layout and navigation for Scout Journey.
 import { useState } from "react";
-import { Compass, Flag, Settings2 } from "lucide-react";
+import { ClipboardList, Compass, Settings2, Target } from "lucide-react";
 import { GoalsProvider, useGoals } from "./domain/GoalsContext";
-import { GoalsScreen } from "./components/GoalsScreen";
+import { ObjectivesScreen } from "./components/ObjectivesScreen";
 import { JourneyScreen } from "./components/JourneyScreen";
 import { SettingsScreen } from "./components/SettingsScreen";
+import { TasksScreen } from "./components/TasksScreen";
 import "./App.css";
 import "./Screens.css";
 
-type Tab = "goals" | "journey" | "settings";
+type Tab = "tasks" | "objectives" | "journey" | "settings";
 
 function ScoutJourney() {
   const { ready, error } = useGoals();
-  const [tab, setTab] = useState<Tab>("goals");
+  const [tab, setTab] = useState<Tab>("tasks");
 
   if (!ready)
     return (
@@ -34,26 +35,31 @@ function ScoutJourney() {
             {error}
           </div>
         )}
-        {tab === "goals" && (
-          <GoalsScreen
-            onJourney={() => setTab("journey")}
-            onSettings={() => setTab("settings")}
-          />
-        )}
+        {tab === "tasks" && <TasksScreen onObjectives={() => setTab("objectives")} />}
+        {tab === "objectives" && <ObjectivesScreen />}
         {tab === "journey" && (
-          <JourneyScreen onSettings={() => setTab("settings")} />
+          <JourneyScreen onObjectives={() => setTab("objectives")} />
         )}
         {tab === "settings" && <SettingsScreen />}
       </main>
       <nav className="bottom-nav" aria-label="Navigazione principale">
         <button
           type="button"
-          className={tab === "goals" ? "active" : ""}
-          aria-current={tab === "goals" ? "page" : undefined}
-          onClick={() => setTab("goals")}
+          className={tab === "tasks" ? "active" : ""}
+          aria-current={tab === "tasks" ? "page" : undefined}
+          onClick={() => setTab("tasks")}
         >
-          <Flag size={20} />
-          <span>Obiettivi</span>
+          <ClipboardList size={20} />
+          <span>Task</span>
+        </button>
+        <button
+          type="button"
+          className={tab === "objectives" ? "active" : ""}
+          aria-current={tab === "objectives" ? "page" : undefined}
+          onClick={() => setTab("objectives")}
+        >
+          <Target size={20} />
+          <span>Objectives</span>
         </button>
         <button
           type="button"
@@ -62,7 +68,7 @@ function ScoutJourney() {
           onClick={() => setTab("journey")}
         >
           <Compass size={20} />
-          <span>Percorso</span>
+          <span>Journey</span>
         </button>
         <button
           type="button"
@@ -71,7 +77,7 @@ function ScoutJourney() {
           onClick={() => setTab("settings")}
         >
           <Settings2 size={20} />
-          <span>Impostazioni</span>
+          <span>Settings</span>
         </button>
       </nav>
     </div>

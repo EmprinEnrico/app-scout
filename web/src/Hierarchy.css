@@ -1,0 +1,67 @@
+/* Objective hierarchy styles: keeps task and editing views quiet and readable. */
+
+.page-intro { margin-bottom: 28px; }
+.page-intro h1 { margin: 7px 0 8px; color: #254536; font-size: 32px; letter-spacing: -1px; }
+.page-intro p { margin: 0; color: #617367; font-size: 13px; line-height: 1.6; }
+.task-objectives, .hierarchy-list { display: grid; gap: 18px; }
+.task-objective, .hierarchy-objective {
+  border: 1px solid #e5eae3; border-radius: 17px; background: #fff;
+  box-shadow: 0 10px 25px -24px #1c422b;
+}
+.task-objective-heading, .hierarchy-objective-heading {
+  display: flex; align-items: center; gap: 13px; min-height: 65px; padding: 0 25px;
+}
+.task-objective-heading h2 { margin: 0; color: #2a4938; font-size: 19px; letter-spacing: -.4px; }
+.task-milestones, .hierarchy-milestones { padding: 0 25px 8px; }
+.task-milestone, .hierarchy-milestone { border-top: 1px solid #eef1ec; padding: 17px 0; }
+.task-milestone h3 { margin: 0 0 12px; color: #344f3f; font-size: 13px; }
+.task-list, .hierarchy-task-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
+.task-item {
+  display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 5px 8px;
+  border-radius: 9px; color: #405a47; font-size: 12px;
+}
+.task-item:hover { background: #f7faf4; }
+.task-check {
+  width: 25px; height: 25px; padding: 0; flex: none; display: grid; place-items: center;
+  border: 1.5px solid #b4c6b3; border-radius: 7px; background: #fff; color: #fff;
+}
+.task-check:hover { border-color: #4a7952; }
+.task-item.is-complete .task-check { border-color: #75a26e; background: #75a26e; }
+.task-title { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.task-item.is-complete .task-title { color: #718276; text-decoration: line-through; }
+.task-status { color: #4e794e; font-size: 10px; white-space: nowrap; }
+.task-empty { margin: 0; color: #839187; font-size: 11px; }
+.hierarchy-objective-heading { border-bottom: 1px solid #eef1ec; }
+.hierarchy-objective-heading .hierarchy-title { font-size: 18px; font-weight: 750; }
+.hierarchy-heading { display: flex; align-items: center; gap: 8px; }
+.hierarchy-heading .hierarchy-title { font-size: 13px; font-weight: 750; }
+.hierarchy-title {
+  min-width: 0; flex: 1; border: 1px solid transparent; border-radius: 7px; padding: 7px 5px;
+  background: transparent; color: #2d4c37; font: inherit; letter-spacing: inherit;
+}
+.hierarchy-title:hover, .hierarchy-title:focus { border-color: #dfe7db; background: #fbfcf9; outline: 0; }
+.hierarchy-task { display: flex; align-items: center; gap: 5px; min-height: 36px; }
+.hierarchy-task .hierarchy-title { color: #526759; font-size: 12px; }
+.hierarchy-add { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
+.hierarchy-add input, .new-objective input {
+  min-width: 0; flex: 1; border: 1px solid #dfe7db; border-radius: 8px; background: #fbfcf9;
+  color: #2d4c37; padding: 9px 11px; font-size: 12px;
+}
+.hierarchy-add input:focus, .new-objective input:focus { border-color: #a9c38d; outline: 3px solid #eaf2dc; }
+.hierarchy-add input::placeholder, .new-objective input::placeholder { color: #7a897c; }
+.milestone-add { padding-top: 8px; }
+.new-objective {
+  display: flex; align-items: center; gap: 8px; padding: 18px; border: 1px dashed #c8d7c2;
+  border-radius: 14px; background: #fdfefb;
+}
+.new-objective .button { flex: none; }
+.settings-page .data-panel { margin-top: 0; }
+
+@media (max-width: 560px) {
+  .page-intro h1 { font-size: 28px; }
+  .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
+  .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
+  .task-status { display: none; }
+  .new-objective { align-items: stretch; flex-direction: column; }
+  .new-objective .button { width: 100%; }
+}

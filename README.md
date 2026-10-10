@@ -1,6 +1,9 @@
 # Scout Journey
 
-Scout Journey aiuta a scrivere obiettivi, organizzarli in aree e fasi e segnare i progressi. L’app è sviluppata in React, TypeScript e Vite. La stessa build web alimenta la PWA e i progetti Capacitor per iOS e Android.
+Scout Journey aiuta a definire obiettivi di vita, scomporli in milestone e
+pratiche concrete, e conservare il percorso di ciò che viene completato. L’app
+è sviluppata in React, TypeScript e Vite. La stessa build web alimenta la PWA e
+i progetti Capacitor per iOS e Android.
 
 Il codice attivo si trova in [`web/`](web/), nel branch `main`. La versione precedente rimane recuperabile nella cronologia Git. Per le decisioni tecniche consulta [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); per la direzione del prodotto e le sue basi di ricerca, consulta [`docs/PRODUCT.md`](docs/PRODUCT.md) e [`docs/RESEARCH.md`](docs/RESEARCH.md).
 
