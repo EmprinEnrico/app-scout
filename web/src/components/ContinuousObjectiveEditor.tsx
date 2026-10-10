@@ -227,5 +227,25 @@ export function ContinuousObjectiveEditor({
     if (pendingBlocks.current) onChangeRef.current(pendingBlocks.current)
   }, [])
 
-  return <EditorContent className="continuous-objective-editor" editor={editor} />
+  function startNewMilestone() {
+    if (!editor) return
+    editor.commands.insertContentAt(editor.state.doc.content.size, {
+      type: 'milestone', attrs: { id: null, completed: false }, content: [],
+    })
+    editor.commands.focus('end')
+  }
+
+  return (
+    <>
+      <EditorContent className="continuous-objective-editor" editor={editor} />
+      <button
+        className="continuous-editor-hint"
+        type="button"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={startNewMilestone}
+      >
+        Nuovo milestone… · inizia con <code>-</code> per una task
+      </button>
+    </>
+  )
 }

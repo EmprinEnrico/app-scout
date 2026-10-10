@@ -112,6 +112,13 @@
 .continuous-task[data-completed="true"] .continuous-task-text {
   color: #718276; text-decoration: line-through;
 }
+.continuous-editor-hint {
+  display: block; width: calc(100% - 50px); margin: -8px 25px 18px; padding: 5px 0;
+  border: 0; background: transparent; color: #a2aea3; font: inherit; font-size: 13px;
+  line-height: 1.5; text-align: left; cursor: text;
+}
+.continuous-editor-hint:hover { color: #718276; }
+.continuous-editor-hint code { font: inherit; color: #879889; }
 .editor-line-group { display: block; min-height: 1.75em; }
 .editor-metadata {
   display: block; color: #a2aea3; font-size: 10px; font-weight: 500; line-height: 1.35;
@@ -127,6 +134,7 @@
   .live-entry { width: calc(100% - 34px); margin: 5px 17px 18px; }
   .markdown-editor { width: calc(100% - 34px); margin: 5px 17px 18px; font-size: 16px; }
   .continuous-objective-editor { padding-left: 17px; padding-right: 17px; }
+  .continuous-editor-hint { width: calc(100% - 34px); margin-left: 17px; margin-right: 17px; }
   .new-objective { align-items: stretch; flex-direction: column; }
   .new-objective .button { width: 100%; }
 }
