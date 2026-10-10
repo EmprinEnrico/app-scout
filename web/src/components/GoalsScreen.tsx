@@ -103,9 +103,6 @@ export function GoalsScreen({
               title="Gestisci tappe"
             >
               <span>{stage.name}</span>
-              <small>
-                {stageIndex + 1} / {stages.length}
-              </small>
             </button>
             <button
               type="button"

@@ -1,30 +1,16 @@
 /* Secondary screens and shared form styles for the Scout Journey interface. */
 
-.journey-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
-.journey-summary > div {
-  min-height: 137px; padding: 23px 27px; display: flex; flex-direction: column; border: 1px solid #e8ece4;
-  border-radius: 14px; background: white;
-}
-.journey-summary strong { font-size: 36px; letter-spacing: -1.5px; color: #2d513a; margin: 5px 0 0; }
-.journey-summary span:last-child { color: #617367; font-size: 11px; }
 .journey-list { display: grid; gap: 18px; }
 .journey-area { border: 1px solid #e5eae3; background: #fff; border-radius: 17px; padding: 25px 28px 8px; }
 .journey-area-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 17px; }
 .journey-area-heading > div { flex: 1; }
-.journey-area-heading h2 { margin: 0 0 3px; font-size: 19px; letter-spacing: -.4px; color: #2a4938; }
-.journey-area-heading p { margin: 0; color: #617367; font-size: 11px; }
-.journey-percent { color: #547b52; font-size: 20px; font-weight: 700; }
+.journey-area-heading h2 { margin: 0; font-size: 19px; letter-spacing: -.4px; color: #2a4938; }
 .journey-stages { margin-top: 22px; }
 .journey-stage { border-top: 1px solid #eef1ec; padding: 17px 0; }
 .journey-stage-heading { display: flex; align-items: center; gap: 12px; }
-.step-badge, .manage-number {
-  width: 27px; height: 27px; border-radius: 8px; background: #eef3e8; color: #52734e; display: grid;
-  place-items: center; flex: none; font-size: 10px; font-weight: 800;
-}
 .journey-stage-heading > div { flex: 1; }
-.journey-stage-heading h3 { margin: 0 0 3px; color: #344f3f; font-size: 13px; }
-.journey-stage-heading p, .stage-fraction { margin: 0; color: #617367; font-size: 11px; }
-.archive-list { margin: 12px 0 0 40px; display: grid; gap: 8px; }
+.journey-stage-heading h3 { margin: 0; color: #344f3f; font-size: 13px; }
+.archive-list { margin: 12px 0 0; display: grid; gap: 8px; }
 .archive-list li { display: flex; align-items: center; gap: 9px; color: #405a47; font-size: 12px; min-height: 27px; }
 .archive-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .archive-icon {
@@ -35,7 +21,7 @@
 .archive-list li.completed .archive-title { color: #5c7563; }
 .journey-status { color: #556b59; font-size: 10px; font-weight: 700; white-space: nowrap; }
 .archive-list li.completed .journey-status { color: #4e794e; }
-.stage-empty-note { margin: 12px 0 0 40px; color: #617367; font-size: 11px; }
+.stage-empty-note { margin: 12px 0 0; color: #617367; font-size: 11px; }
 .stage-empty-note.no-stages { margin: 22px 0; }
 .wide-empty { min-height: 310px; }
 
@@ -104,11 +90,6 @@
 }
 
 @media (max-width: 460px) {
-  .journey-summary { gap: 7px; }
-  .journey-summary > div { padding: 14px 10px; min-height: 112px; }
-  .journey-summary strong { font-size: 29px; }
-  .journey-summary .eyebrow { letter-spacing: 1px; font-size: 9px; }
-  .journey-summary span:last-child { font-size: 10px; }
   .journey-area { padding: 22px 18px 7px; }
   .settings-panel { padding: 21px 17px; }
   .data-actions { align-items: flex-start; flex-direction: column; gap: 11px; }

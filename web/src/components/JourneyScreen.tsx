@@ -1,9 +1,7 @@
-// Journey screen: summarizes progress across areas, stages, and goals.
+// Journey screen: shows the qualitative record of areas, stages, and practices.
 import { ArrowRight, Check, Compass } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
-import { count } from "./format";
-import { Progress } from "./ui";
 
 function JourneyArea({
   area,
@@ -18,7 +16,6 @@ function JourneyArea({
     .filter((stage) => stage.areaId === area.id)
     .sort((a, b) => a.position - b.position);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
-  const areaDone = areaGoals.filter((goal) => goal.completed).length;
 
   return (
     <section className="journey-area" aria-labelledby={`journey-${area.id}`}>
@@ -30,44 +27,20 @@ function JourneyArea({
         />
         <div>
           <h2 id={`journey-${area.id}`}>{area.name}</h2>
-          <p>
-            {count(areaDone, "obiettivo completato", "obiettivi completati")} su{" "}
-            {areaGoals.length}
-          </p>
         </div>
-        <span className="journey-percent">
-          {areaGoals.length
-            ? Math.round((areaDone / areaGoals.length) * 100)
-            : 0}
-          %
-        </span>
       </div>
-      <Progress done={areaDone} total={areaGoals.length} />
       {areaStages.length ? (
         <div className="journey-stages">
-          {areaStages.map((stage, index) => {
+          {areaStages.map((stage) => {
             const stageGoals = areaGoals.filter(
               (goal) => goal.stageId === stage.id,
             );
-            const completed = stageGoals.filter(
-              (goal) => goal.completed,
-            ).length;
             return (
               <div className="journey-stage" key={stage.id}>
                 <div className="journey-stage-heading">
-                  <span className="step-badge">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   <div>
                     <h3>{stage.name}</h3>
-                    <p>
-                      {count(completed, "completato", "completati")} su{" "}
-                      {stageGoals.length}
-                    </p>
                   </div>
-                  <span className="stage-fraction">
-                    {completed}/{stageGoals.length}
-                  </span>
                 </div>
                 {stageGoals.length ? (
                   <ul className="archive-list">
@@ -108,27 +81,9 @@ function JourneyArea({
 
 export function JourneyScreen({ onSettings }: { onSettings: () => void }) {
   const { state } = useGoals();
-  const done = state.goals.filter((goal) => goal.completed).length;
 
   return (
     <>
-      <section className="journey-summary" aria-label="Riepilogo del percorso">
-        <div>
-          <span className="eyebrow">FINORA</span>
-          <strong>{done}</strong>
-          <span>obiettivi completati</span>
-        </div>
-        <div>
-          <span className="eyebrow">IN CAMMINO</span>
-          <strong>{state.goals.length - done}</strong>
-          <span>obiettivi da fare</span>
-        </div>
-        <div>
-          <span className="eyebrow">I TUOI SPAZI</span>
-          <strong>{state.areas.length}</strong>
-          <span>{state.areas.length === 1 ? "area" : "aree"} da esplorare</span>
-        </div>
-      </section>
       {state.areas.length ? (
         <div className="journey-list">
           {state.areas.map((area) => (
@@ -147,8 +102,8 @@ export function JourneyScreen({ onSettings }: { onSettings: () => void }) {
           </span>
           <h3>Il tuo percorso comincia da qui</h3>
           <p>
-            Quando creerai le tue aree e i tuoi obiettivi, vedrai qui i
-            progressi e i traguardi raggiunti.
+            Quando creerai le tue aree e le tue pratiche, potrai tornare qui
+            per rileggere ciò che hai provato e imparato.
           </p>
           <button
             type="button"

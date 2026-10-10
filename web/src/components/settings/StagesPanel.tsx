@@ -29,7 +29,7 @@ export function StagesPanel({
             </select>
           </label>
           <ul className="manage-list stage-manage-list">
-            {managedStages.map((stage, index) => (
+            {managedStages.map((stage) => (
               <li key={stage.id}>
                 {renaming?.kind === "stage" && renaming.id === stage.id ? (
                   <form className="rename-form" onSubmit={(event) => {
@@ -59,9 +59,6 @@ export function StagesPanel({
                   </form>
                 ) : (
                   <>
-                    <span className="manage-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
                     <strong>{stage.name}</strong>
                     <button
                       className="icon-button"

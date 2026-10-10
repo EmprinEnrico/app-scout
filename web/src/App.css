@@ -92,15 +92,6 @@
 .stage-arrows button:hover:not(:disabled), .icon-button:hover { background: #eff4e7; color: #245039; }
 .stage-arrows button:disabled { opacity: .35; }
 .stage-card h3 { font-size: 24px; letter-spacing: -.7px; margin: 8px 0 25px; color: #2a4938; }
-.stage-progress-line {
-  display: flex; justify-content: space-between; gap: 15px; color: #617367; font-size: 11px; font-weight: 600;
-  margin-bottom: 10px;
-}
-.stage-progress-line span:last-child { color: #416f49; }
-.progress-track { width: 100%; height: 7px; background: #e8eee3; border-radius: 20px; overflow: hidden; }
-.progress-track > span {
-  display: block; height: 100%; background: #a7c67b; border-radius: inherit; transition: width .25s ease;
-}
 .goals-heading { margin-top: 44px; }
 .button {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent;
