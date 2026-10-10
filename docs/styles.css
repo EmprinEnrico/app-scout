@@ -1,0 +1,85 @@
+/* Landing page styles: gives the static Scout Journey introduction its visual language. */
+
+:root {
+  color: #294437;
+  background: #f5f7f1;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; }
+.site-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 24px 32px;
+}
+.brand { align-items: center; display: inline-flex; gap: 11px; font-weight: 800; text-decoration: none; }
+.brand img { border-radius: 12px; }
+.header-link { color: #617568; font-size: .85rem; text-decoration: none; }
+.header-link:hover { color: #294437; }
+main { margin: 0 auto; max-width: 1120px; padding: 74px 32px 90px; }
+.hero { align-items: center; display: grid; gap: 70px; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr); }
+.eyebrow { color: #628151; font-size: .72rem; font-weight: 800; letter-spacing: .18em; margin: 0 0 18px; }
+h1, h2, p { margin-top: 0; }
+h1 {
+  color: #203c2f; font-size: clamp(3.3rem, 8vw, 6.3rem); letter-spacing: -.08em;
+  line-height: .94; margin-bottom: 27px; max-width: 720px;
+}
+.hero-text { color: #617568; font-size: 1.08rem; max-width: 500px; }
+.hero-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 13px; margin-top: 33px; }
+.button { border-radius: 9px; display: inline-flex; gap: 9px; padding: 12px 17px; text-decoration: none; }
+.button-primary { background: #28533d; color: white; font-weight: 700; }
+.button-primary:hover { background: #1e4331; }
+.button-quiet { color: #5d7566; font-size: .9rem; }
+.button-quiet:hover { color: #294437; }
+.hero-card {
+  background: #fff; border: 1px solid #e1e9dc; border-radius: 22px;
+  box-shadow: 0 24px 60px #375f3e18; padding: 25px 28px 31px; transform: rotate(2deg);
+}
+.card-topline { display: flex; gap: 5px; margin-bottom: 37px; }
+.card-topline span { background: #d9e5d3; border-radius: 50%; height: 6px; width: 6px; }
+.card-label { color: #89a07f; font-size: .65rem; font-weight: 800; letter-spacing: .17em; margin-bottom: 8px; }
+.hero-card h2 { color: #294437; font-size: 1.35rem; letter-spacing: -.04em; margin-bottom: 25px; }
+.note {
+  align-items: center; border-bottom: 1px solid #edf1eb; color: #47604e;
+  display: flex; gap: 11px; padding: 14px 0;
+}
+.note i {
+  border: 1px solid #b8cbb3; border-radius: 5px; display: grid; font-size: .75rem;
+  font-style: normal; height: 19px; place-items: center; width: 19px;
+}
+.note.checked i { background: #7ba06e; border-color: #7ba06e; color: white; }
+.note.checked { color: #91a096; text-decoration: line-through; }
+.note.muted { color: #a5b0a5; }
+.principles { border-top: 1px solid #dfe8db; margin-top: 130px; padding-top: 28px; }
+.principle-grid { display: grid; gap: 28px; grid-template-columns: repeat(3, 1fr); }
+.principle-grid article { border-top: 2px solid #aec58e; padding-top: 18px; }
+.number { color: #89a873; font-size: .78rem; font-weight: 800; }
+.principle-grid h2 { font-size: 1.25rem; letter-spacing: -.03em; margin: 19px 0 8px; }
+.principle-grid p, .privacy-note > p { color: #6d7f72; font-size: .9rem; max-width: 310px; }
+.privacy-note {
+  align-items: end; background: #e7efdf; border-radius: 18px; display: flex; gap: 40px;
+  justify-content: space-between; margin-top: 85px; padding: 33px 38px;
+}
+.privacy-note h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); letter-spacing: -.05em; margin: 0; }
+.privacy-note > p { margin: 0; max-width: 410px; }
+footer {
+  color: #7d8d80; display: flex; font-size: .78rem; justify-content: space-between;
+  margin: 0 auto; max-width: 1120px; padding: 24px 32px 38px;
+}
+@media (max-width: 720px) {
+  .site-header { padding: 18px 20px; }
+  main { padding: 45px 20px 65px; }
+  .hero { gap: 52px; grid-template-columns: 1fr; }
+  .hero-card { justify-self: center; max-width: 390px; width: 100%; }
+  .principles { margin-top: 80px; }
+  .principle-grid { grid-template-columns: 1fr; }
+  .privacy-note { align-items: start; flex-direction: column; gap: 22px; margin-top: 65px; padding: 28px 24px; }
+  footer { padding: 20px; }
+}

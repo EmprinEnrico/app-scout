@@ -1,6 +1,12 @@
 // Data settings panel: exports, imports, migrates, and resets local app data.
 import { useState } from "react";
-import { ArrowDownToLine, ArrowRight, ArrowUpFromLine, RotateCcw } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ArrowRight,
+  ArrowUpFromLine,
+  ExternalLink,
+  RotateCcw,
+} from "lucide-react";
 
 type DataPanelProps = {
   legacyDataAvailable: boolean;
@@ -100,6 +106,20 @@ export function DataPanel({
           {message.text}
         </p>
       )}
+      <div className="data-actions">
+        <div>
+          <strong>Codice del progetto</strong>
+          <p>Scopri il codice sorgente e contribuisci su GitHub.</p>
+        </div>
+        <a
+          className="button button-secondary"
+          href="https://github.com/EmprinEnrico/app-scout"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExternalLink size={17} /> GitHub
+        </a>
+      </div>
       <div className="data-actions reset-action">
         <div><strong>Ricomincia da zero</strong><p>Elimina aree, tappe e obiettivi salvati.</p></div>
         <button type="button" className="button button-danger" onClick={() => {
