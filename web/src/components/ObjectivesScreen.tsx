@@ -1,5 +1,5 @@
 // Objectives screen: edits each objective as one Markdown-like text document.
-import { useRef, useState, type FormEvent, type MouseEvent } from "react";
+import { useState, type FormEvent, type MouseEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
@@ -10,6 +10,7 @@ import {
 } from "../domain/objectiveMarkdown";
 import { syncObjective } from "../domain/objectiveSync";
 import { SwipeObjective } from "./SwipeObjective";
+import { MarkdownEditor } from "./MarkdownEditor";
 import "../Hierarchy.css";
 import "../Screens.css";
 
@@ -71,38 +72,56 @@ function ObjectiveCard({
   onUpdateGoal: (id: string, patch: { title: string; stageId: string }) => void;
   onDeleteGoal: (id: string) => void;
 }) {
-  const editorRef = useRef<HTMLTextAreaElement>(null);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState("");
+  const [editSession, setEditSession] = useState<{
+    value: string;
+    caret: number;
+  } | null>(null);
+  const editing = editSession !== null;
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
 
-  function enterEdit(stageId?: string, goalId?: string) {
+  function enterEdit(stageId?: string, goalId?: string, characterOffset = 0) {
     const markdown = objectiveToMarkdown(areaStages, areaGoals);
-    const cursorPosition = objectiveCursorPosition(areaStages, areaGoals, { stageId, goalId });
-    setDraft(markdown);
-    setEditing(true);
-    requestAnimationFrame(() => {
-      const editor = editorRef.current;
-      if (!editor) return;
-      editor.focus();
-      editor.setSelectionRange(cursorPosition, cursorPosition);
+    const linePosition = objectiveCursorPosition(areaStages, areaGoals, { stageId, goalId });
+    setEditSession({
+      value: markdown,
+      caret: Math.min(markdown.length, linePosition + characterOffset),
     });
+  }
+
+  function clickedTextOffset(event: MouseEvent<HTMLDivElement>, line: Element) {
+    const documentWithCaret = document as Document & {
+      caretRangeFromPoint?: (x: number, y: number) => Range | null;
+      caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+    };
+    const range = documentWithCaret.caretRangeFromPoint?.(event.clientX, event.clientY);
+    if (range && line.contains(range.startContainer)) {
+      return range.startContainer.nodeType === Node.TEXT_NODE ? range.startOffset : 0;
+    }
+    const position = documentWithCaret.caretPositionFromPoint?.(event.clientX, event.clientY);
+    if (position && line.contains(position.offsetNode)) {
+      return position.offsetNode.nodeType === Node.TEXT_NODE ? position.offset : 0;
+    }
+    return 0;
   }
 
   function handleBodyClick(event: MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
     const goalId = target.closest<HTMLElement>("[data-goal-id]")?.dataset.goalId;
     const stageId = target.closest<HTMLElement>("[data-stage-id]")?.dataset.stageId;
-    enterEdit(stageId, goalId);
+    const line = goalId
+      ? target.closest<HTMLElement>("[data-goal-id]")?.querySelector(".task-title")
+      : target.closest<HTMLElement>("[data-stage-id]")?.querySelector("h3");
+    const characterOffset = line ? clickedTextOffset(event, line) : 0;
+    enterEdit(stageId, goalId, characterOffset);
   }
 
-  function exitEdit() {
+  function exitEdit(value: string) {
     if (!editing) return;
-    setEditing(false);
+    setEditSession(null);
     syncObjective({
       area,
-      blocks: parseObjectiveMarkdown(draft),
+      blocks: parseObjectiveMarkdown(value),
       stages,
       goals,
       renameStage: onRenameStage,
@@ -131,20 +150,12 @@ function ObjectiveCard({
             onUpdate={(name) => onRenameArea(area.id, name)}
           />
         </header>
-        {editing ? (
-          <textarea
-            ref={editorRef}
-            className="markdown-editor"
-            aria-label={`Testo dell’obiettivo ${area.name}`}
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onBlur={exitEdit}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" || event.key === "Esc") {
-                event.preventDefault();
-                exitEdit();
-              }
-            }}
+        {editing && editSession ? (
+          <MarkdownEditor
+            initialValue={editSession.value}
+            initialCaret={editSession.caret}
+            ariaLabel={`Testo dell’obiettivo ${area.name}`}
+            onExit={exitEdit}
           />
         ) : (
           <div className="hierarchy-milestones" onClick={handleBodyClick}>
