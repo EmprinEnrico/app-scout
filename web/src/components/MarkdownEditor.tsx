@@ -1,10 +1,20 @@
 // Markdown editor: provides a plain, browser-native contenteditable document.
 import { useEffect, useRef, type KeyboardEvent } from "react";
 
+export function editorLinesToText(lines: string[]): string {
+  return lines.map((line) => line.replace(/\u00a0/g, " ")).join("\n");
+}
+
 function textFromEditor(editor: HTMLDivElement): string {
-  const clone = editor.cloneNode(true) as HTMLDivElement;
-  clone.querySelectorAll("[data-editor-metadata]").forEach((node) => node.remove());
-  return clone.innerText.replace(/\u00a0/g, " ").replace(/\r\n/g, "\n");
+  const groups = Array.from(editor.querySelectorAll<HTMLElement>(".editor-line-group"));
+  if (!groups.length) return editor.textContent?.replace(/\u00a0/g, " ") ?? "";
+
+  const lines = groups.map((group) => {
+    const clone = group.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll("[data-editor-metadata]").forEach((node) => node.remove());
+    return clone.textContent ?? "";
+  });
+  return editorLinesToText(lines).replace(/\r\n/g, "\n");
 }
 
 function lineAndOffset(value: string, position: number): { line: number; offset: number } {

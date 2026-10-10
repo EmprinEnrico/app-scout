@@ -77,6 +77,7 @@ function ObjectiveCard({
   const [editSession, setEditSession] = useState<{
     value: string;
     caret: number;
+    metadata?: string[][];
   } | null>(null);
   const editing = editSession !== null;
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
@@ -95,11 +96,18 @@ function ObjectiveCard({
     const markdown = objectiveToMarkdown(areaStages, areaGoals);
     const caret = objectiveStageEndPosition(areaStages, areaGoals, stageId);
     const value = `${markdown.slice(0, caret)}\n${markdown.slice(caret)}`;
-    setEditSession({ value, caret: caret + 1 });
+    const metadata = objectiveEditorMetadata(area, areaStages, areaGoals);
+    const insertedLine = value.slice(0, caret + 1).split("\n").length - 1;
+    metadata.splice(insertedLine, 0, []);
+    setEditSession({ value, caret: caret + 1, metadata });
   }
 
-  function handleBodyClick(event: MouseEvent<HTMLDivElement>) {
+  function handleBodyMouseDown(event: MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLElement;
+    if (target.closest("button") || target.closest(".live-entry") || target.closest(".task-entry")) {
+      return;
+    }
+    event.preventDefault();
     const goalId = target.closest<HTMLElement>("[data-goal-id]")?.dataset.goalId;
     const stageId = target.closest<HTMLElement>("[data-stage-id]")?.dataset.stageId;
     enterEdit(stageId, goalId);
@@ -143,12 +151,12 @@ function ObjectiveCard({
           <MarkdownEditor
             initialValue={editSession.value}
             initialCaret={editSession.caret}
-            metadata={objectiveEditorMetadata(area, areaStages, areaGoals)}
+            metadata={editSession.metadata ?? objectiveEditorMetadata(area, areaStages, areaGoals)}
             ariaLabel={`Testo dell’obiettivo ${area.name}`}
             onExit={exitEdit}
           />
         ) : (
-          <div className="hierarchy-milestones" onClick={handleBodyClick}>
+          <div className="hierarchy-milestones" onMouseDown={handleBodyMouseDown}>
             {areaStages.map((stage) => (
               <section className="hierarchy-milestone" key={stage.id} data-stage-id={stage.id}>
                 <header className="hierarchy-heading">
