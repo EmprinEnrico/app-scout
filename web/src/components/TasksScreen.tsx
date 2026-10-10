@@ -1,11 +1,38 @@
 // Tasks screen: aggregates concrete tasks inside their milestones and objectives.
+import { useLayoutEffect, useRef, useState } from "react";
 import { Check, Circle } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
 import "../Hierarchy.css";
 import "../Screens.css";
 
-function TaskRow({ goal, onToggle }: { goal: Goal; onToggle: () => void }) {
+function TaskRow({
+  goal,
+  onToggle,
+  onUpdate,
+  onDelete,
+}: {
+  goal: Goal;
+  onToggle: () => void;
+  onUpdate: (title: string) => void;
+  onDelete: () => void;
+}) {
+  const [title, setTitle] = useState(goal.title);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = "auto";
+    input.style.height = `${input.scrollHeight}px`;
+  }, [title]);
+
+  function changeTitle(value: string) {
+    setTitle(value);
+    if (value.trim()) onUpdate(value);
+    else onDelete();
+  }
+
   return (
     <li className={`task-item ${goal.completed ? "is-complete" : ""}`}>
       <button
@@ -17,8 +44,14 @@ function TaskRow({ goal, onToggle }: { goal: Goal; onToggle: () => void }) {
       >
         {goal.completed ? <Check size={14} strokeWidth={3} /> : <Circle size={14} />}
       </button>
-      <span className="task-title">{goal.title}</span>
-      {goal.completed && <span className="task-status">Completato</span>}
+      <textarea
+        ref={inputRef}
+        className="task-title"
+        aria-label="Testo della pratica"
+        rows={1}
+        value={title}
+        onChange={(event) => changeTitle(event.target.value)}
+      />
     </li>
   );
 }
@@ -28,11 +61,15 @@ function ObjectiveTasks({
   stages,
   goals,
   onToggle,
+  onUpdate,
+  onDelete,
 }: {
   area: Area;
   stages: Stage[];
   goals: Goal[];
   onToggle: (id: string) => void;
+  onUpdate: (id: string, title: string) => void;
+  onDelete: (id: string) => void;
 }) {
   const areaStages = stages
     .filter((stage) => stage.areaId === area.id)
@@ -57,6 +94,8 @@ function ObjectiveTasks({
                       key={goal.id}
                       goal={goal}
                       onToggle={() => onToggle(goal.id)}
+                      onUpdate={(title) => onUpdate(goal.id, title)}
+                      onDelete={() => onDelete(goal.id)}
                     />
                   ))}
                 </ul>
@@ -72,7 +111,7 @@ function ObjectiveTasks({
 }
 
 export function TasksScreen({ onObjectives }: { onObjectives: () => void }) {
-  const { state, toggleGoal } = useGoals();
+  const { state, toggleGoal, updateGoal, deleteGoal } = useGoals();
 
   return (
     <section className="tasks-page" aria-label="Tutte le task">
@@ -85,6 +124,8 @@ export function TasksScreen({ onObjectives }: { onObjectives: () => void }) {
               stages={state.stages}
               goals={state.goals}
               onToggle={toggleGoal}
+              onUpdate={(id, title) => updateGoal(id, { title })}
+              onDelete={deleteGoal}
             />
           ))}
         </div>

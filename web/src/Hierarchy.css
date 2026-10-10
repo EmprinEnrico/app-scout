@@ -11,13 +11,16 @@
 .task-objective-heading, .hierarchy-objective-heading {
   display: flex; align-items: center; gap: 13px; min-height: 65px; padding: 0 25px;
 }
-.task-objective-heading h2 { margin: 0; color: #2a4938; font-size: 19px; letter-spacing: -.4px; }
+.task-objective-heading h2 {
+  margin: 0; color: #617367; font-size: 11px; font-weight: 800;
+  letter-spacing: 1.2px; text-transform: uppercase;
+}
 .task-milestones, .hierarchy-milestones { padding: 0 25px 8px; }
 .task-milestone, .hierarchy-milestone { border-top: 1px solid #eef1ec; padding: 17px 0; }
-.task-milestone h3 { margin: 0 0 12px; color: #344f3f; font-size: 13px; }
+.task-milestone h3 { margin: 0 0 12px; color: #405a47; font-size: 12px; font-weight: 700; }
 .task-list, .hierarchy-task-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 7px; }
 .task-item {
-  display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 5px 8px;
+  display: flex; align-items: flex-start; gap: 10px; min-height: 38px; padding: 6px 8px;
   border-radius: 9px; color: #405a47; font-size: 12px;
 }
 .task-item:hover { background: #f7faf4; }
@@ -27,9 +30,13 @@
 }
 .task-check:hover { border-color: #4a7952; }
 .task-item.is-complete .task-check { border-color: #75a26e; background: #75a26e; }
-.task-title { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.task-title {
+  min-width: 0; flex: 1; min-height: 25px; margin: 0; padding: 1px 0; resize: none;
+  overflow: hidden; border: 0; outline: 0; background: transparent; color: #304c3b;
+  font: inherit; font-size: 15px; line-height: 1.45; overflow-wrap: anywhere;
+}
+.task-title:focus { background: #fbfcf9; border-radius: 4px; }
 .task-item.is-complete .task-title { color: #718276; text-decoration: line-through; }
-.task-status { color: #4e794e; font-size: 10px; white-space: nowrap; }
 .task-empty { margin: 0; color: #839187; font-size: 11px; }
 .hierarchy-objective-heading { border-bottom: 1px solid #eef1ec; }
 .hierarchy-objective-heading .hierarchy-title { font-size: 18px; font-weight: 750; }
@@ -61,7 +68,7 @@
   .page-intro h1 { font-size: 28px; }
   .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
   .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
-  .task-status { display: none; }
+  .task-title { font-size: 14px; }
   .new-objective { align-items: stretch; flex-direction: column; }
   .new-objective .button { width: 100%; }
 }
