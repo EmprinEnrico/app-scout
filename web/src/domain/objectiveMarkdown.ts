@@ -70,19 +70,19 @@ export function objectiveEditorMetadata(
 ): ObjectiveEditorMetadata {
   const body = objectiveToMarkdown(stages, goals);
   const metadata = body.split("\n").map(() => [] as string[]);
-  metadata[0]?.push(`[objective id: ${area.id}, creation date: ${shortDate(area.createdAt)}]`);
+  metadata[0]?.push(`[objective created: ${shortDate(area.createdAt)}]`);
   const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
   let line = 0;
   orderedStages.forEach((stage, stageIndex) => {
     metadata[line]?.push(
-      `[milestone id: ${stage.id}, creation date: ${shortDate(area.createdAt)}]`,
+      `[milestone created: ${shortDate(area.createdAt)}]`,
     );
     line += 1;
     const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
     stageGoals.forEach((goal) => {
       const completed = goal.completed ? "true" : "false";
       metadata[line]?.push(
-        `[task id: ${goal.id}, creation date: ${shortDate(goal.createdAt)}, completed: ${completed}]`,
+        `[task created: ${shortDate(goal.createdAt)}, completed: ${completed}]`,
       );
       line += 1;
     });
