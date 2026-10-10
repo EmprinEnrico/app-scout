@@ -3,7 +3,8 @@ import { useState, type FormEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
-import { SwipeGoalRow } from "./SwipeGoalRow";
+import { GoalRow } from "./GoalRow";
+import { SwipeObjective } from "./SwipeObjective";
 import "../Hierarchy.css";
 import "../Screens.css";
 
@@ -68,7 +69,13 @@ function LiveEntry({
         value={value}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={(event) => {
-          if (event.key === "Escape") {
+          if (event.key === "Escape" || event.key === "Esc" || event.code === "Escape") {
+            event.preventDefault();
+            commit();
+          }
+        }}
+        onKeyUp={(event) => {
+          if (event.key === "Escape" || event.key === "Esc" || event.code === "Escape") {
             event.preventDefault();
             commit();
           }
@@ -124,8 +131,15 @@ function ObjectiveCard({
     setActiveStageId(stageId);
   }
 
+  function deleteObjective() {
+    if (window.confirm(`Eliminare “${area.name}” e tutto il suo contenuto?`)) {
+      onDeleteArea(area.id);
+    }
+  }
+
   return (
-    <article className="hierarchy-objective">
+    <SwipeObjective name={area.name} onDelete={deleteObjective}>
+      <div className="hierarchy-objective">
       <header className="hierarchy-objective-heading">
         <span className="area-dot large" style={{ backgroundColor: area.color }} />
         <InlineTitle
@@ -134,18 +148,6 @@ function ObjectiveCard({
           className="objective-title"
           onUpdate={(name) => onRenameArea(area.id, name)}
         />
-        <button
-          className="icon-button danger-hover"
-          type="button"
-          aria-label={`Elimina ${area.name}`}
-          onClick={() => {
-            if (window.confirm(`Eliminare “${area.name}” e tutto il suo contenuto?`)) {
-              onDeleteArea(area.id);
-            }
-          }}
-        >
-          <Trash2 size={16} />
-        </button>
       </header>
       <div className="hierarchy-milestones">
         {areaStages.map((stage) => {
@@ -177,7 +179,7 @@ function ObjectiveCard({
               </header>
               <ul className="hierarchy-task-list">
                 {stageGoals.map((goal: Goal) => (
-                  <SwipeGoalRow
+                  <GoalRow
                     key={goal.id}
                     goal={goal}
                     onToggle={() => onToggleGoal(goal.id)}
@@ -191,7 +193,8 @@ function ObjectiveCard({
         })}
       </div>
       <LiveEntry hasMilestone={areaStages.length > 0} onCommit={commitEntry} />
-    </article>
+      </div>
+    </SwipeObjective>
   );
 }
 
