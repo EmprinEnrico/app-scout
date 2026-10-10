@@ -94,8 +94,8 @@
   cursor: text; user-select: text;
 }
 .markdown-editor:focus { background: #fbfcf9; }
-.continuous-objective-editor { padding: 13px 25px 20px; }
-.continuous-objective-editor .tiptap { min-height: 240px; outline: 0; color: #304c3b; }
+.continuous-objective-editor { padding: 13px 25px 4px; }
+.continuous-objective-editor .tiptap { outline: 0; color: #304c3b; }
 .continuous-objective-editor .continuous-milestone {
   margin: 0; color: #344f3f; font-size: 16px; font-weight: 750; line-height: 1.5;
 }
@@ -113,7 +113,7 @@
   color: #718276; text-decoration: line-through;
 }
 .continuous-editor-hint {
-  display: block; width: calc(100% - 50px); margin: -8px 25px 18px; padding: 5px 0;
+  display: block; width: calc(100% - 50px); margin: 0 25px 18px; padding: 12px 0 10px;
   border: 0; background: transparent; color: #a2aea3; font: inherit; font-size: 13px;
   line-height: 1.5; text-align: left; cursor: text;
 }
