@@ -11,7 +11,6 @@ import {
   parseObjectiveMarkdown,
 } from "../domain/objectiveMarkdown";
 import { syncObjective } from "../domain/objectiveSync";
-import { SwipeObjective } from "./SwipeObjective";
 import { MarkdownEditor } from "./MarkdownEditor";
 import "../Hierarchy.css";
 import "../Screens.css";
@@ -137,7 +136,6 @@ function ObjectiveCard({
   }
 
   return (
-    <SwipeObjective name={area.name} onDelete={deleteObjective}>
       <div className="hierarchy-objective">
         <header className="hierarchy-objective-heading">
           <span className="area-dot large" style={{ backgroundColor: area.color }} />
@@ -146,6 +144,14 @@ function ObjectiveCard({
             label="Nome dell’obiettivo"
             onUpdate={(name) => onRenameArea(area.id, name)}
           />
+          <button
+            className="icon-button danger-hover"
+            type="button"
+            aria-label={`Elimina ${area.name}`}
+            onClick={deleteObjective}
+          >
+            <Trash2 size={15} />
+          </button>
         </header>
         {editing && editSession ? (
           <MarkdownEditor
@@ -220,7 +226,6 @@ function ObjectiveCard({
           </div>
         )}
       </div>
-    </SwipeObjective>
   );
 }
 
