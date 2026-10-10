@@ -38,16 +38,17 @@
 .task-title:focus { background: #fbfcf9; border-radius: 4px; }
 .task-item.is-complete .task-title { color: #718276; text-decoration: line-through; }
 .task-empty { margin: 0; color: #839187; font-size: 11px; }
-.hierarchy-objective-heading { border-bottom: 1px solid #eef1ec; }
+.hierarchy-objective-heading { border-bottom: 1px solid #eef1ec; min-width: 0; }
 .hierarchy-objective-heading .hierarchy-title { font-size: 18px; font-weight: 750; }
-.hierarchy-heading { display: flex; align-items: center; gap: 8px; }
+.hierarchy-heading { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .hierarchy-heading .hierarchy-title { font-size: 13px; font-weight: 750; }
+.hierarchy-objective-heading .icon-button, .hierarchy-heading .icon-button { flex: none; }
 .hierarchy-title {
   min-width: 0; flex: 1; border: 1px solid transparent; border-radius: 7px; padding: 7px 5px;
   background: transparent; color: #2d4c37; font: inherit; letter-spacing: inherit;
 }
 .hierarchy-title:hover, .hierarchy-title:focus { border-color: #dfe7db; background: #fbfcf9; outline: 0; }
-.hierarchy-task { display: flex; align-items: center; gap: 5px; min-height: 36px; }
+.hierarchy-task { display: flex; align-items: center; min-height: 36px; }
 .hierarchy-task .hierarchy-title { color: #526759; font-size: 12px; }
 .hierarchy-add { display: flex; align-items: center; gap: 7px; margin-top: 10px; }
 .hierarchy-add input, .new-objective input {

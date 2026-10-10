@@ -36,13 +36,11 @@ function TaskEditor({
   draft,
   onChange,
   onSave,
-  onDelete,
 }: {
   goal: Goal;
   draft: string | undefined;
   onChange: (value: string) => void;
   onSave: () => void;
-  onDelete: () => void;
 }) {
   return (
     <li className="hierarchy-task">
@@ -53,14 +51,6 @@ function TaskEditor({
         onChange={onChange}
         onSave={onSave}
       />
-      <button
-        className="icon-button danger-hover"
-        type="button"
-        aria-label={`Elimina ${goal.title}`}
-        onClick={onDelete}
-      >
-        <Trash2 size={15} />
-      </button>
     </li>
   );
 }
@@ -75,7 +65,6 @@ export function MilestoneEditor({
   onStageSave,
   onTaskChange,
   onTaskSave,
-  onTaskDelete,
   onNewTaskChange,
   onAddTask,
   onDeleteStage,
@@ -89,7 +78,6 @@ export function MilestoneEditor({
   onStageSave: () => void;
   onTaskChange: (id: string, value: string) => void;
   onTaskSave: (goal: Goal) => void;
-  onTaskDelete: (goal: Goal) => void;
   onNewTaskChange: (value: string) => void;
   onAddTask: () => void;
   onDeleteStage: () => void;
@@ -121,7 +109,6 @@ export function MilestoneEditor({
             draft={taskDrafts[goal.id]}
             onChange={(value) => onTaskChange(goal.id, value)}
             onSave={() => onTaskSave(goal)}
-            onDelete={() => onTaskDelete(goal)}
           />
         ))}
       </ul>

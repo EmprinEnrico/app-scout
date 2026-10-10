@@ -49,9 +49,15 @@ export function ObjectivesScreen() {
   }
 
   function saveTask(goal: Goal) {
-    const title = taskDrafts[goal.id]?.trim();
+    const draft = taskDrafts[goal.id];
     clearDraft(setTaskDrafts, goal.id);
-    if (title && title !== goal.title) updateGoal(goal.id, { title });
+    if (draft === undefined) return;
+    const title = draft.trim();
+    if (!title) {
+      deleteGoal(goal.id);
+      return;
+    }
+    if (title !== goal.title) updateGoal(goal.id, { title });
   }
 
   function addObjective() {
@@ -118,7 +124,6 @@ export function ObjectivesScreen() {
                     onStageSave={() => saveStage(stage)}
                     onTaskChange={(id, value) => setTaskDrafts({ ...taskDrafts, [id]: value })}
                     onTaskSave={saveTask}
-                    onTaskDelete={(goal) => deleteGoal(goal.id)}
                     onNewTaskChange={(value) => setNewTasks({ ...newTasks, [stage.id]: value })}
                     onAddTask={() => addTask(stage)}
                     onDeleteStage={() => {
