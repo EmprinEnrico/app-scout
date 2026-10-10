@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
 import {
+  objectiveEditorMetadata,
   objectiveLineEndPosition,
   objectiveStageEndPosition,
   objectiveToMarkdown,
@@ -142,6 +143,7 @@ function ObjectiveCard({
           <MarkdownEditor
             initialValue={editSession.value}
             initialCaret={editSession.caret}
+            metadata={objectiveEditorMetadata(area, areaStages, areaGoals)}
             ariaLabel={`Testo dell’obiettivo ${area.name}`}
             onExit={exitEdit}
           />

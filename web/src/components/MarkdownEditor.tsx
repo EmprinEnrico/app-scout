@@ -2,32 +2,38 @@
 import { useEffect, useRef, type KeyboardEvent } from "react";
 
 function textFromEditor(editor: HTMLDivElement): string {
-  return editor.innerText.replace(/\u00a0/g, " ").replace(/\r\n/g, "\n");
+  const clone = editor.cloneNode(true) as HTMLDivElement;
+  clone.querySelectorAll("[data-editor-metadata]").forEach((node) => node.remove());
+  return clone.innerText.replace(/\u00a0/g, " ").replace(/\r\n/g, "\n");
 }
 
-function setCaretPosition(editor: HTMLDivElement, position: number) {
+function lineAndOffset(value: string, position: number): { line: number; offset: number } {
+  const lines = value.split("\n");
+  let remaining = Math.max(0, position);
+  for (const [line, text] of lines.entries()) {
+    if (remaining <= text.length) return { line, offset: remaining };
+    remaining -= text.length + 1;
+  }
+  return { line: lines.length - 1, offset: lines.at(-1)?.length ?? 0 };
+}
+
+function setCaretPosition(editor: HTMLDivElement, value: string, position: number) {
   const selection = window.getSelection();
   if (!selection) return;
   const range = document.createRange();
-  const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
-  let remaining = Math.max(0, position);
-  let node = walker.nextNode();
-
-  while (node) {
-    const length = node.textContent?.length ?? 0;
-    if (remaining <= length) {
-      range.setStart(node, remaining);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-      return;
-    }
-    remaining -= length;
-    node = walker.nextNode();
+  const target = lineAndOffset(value, position);
+  const lines = editor.querySelectorAll<HTMLElement>("[data-editor-line]");
+  const line = lines[target.line];
+  const textNode = line?.firstChild?.nodeType === Node.TEXT_NODE ? line.firstChild : null;
+  if (line && textNode) {
+    range.setStart(textNode, Math.min(target.offset, textNode.textContent?.length ?? 0));
+  } else if (line) {
+    range.selectNodeContents(line);
+    range.collapse(true);
+  } else {
+    range.selectNodeContents(editor);
+    range.collapse(false);
   }
-
-  range.selectNodeContents(editor);
-  range.collapse(false);
   selection.removeAllRanges();
   selection.addRange(range);
 }
@@ -35,11 +41,13 @@ function setCaretPosition(editor: HTMLDivElement, position: number) {
 export function MarkdownEditor({
   initialValue,
   initialCaret,
+  metadata,
   ariaLabel,
   onExit,
 }: {
   initialValue: string;
   initialCaret: number;
+  metadata: string[][];
   ariaLabel: string;
   onExit: (value: string) => void;
 }) {
@@ -51,8 +59,8 @@ export function MarkdownEditor({
     const editor = editorRef.current;
     if (!editor) return;
     editor.focus();
-    setCaretPosition(editor, initialCaret);
-  }, [initialCaret]);
+    setCaretPosition(editor, initialValue, initialCaret);
+  }, [initialCaret, initialValue]);
 
   function exit() {
     if (closedRef.current) return;
@@ -66,6 +74,8 @@ export function MarkdownEditor({
     event.preventDefault();
     exit();
   }
+
+  const lines = initialValue.split("\n");
 
   return (
     <div
@@ -82,7 +92,21 @@ export function MarkdownEditor({
       onBlur={exit}
       onKeyDown={handleKeyDown}
     >
-      {initialValue}
+      {lines.map((line, index) => (
+        <div className="editor-line-group" key={index}>
+          {metadata[index]?.map((entry) => (
+            <span
+              className="editor-metadata"
+              contentEditable={false}
+              data-editor-metadata
+              key={entry}
+            >
+              {entry}
+            </span>
+          ))}
+          <span data-editor-line>{line || <br />}</span>
+        </div>
+      ))}
     </div>
   );
 }

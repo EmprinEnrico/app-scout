@@ -18,6 +18,8 @@ export type ParsedObjectiveFile = {
   goals: Goal[];
 };
 
+export type ObjectiveEditorMetadata = string[][];
+
 type Metadata = Record<string, unknown>;
 
 function metadataLine(kind: string, value: Metadata): string {
@@ -55,6 +57,38 @@ export function objectiveToMarkdown(stages: Stage[], goals: Goal[]): string {
       return [stage.name, ...stageGoals].join("\n");
     })
     .join("\n\n");
+}
+
+function shortDate(value: string): string {
+  return value.slice(0, 10);
+}
+
+export function objectiveEditorMetadata(
+  area: Area,
+  stages: Stage[],
+  goals: Goal[],
+): ObjectiveEditorMetadata {
+  const body = objectiveToMarkdown(stages, goals);
+  const metadata = body.split("\n").map(() => [] as string[]);
+  metadata[0]?.push(`[objective id: ${area.id}, creation date: ${shortDate(area.createdAt)}]`);
+  const orderedStages = stages.slice().sort((left, right) => left.position - right.position);
+  let line = 0;
+  orderedStages.forEach((stage, stageIndex) => {
+    metadata[line]?.push(
+      `[milestone id: ${stage.id}, creation date: ${shortDate(area.createdAt)}]`,
+    );
+    line += 1;
+    const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
+    stageGoals.forEach((goal) => {
+      const completed = goal.completed ? "true" : "false";
+      metadata[line]?.push(
+        `[task id: ${goal.id}, creation date: ${shortDate(goal.createdAt)}, completed: ${completed}]`,
+      );
+      line += 1;
+    });
+    if (stageIndex < orderedStages.length - 1) line += 1;
+  });
+  return metadata;
 }
 
 export function objectiveToMarkdownFile(area: Area, stages: Stage[], goals: Goal[]): string {
