@@ -37,6 +37,7 @@
 }
 .task-title:focus { background: #fbfcf9; border-radius: 4px; }
 .task-item.is-complete .task-title { color: #718276; text-decoration: line-through; }
+.task-title.is-complete { color: #718276; text-decoration: line-through; }
 .task-empty { margin: 0; color: #839187; font-size: 11px; }
 .hierarchy-objective-heading {
   border-bottom: 1px solid #eef1ec; min-width: 0; max-width: 100%; overflow: hidden;
@@ -70,12 +71,51 @@
 .new-objective .button { flex: none; }
 .settings-page .data-panel { margin-top: 0; }
 
+.swipe-goal {
+  position: relative; min-height: 38px; overflow: hidden; list-style: none;
+  border-radius: 9px; background: #fff;
+}
+.swipe-goal-actions { position: absolute; inset: 0 0 0 auto; width: 88px; background: #f8eae5; }
+.swipe-goal-delete {
+  width: 100%; height: 100%; border: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 2px; background: transparent; color: #a34d41; font-size: 10px;
+}
+.swipe-goal-content {
+  position: relative; z-index: 1; display: flex; align-items: flex-start; gap: 10px; min-height: 38px;
+  padding: 6px 8px; background: #fff; transition: transform .18s ease; touch-action: pan-y;
+}
+.swipe-goal-content:hover { background: #f7faf4; }
+.swipe-goal-content .task-check { margin-top: 1px; }
+.swipe-goal-content .task-title { display: block; width: 0; }
+.add-goal-trigger {
+  width: 100%; min-height: 48px; margin-top: 18px; border: 1px dashed #b9ceb0; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; background: #fdfefb;
+  color: #3e6544; font-size: 12px; font-weight: 750;
+}
+.add-goal-trigger:hover { border-color: #8eae86; background: #f4f8ef; }
+.goal-composer {
+  display: grid; gap: 10px; margin-top: 18px; padding: 15px; border: 1px solid #dbe5d6;
+  border-radius: 13px; background: #fff;
+}
+.goal-composer > textarea {
+  width: 100%; min-height: 58px; resize: vertical; border: 1px solid #dfe7db; border-radius: 8px;
+  background: #fbfcf9; color: #2d4c37; padding: 10px 11px; font-size: 13px;
+}
+.goal-composer-controls { display: flex; align-items: center; gap: 8px; }
+.goal-composer-controls select {
+  min-width: 0; flex: 1; border: 1px solid #dfe7db; border-radius: 8px; background: #fbfcf9;
+  color: #405a47; padding: 9px 10px; font-size: 11px;
+}
+.goal-composer-controls .button { flex: none; }
+
 @media (max-width: 560px) {
   .page-intro h1 { font-size: 28px; }
   .task-objective-heading, .hierarchy-objective-heading { padding: 0 17px; }
   .task-milestones, .hierarchy-milestones { padding-left: 17px; padding-right: 17px; }
   .task-title { font-size: 14px; }
   .milestone-add { margin: 8px 17px 18px; padding: 10px; }
+  .goal-composer-controls { align-items: stretch; flex-direction: column; }
+  .goal-composer-controls .button { width: 100%; }
   .new-objective { align-items: stretch; flex-direction: column; }
   .new-objective .button { width: 100%; }
 }

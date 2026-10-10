@@ -1,20 +1,162 @@
-// Objectives screen: edits objectives, milestones, and their concrete tasks.
-import { useState, type Dispatch, type SetStateAction } from "react";
+// Objectives screen: edits the objective, milestone, and concrete practice hierarchy.
+import { useState, type FormEvent } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
+import { GoalComposer } from "./GoalComposer";
+import { SwipeGoalRow } from "./SwipeGoalRow";
 import "../Hierarchy.css";
 import "../Screens.css";
-import { EditableTitle, MilestoneEditor, type Drafts } from "./HierarchyEditors";
 
-function clearDraft(setDrafts: Dispatch<SetStateAction<Drafts>>, id: string) {
-  setDrafts((drafts) => {
-    const next = { ...drafts };
-    delete next[id];
-    return next;
-  });
+function InlineTitle({
+  value,
+  label,
+  className,
+  onUpdate,
+}: {
+  value: string;
+  label: string;
+  className?: string;
+  onUpdate: (value: string) => void;
+}) {
+  const [draft, setDraft] = useState(value);
+
+  function change(nextValue: string) {
+    setDraft(nextValue);
+    if (nextValue.trim()) onUpdate(nextValue);
+  }
+
+  function restoreIfEmpty() {
+    if (!draft.trim()) setDraft(value);
+  }
+
+  return (
+    <input
+      className={`hierarchy-title ${className ?? ""}`}
+      aria-label={label}
+      value={draft}
+      onChange={(event) => change(event.target.value)}
+      onBlur={restoreIfEmpty}
+    />
+  );
 }
 
+function ObjectiveCard({
+  area,
+  stages,
+  goals,
+  onRenameArea,
+  onDeleteArea,
+  onRenameStage,
+  onDeleteStage,
+  onToggleGoal,
+  onUpdateGoal,
+  onDeleteGoal,
+  onAddStage,
+}: {
+  area: Area;
+  stages: Stage[];
+  goals: Goal[];
+  onRenameArea: (id: string, name: string) => void;
+  onDeleteArea: (id: string) => void;
+  onRenameStage: (id: string, name: string) => void;
+  onDeleteStage: (id: string) => void;
+  onToggleGoal: (id: string) => void;
+  onUpdateGoal: (id: string, title: string) => void;
+  onDeleteGoal: (id: string) => void;
+  onAddStage: (areaId: string, name: string) => void;
+}) {
+  const areaStages = stages
+    .filter((stage) => stage.areaId === area.id)
+    .sort((left, right) => left.position - right.position);
+  const [newStage, setNewStage] = useState("");
+
+  function addStage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!newStage.trim()) return;
+    onAddStage(area.id, newStage.trim());
+    setNewStage("");
+  }
+
+  return (
+    <article className="hierarchy-objective">
+      <header className="hierarchy-objective-heading">
+        <span className="area-dot large" style={{ backgroundColor: area.color }} />
+        <InlineTitle
+          value={area.name}
+          label="Nome dell’obiettivo"
+          className="objective-title"
+          onUpdate={(name) => onRenameArea(area.id, name)}
+        />
+        <button
+          className="icon-button danger-hover"
+          type="button"
+          aria-label={`Elimina ${area.name}`}
+          onClick={() => {
+            if (window.confirm(`Eliminare “${area.name}” e tutto il suo contenuto?`)) {
+              onDeleteArea(area.id);
+            }
+          }}
+        >
+          <Trash2 size={16} />
+        </button>
+      </header>
+      <div className="hierarchy-milestones">
+        {areaStages.map((stage) => {
+          const stageGoals = goals.filter((goal) => goal.stageId === stage.id);
+          return (
+            <section className="hierarchy-milestone" key={stage.id}>
+              <header className="hierarchy-heading">
+                <InlineTitle
+                  value={stage.name}
+                  label="Nome del milestone"
+                  className="milestone-title"
+                  onUpdate={(name) => onRenameStage(stage.id, name)}
+                />
+                <button
+                  className="icon-button danger-hover"
+                  type="button"
+                  aria-label={`Elimina ${stage.name}`}
+                  onClick={() => {
+                    if (window.confirm(
+                      `Eliminare “${stage.name}”? Le pratiche saranno spostate nel primo milestone.`,
+                    )) {
+                      onDeleteStage(stage.id);
+                    }
+                  }}
+                >
+                  <Trash2 size={15} />
+                </button>
+              </header>
+              <ul className="hierarchy-task-list">
+                {stageGoals.map((goal) => (
+                  <SwipeGoalRow
+                    key={goal.id}
+                    goal={goal}
+                    onToggle={() => onToggleGoal(goal.id)}
+                    onUpdate={(title) => onUpdateGoal(goal.id, title)}
+                    onDelete={() => onDeleteGoal(goal.id)}
+                  />
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+      <form className="hierarchy-add milestone-add" onSubmit={addStage}>
+        <input
+          aria-label={`Aggiungi milestone a ${area.name}`}
+          placeholder="Aggiungi un milestone…"
+          value={newStage}
+          onChange={(event) => setNewStage(event.target.value)}
+        />
+        <button className="button button-secondary" type="submit">
+          <Plus size={16} /> Milestone
+        </button>
+      </form>
+    </article>
+  );
+}
 
 export function ObjectivesScreen() {
   const {
@@ -27,136 +169,40 @@ export function ObjectivesScreen() {
     deleteStage,
     addGoal,
     updateGoal,
+    toggleGoal,
     deleteGoal,
   } = useGoals();
-  const [areaDrafts, setAreaDrafts] = useState<Drafts>({});
-  const [stageDrafts, setStageDrafts] = useState<Drafts>({});
-  const [taskDrafts, setTaskDrafts] = useState<Drafts>({});
   const [newArea, setNewArea] = useState("");
-  const [newStages, setNewStages] = useState<Drafts>({});
-  const [newTasks, setNewTasks] = useState<Drafts>({});
-
-  function saveArea(area: Area) {
-    const name = areaDrafts[area.id]?.trim();
-    clearDraft(setAreaDrafts, area.id);
-    if (name && name !== area.name) renameArea(area.id, name);
-  }
-
-  function saveStage(stage: Stage) {
-    const name = stageDrafts[stage.id]?.trim();
-    clearDraft(setStageDrafts, stage.id);
-    if (name && name !== stage.name) renameStage(stage.id, name);
-  }
-
-  function saveTask(goal: Goal) {
-    const draft = taskDrafts[goal.id];
-    clearDraft(setTaskDrafts, goal.id);
-    if (draft === undefined) return;
-    const title = draft.trim();
-    if (!title) {
-      deleteGoal(goal.id);
-      return;
-    }
-    if (title !== goal.title) updateGoal(goal.id, { title });
-  }
-
-  function addObjective() {
-    const name = newArea.trim();
-    if (!name) return;
-    addArea(name);
-    setNewArea("");
-  }
-
-  function addMilestone(areaId: string) {
-    const name = newStages[areaId]?.trim();
-    if (!name) return;
-    addStage(areaId, name);
-    setNewStages((drafts) => ({ ...drafts, [areaId]: "" }));
-  }
-
-  function addTask(stage: Stage) {
-    const title = newTasks[stage.id]?.trim();
-    if (!title) return;
-    addGoal({ title, areaId: stage.areaId, stageId: stage.id });
-    setNewTasks((drafts) => ({ ...drafts, [stage.id]: "" }));
-  }
 
   return (
-    <section className="objectives-page" aria-label="Modifica degli obiettivi">
+    <section className="objectives-page" aria-label="Obiettivi">
       <div className="hierarchy-list">
         {state.areas.map((area) => (
-          <article className="hierarchy-objective" key={area.id}>
-            <header className="hierarchy-objective-heading">
-              <span className="area-dot large" style={{ backgroundColor: area.color }} />
-              <EditableTitle
-                value={area.name}
-                draft={areaDrafts[area.id]}
-                placeholder="Nome dell’obiettivo"
-                onChange={(value) => setAreaDrafts({ ...areaDrafts, [area.id]: value })}
-                onSave={() => saveArea(area)}
-              />
-              <button
-                className="icon-button danger-hover"
-                type="button"
-                aria-label={`Elimina ${area.name}`}
-                onClick={() => {
-                  if (window.confirm(`Eliminare “${area.name}” e tutto il suo contenuto?`)) {
-                    deleteArea(area.id);
-                  }
-                }}
-              >
-                <Trash2 size={16} />
-              </button>
-            </header>
-            <div className="hierarchy-milestones">
-              {state.stages
-                .filter((stage) => stage.areaId === area.id)
-                .sort((left, right) => left.position - right.position)
-                .map((stage) => (
-                  <MilestoneEditor
-                    key={stage.id}
-                    stage={stage}
-                    goals={state.goals.filter((goal) => goal.stageId === stage.id)}
-                    stageDraft={stageDrafts[stage.id]}
-                    taskDrafts={taskDrafts}
-                    newTask={newTasks[stage.id] ?? ""}
-                    onStageChange={(value) => setStageDrafts({ ...stageDrafts, [stage.id]: value })}
-                    onStageSave={() => saveStage(stage)}
-                    onTaskChange={(id, value) => setTaskDrafts({ ...taskDrafts, [id]: value })}
-                    onTaskSave={saveTask}
-                    onNewTaskChange={(value) => setNewTasks({ ...newTasks, [stage.id]: value })}
-                    onAddTask={() => addTask(stage)}
-                    onDeleteStage={() => {
-                      if (window.confirm(
-                        `Eliminare “${stage.name}”? Le pratiche saranno spostate nel primo milestone.`,
-                      )) {
-                        deleteStage(stage.id);
-                      }
-                    }}
-                  />
-                ))}
-            </div>
-            <form className="hierarchy-add milestone-add" onSubmit={(event) => {
-              event.preventDefault();
-              addMilestone(area.id);
-            }}>
-              <input
-                aria-label={`Aggiungi milestone a ${area.name}`}
-                placeholder="Aggiungi un milestone o risultato…"
-                value={newStages[area.id] ?? ""}
-                onChange={(event) => setNewStages({ ...newStages, [area.id]: event.target.value })}
-              />
-              <button className="button button-secondary" type="submit">
-                <Plus size={16} /> Milestone
-              </button>
-            </form>
-          </article>
+          <ObjectiveCard
+            key={area.id}
+            area={area}
+            stages={state.stages}
+            goals={state.goals}
+            onRenameArea={renameArea}
+            onDeleteArea={deleteArea}
+            onRenameStage={renameStage}
+            onDeleteStage={deleteStage}
+            onToggleGoal={toggleGoal}
+            onUpdateGoal={(id, title) => updateGoal(id, { title })}
+            onDeleteGoal={deleteGoal}
+            onAddStage={addStage}
+          />
         ))}
       </div>
-      <form className="new-objective" onSubmit={(event) => {
-        event.preventDefault();
-        addObjective();
-      }}>
+      <form
+        className="new-objective"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!newArea.trim()) return;
+          addArea(newArea.trim());
+          setNewArea("");
+        }}
+      >
         <input
           aria-label="Nome del nuovo obiettivo"
           placeholder="Inizia un nuovo obiettivo…"
@@ -167,6 +213,11 @@ export function ObjectivesScreen() {
           <Pencil size={16} /> Obiettivo
         </button>
       </form>
+      <GoalComposer
+        areas={state.areas}
+        stages={state.stages}
+        onAdd={(title, areaId, stageId) => addGoal({ title, areaId, stageId })}
+      />
     </section>
   );
 }

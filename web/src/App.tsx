@@ -1,19 +1,18 @@
 // App shell: provides the global layout and navigation for Scout Journey.
 import { useState } from "react";
-import { ClipboardList, Compass, Settings2, Target } from "lucide-react";
+import { Compass, Settings2, Target } from "lucide-react";
 import { GoalsProvider, useGoals } from "./domain/GoalsContext";
 import { ObjectivesScreen } from "./components/ObjectivesScreen";
 import { JourneyScreen } from "./components/JourneyScreen";
 import { SettingsScreen } from "./components/SettingsScreen";
-import { TasksScreen } from "./components/TasksScreen";
 import "./App.css";
 import "./Screens.css";
 
-type Tab = "tasks" | "objectives" | "journey" | "settings";
+type Tab = "objectives" | "journey" | "settings";
 
 function ScoutJourney() {
   const { ready, error } = useGoals();
-  const [tab, setTab] = useState<Tab>("tasks");
+  const [tab, setTab] = useState<Tab>("objectives");
 
   if (!ready)
     return (
@@ -35,7 +34,6 @@ function ScoutJourney() {
             {error}
           </div>
         )}
-        {tab === "tasks" && <TasksScreen onObjectives={() => setTab("objectives")} />}
         {tab === "objectives" && <ObjectivesScreen />}
         {tab === "journey" && (
           <JourneyScreen onObjectives={() => setTab("objectives")} />
@@ -43,15 +41,6 @@ function ScoutJourney() {
         {tab === "settings" && <SettingsScreen />}
       </main>
       <nav className="bottom-nav" aria-label="Navigazione principale">
-        <button
-          type="button"
-          className={tab === "tasks" ? "active" : ""}
-          aria-current={tab === "tasks" ? "page" : undefined}
-          onClick={() => setTab("tasks")}
-        >
-          <ClipboardList size={20} />
-          <span>Task</span>
-        </button>
         <button
           type="button"
           className={tab === "objectives" ? "active" : ""}

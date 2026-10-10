@@ -2,9 +2,8 @@
 
 Scout Journey is a general-purpose place to note and reach personal objectives.
 The core hierarchy is intentionally small: an objective contains milestones, and
-each milestone contains concrete practices. The Task page aggregates those
-practices for action, Objectives is the editable source of truth, and Journey is
-a read-only record of completion dates.
+each milestone contains concrete practices. Objectives is the editable source
+of truth, and Journey is a read-only record of completion dates.
 
 Goal data stays local to the device. Export and import let people back up their data or move it between devices. On the original web origin, people can explicitly import their old app's browser data without deleting the original copy. See `web/src/domain/` for the data contracts.
 
