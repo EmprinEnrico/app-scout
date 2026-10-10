@@ -29,13 +29,6 @@ export function SettingsScreen() {
 
   return (
     <>
-      <div className="page-intro">
-        <span className="eyebrow">
-          <span className="tiny-sun" /> FAI SPAZIO A CIÒ CHE CONTA
-        </span>
-        <h1>Impostazioni<span className="accent-period">.</span></h1>
-        <p>Organizza il tuo spazio e tieni i tuoi dati con te.</p>
-      </div>
       <div className="settings-grid">
         <AreasPanel
           areas={state.areas}

@@ -11,27 +11,8 @@
   height: 84px; padding: 0 max(28px, calc((100vw - 1100px)/2)); display: flex; justify-content: space-between;
   align-items: center; border-bottom: 1px solid #e9ece6; background: #fff;
 }
-.brand {
-  display: inline-flex; align-items: center; gap: 11px; color: #1f4538; font-size: 29px; font-weight: 800;
-  letter-spacing: -1.8px; line-height: 1;
-}
-.brand-mark { width: 37px; height: 37px; display: grid; place-items: center; overflow: hidden; border-radius: 10px; }
-.brand-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.brand-dot { color: #aac875; }
-.header-date { color: #5e7064; font-size: 13px; font-weight: 600; text-transform: capitalize; }
 .main-content { width: min(100% - 56px, 1100px); margin: 0 auto; padding-top: 54px; }
-.page-intro { margin-bottom: 34px; }
 .eyebrow { color: #52734e; font-size: 10px; letter-spacing: 2.1px; font-weight: 800; line-height: 1.4; }
-.tiny-sun {
-  display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: #b5cf7a;
-  box-shadow: 0 0 0 4px #ebf1d9;
-}
-.page-intro h1 {
-  margin: 14px 0 9px; font-size: clamp(36px, 5vw, 56px); line-height: 1.09; letter-spacing: -2.9px; font-weight: 750;
-  color: #213e33;
-}
-.accent-period { color: #a9c474; }
-.page-intro p { margin: 0; color: #617367; font-size: 15px; line-height: 1.6; }
 .overview-card {
   position: relative; overflow: hidden; min-height: 258px; border-radius: 20px; padding: 37px 48px;
   background: #224a39; color: #fff; display: flex; justify-content: space-between; gap: 24px; align-items: center;
@@ -182,12 +163,7 @@
 .bottom-nav button.active { color: #315d42; background: #eaf2dc; }
 @media (max-width: 700px) {
   .site-header { height: 66px; padding: 0 21px; }
-  .brand { font-size: 25px; }
-  .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
-  .header-date { font-size: 11px; }
   .main-content { width: calc(100% - 40px); padding-top: 34px; }
-  .page-intro { margin-bottom: 27px; }
-  .page-intro h1 { font-size: 38px; letter-spacing: -2px; }
   .overview-card { padding: 26px; min-height: 244px; }
   .overview-copy h2 { font-size: 26px; }
   .overview-metric { min-width: 115px; }
@@ -204,7 +180,6 @@
 }
 @media (max-width: 460px) {
   .main-content { width: calc(100% - 34px); }
-  .page-intro h1 { font-size: 35px; }
   .overview-card { min-height: 0; padding: 24px 22px; flex-direction: column; align-items: flex-start; gap: 18px; }
   .overview-copy h2 { font-size: 24px; }
   .overview-copy p { max-width: none; line-height: 1.5; }
@@ -217,11 +192,6 @@
   .section-heading > .text-link { font-size: 11px; }
   .stage-card { padding: 20px; }
   .add-goal { padding: 9px 10px; font-size: 11px; }
-}
-@media (max-width: 360px) {
-  .header-date { display: none; }
-  .brand { font-size: 22px; gap: 8px; }
-  .brand-mark { width: 30px; height: 30px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *,

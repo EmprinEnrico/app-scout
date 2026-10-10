@@ -9,11 +9,6 @@ import "./App.css";
 import "./Screens.css";
 
 type Tab = "goals" | "journey" | "settings";
-const today = new Intl.DateTimeFormat("it-IT", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-}).format(new Date());
 
 function ScoutJourney() {
   const { ready, error } = useGoals();
@@ -32,18 +27,7 @@ function ScoutJourney() {
       <a className="skip-link" href="#main-content">
         Vai al contenuto
       </a>
-      <header className="site-header">
-        <div
-          className="brand"
-          aria-label="Scout Journey, il tuo spazio per gli obiettivi"
-        >
-          <span className="brand-mark">
-            <img src="/icon-192.png" alt="" />
-          </span>
-          <span>Scout Journey</span>
-        </div>
-        <span className="header-date">{today}</span>
-      </header>
+      <header className="site-header" aria-label="Intestazione" />
       <main className="main-content" id="main-content">
         {error && (
           <div className="notice notice-error" role="alert">

@@ -112,15 +112,6 @@ export function JourneyScreen({ onSettings }: { onSettings: () => void }) {
 
   return (
     <>
-      <div className="page-intro">
-        <span className="eyebrow">
-          <span className="tiny-sun" /> GUARDA QUANTA STRADA
-        </span>
-        <h1>
-          Il tuo percorso<span className="accent-period">.</span>
-        </h1>
-        <p>Rivedi ciò che hai fatto e quello che ti aspetta.</p>
-      </div>
       <section className="journey-summary" aria-label="Riepilogo del percorso">
         <div>
           <span className="eyebrow">FINORA</span>

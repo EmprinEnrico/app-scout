@@ -62,12 +62,8 @@ export function GoalsScreen({
   }
 
   return (
-    <section className="notes-page" aria-labelledby="notes-title">
+    <section className="notes-page" aria-label="Scrittura degli obiettivi">
       <header className="notes-header">
-        <div>
-          <h1 id="notes-title">Obiettivi</h1>
-          <p>Scrivi quello che vuoi portare avanti.</p>
-        </div>
         {state.areas.length > 0 && (
           <button
             className="notes-selector"
