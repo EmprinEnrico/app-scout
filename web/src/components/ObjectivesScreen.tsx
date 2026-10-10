@@ -1,5 +1,5 @@
 // Objectives screen: a live text editor for objectives, milestones, and goals.
-import { useState, type FormEvent } from "react";
+import { useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
@@ -52,20 +52,32 @@ function LiveEntry({
   onCommit: (value: string) => void;
 }) {
   const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    input.style.height = "auto";
+    input.style.height = `${input.scrollHeight}px`;
+  }, [value]);
 
   function commit() {
     const nextValue = value.trim();
     if (!nextValue) return;
-    onCommit(nextValue);
+    onCommit(value);
     setValue("");
   }
 
   return (
     <div className="live-entry">
-      <input
+      <textarea
+        ref={inputRef}
         className="live-entry-input"
         aria-label="Scrivi un milestone o una task"
-        placeholder={hasMilestone ? "Scrivi… oppure - una task" : "Scrivi un milestone…"}
+        placeholder={hasMilestone
+          ? "Scrivi… vai a capo; - all’inizio crea una task"
+          : "Scrivi un milestone…"}
+        rows={1}
         value={value}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={(event) => {
@@ -80,6 +92,7 @@ function LiveEntry({
             commit();
           }
         }}
+        onBlur={commit}
       />
     </div>
   );
@@ -116,19 +129,26 @@ function ObjectiveCard({
     .filter((stage) => stage.areaId === area.id)
     .sort((left, right) => left.position - right.position);
   const [activeStageId, setActiveStageId] = useState(areaStages[0]?.id ?? "");
-  const activeStage = areaStages.find((stage) => stage.id === activeStageId)
-    ?? areaStages.at(-1);
-
   function commitEntry(value: string) {
-    if (value.startsWith("-")) {
-      const title = value.slice(1).trim();
-      if (title && activeStage) {
-        onAddGoal({ title, areaId: area.id, stageId: activeStage.id });
+    let currentStageId = areaStages.find((stage) => stage.id === activeStageId)?.id
+      ?? areaStages.at(-1)?.id
+      ?? "";
+
+    for (const rawLine of value.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line) continue;
+      if (line.startsWith("-")) {
+        const title = line.slice(1).trim();
+        if (!title) continue;
+        if (!currentStageId) {
+          currentStageId = onAddStage(area.id, "Primi passi");
+        }
+        onAddGoal({ title, areaId: area.id, stageId: currentStageId });
+      } else {
+        currentStageId = onAddStage(area.id, line);
       }
-      return;
     }
-    const stageId = onAddStage(area.id, value);
-    setActiveStageId(stageId);
+    if (currentStageId) setActiveStageId(currentStageId);
   }
 
   function deleteObjective() {

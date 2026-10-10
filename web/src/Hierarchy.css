@@ -87,8 +87,8 @@
 }
 .live-entry { margin: 5px 25px 20px; border-top: 1px solid #eef1ec; }
 .live-entry-input {
-  width: 100%; border: 0; outline: 0; background: transparent; color: #304c3b;
-  padding: 13px 5px 7px; font-size: 14px; line-height: 1.45;
+  width: 100%; min-height: 27px; resize: none; overflow: hidden; border: 0; outline: 0;
+  background: transparent; color: #304c3b; padding: 13px 5px 7px; font-size: 14px; line-height: 1.45;
 }
 .live-entry-input::placeholder { color: #9aaa9b; }
 .live-entry-input:focus { background: #fbfcf9; }
