@@ -1,6 +1,6 @@
 // App shell: provides the global layout and navigation for Scout Journey.
 import { useState } from "react";
-import { Compass, Settings2, Target } from "lucide-react";
+import { Compass, Settings2, Target, UserCircle } from "lucide-react";
 import { GoalsProvider, useGoals } from "./domain/GoalsContext";
 import { ObjectivesScreen } from "./components/ObjectivesScreen";
 import { JourneyScreen } from "./components/JourneyScreen";
@@ -27,7 +27,12 @@ function ScoutJourney() {
       <a className="skip-link" href="#main-content">
         Vai al contenuto
       </a>
-      <header className="site-header" aria-label="Intestazione" />
+      <header className="site-header" aria-label="Intestazione">
+        <span aria-hidden="true" />
+        <button className="profile-button" type="button" aria-label="Profilo mock">
+          <UserCircle size={25} strokeWidth={1.8} />
+        </button>
+      </header>
       <main className="main-content" id="main-content">
         {error && (
           <div className="notice notice-error" role="alert">

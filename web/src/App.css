@@ -11,6 +11,11 @@
   height: 84px; padding: 0 max(28px, calc((100vw - 1100px)/2)); display: flex; justify-content: space-between;
   align-items: center; border-bottom: 1px solid #e9ece6; background: #fff;
 }
+.profile-button {
+  width: 42px; height: 42px; display: grid; place-items: center; padding: 0;
+  border: 1px solid #e0e8dc; border-radius: 50%; background: #f7faf4; color: #5b7860;
+}
+.profile-button:hover { border-color: #b8d08b; background: #edf3df; color: #315d42; }
 .main-content { width: min(100% - 56px, 1100px); margin: 0 auto; padding-top: 54px; }
 .eyebrow { color: #52734e; font-size: 10px; letter-spacing: 2.1px; font-weight: 800; line-height: 1.4; }
 .overview-card {
