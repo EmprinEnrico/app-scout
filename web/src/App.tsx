@@ -29,9 +29,24 @@ function ScoutJourney() {
       </a>
       <header className="site-header" aria-label="Intestazione">
         <span aria-hidden="true" />
-        <button className="profile-button" type="button" aria-label="Profilo mock">
-          <UserCircle size={25} strokeWidth={1.8} />
-        </button>
+        <details className="profile-menu">
+          <summary className="profile-button" aria-label="Apri menu utente">
+            <UserCircle size={25} strokeWidth={1.8} />
+          </summary>
+          <div className="profile-menu-popover" role="menu" aria-label="Menu utente">
+            <div className="profile-menu-heading">
+              <UserCircle size={31} strokeWidth={1.5} />
+              <div>
+                <strong>Utente mock</strong>
+                <span>Account non collegato</span>
+              </div>
+            </div>
+            <div className="profile-menu-divider" />
+            <button type="button" role="menuitem" disabled>Profilo</button>
+            <button type="button" role="menuitem" disabled>Impostazioni account</button>
+            <button type="button" role="menuitem" disabled>Esci</button>
+          </div>
+        </details>
       </header>
       <main className="main-content" id="main-content">
         {error && (
