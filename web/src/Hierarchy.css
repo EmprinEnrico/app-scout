@@ -101,6 +101,9 @@
 .continuous-objective-editor .continuous-milestone {
   margin: 0; color: #344f3f; font-size: var(--font-body-size); font-weight: 750; line-height: 1.5;
 }
+.continuous-objective-editor.is-editing .continuous-milestone::before {
+  content: '# '; color: #829286; font-weight: 500;
+}
 .continuous-objective-editor .continuous-paragraph {
   margin: 0; color: #405a47; font-size: var(--font-body-size); line-height: 1.5;
 }

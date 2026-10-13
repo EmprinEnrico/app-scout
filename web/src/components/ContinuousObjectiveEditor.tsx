@@ -1,5 +1,5 @@
 // Continuous objective editor: keeps milestones and tasks in one live document.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Editor, Node } from '@tiptap/core'
 import { TextSelection } from '@tiptap/pm/state'
 import { EditorContent, NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditor } from '@tiptap/react'
@@ -163,6 +163,7 @@ export function ContinuousObjectiveEditor({
   goals: Goal[]
   onChange: (blocks: ReturnType<typeof editorDocumentToBlocks>) => void
 }) {
+  const [isEditing, setIsEditing] = useState(false)
   const onChangeRef = useRef(onChange)
   const editorRef = useRef<Editor | null>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -183,6 +184,8 @@ export function ContinuousObjectiveEditor({
     onCreate: ({ editor: created }) => {
       editorRef.current = created
     },
+    onFocus: () => setIsEditing(true),
+    onBlur: () => setIsEditing(false),
     onUpdate: ({ editor: changed }) => {
       pendingBlocks.current = editorDocumentToBlocks(changed.getJSON())
       if (saveTimer.current) clearTimeout(saveTimer.current)
@@ -249,7 +252,10 @@ export function ContinuousObjectiveEditor({
 
   return (
     <>
-      <EditorContent className="continuous-objective-editor" editor={editor} />
+      <EditorContent
+        className={`continuous-objective-editor${isEditing ? ' is-editing' : ''}`}
+        editor={editor}
+      />
       <button
         className="continuous-editor-hint"
         type="button"
