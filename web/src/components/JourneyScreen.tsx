@@ -1,129 +1,141 @@
-// Journey screen: shows the qualitative record of areas, stages, and practices.
-import { ArrowRight, Check, Compass } from "lucide-react";
+// Read-only objective journey path built from the existing goal records.
+import { ArrowRight, Check, Compass, Circle } from "lucide-react";
 import { useGoals } from "../domain/GoalsContext";
 import type { Area, Goal, Stage } from "../domain/contracts";
+import "../JourneyPath.css";
 
-function completionLabel(goal: Goal): string {
-  if (!goal.completedAt) return "Da completare";
-  const date = new Intl.DateTimeFormat("it-IT", {
+function completionDate(goals: Goal[]): string | null {
+  const dates = goals
+    .map((goal) => goal.completedAt)
+    .filter((date): date is string => Boolean(date))
+    .sort((left, right) => Date.parse(right) - Date.parse(left));
+  const latest = dates[0];
+  if (!latest) return null;
+  return new Intl.DateTimeFormat("it-IT", {
     day: "numeric",
-    month: "short",
+    month: "long",
     year: "numeric",
-  }).format(new Date(goal.completedAt));
-  return `Completato il ${date}`;
+  }).format(new Date(latest));
+}
+
+function Milestone({ stage, goals }: { stage: Stage; goals: Goal[] }) {
+  const tasks = goals.filter((goal) => goal.stageId === stage.id);
+  const complete = tasks.length > 0 && tasks.every((goal) => goal.completed);
+  const date = complete ? completionDate(tasks) : null;
+
+  return (
+    <li className={`journey-milestone${complete ? " is-complete" : ""}`}>
+      <span className="journey-milestone-node" aria-hidden="true">
+        {complete ? <Check size={14} strokeWidth={2.5} /> : <Circle size={9} />}
+      </span>
+      <div className="journey-milestone-content">
+        <div className="journey-milestone-heading">
+          <h3>{stage.name}</h3>
+          {date && <time>{date}</time>}
+        </div>
+        {tasks.length > 0 && (
+          <ul className="journey-task-list" aria-label={`Attività: ${stage.name}`}>
+            {tasks.map((goal) => (
+              <li
+                className={`journey-task${goal.completed ? " is-complete" : ""}`}
+                key={goal.id}
+              >
+                <span className="journey-task-mark" aria-hidden="true">
+                  {goal.completed ? <Check size={11} strokeWidth={2.5} /> : null}
+                </span>
+                <span>{goal.title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </li>
+  );
 }
 
 function JourneyArea({
   area,
   stages,
   goals,
+  onOpenHistory,
 }: {
   area: Area;
   stages: Stage[];
   goals: Goal[];
+  onOpenHistory?: (areaId: string) => void;
 }) {
   const areaStages = stages
     .filter((stage) => stage.areaId === area.id)
-    .sort((a, b) => a.position - b.position);
-  const areaGoals = goals.filter((goal) => goal.areaId === area.id);
+    .sort((left, right) => left.position - right.position);
 
   return (
-    <section className="journey-area" aria-labelledby={`journey-${area.id}`}>
-      <div className="journey-area-heading">
+    <section className="journey-path-area" aria-labelledby={`journey-${area.id}`}>
+      <header className="journey-path-header">
         <span
-          className="area-dot large"
-          style={{ backgroundColor: area.color }}
+          className="journey-path-dot"
           aria-hidden="true"
         />
-        <div>
-          <h2 id={`journey-${area.id}`}>{area.name}</h2>
-        </div>
-      </div>
-      {areaStages.length ? (
-        <div className="journey-stages">
-          {areaStages.map((stage) => {
-            const stageGoals = areaGoals.filter(
-              (goal) => goal.stageId === stage.id,
-            );
-            return (
-              <div className="journey-stage" key={stage.id}>
-                <div className="journey-stage-heading">
-                  <div>
-                    <h3>{stage.name}</h3>
-                  </div>
-                </div>
-                {stageGoals.length ? (
-                  <ul className="archive-list">
-                    {stageGoals.map((goal) => (
-                      <li
-                        className={goal.completed ? "completed" : "pending"}
-                        key={goal.id}
-                      >
-                        <span className="archive-icon" aria-hidden="true">
-                          {goal.completed ? (
-                            <Check size={13} strokeWidth={3} />
-                          ) : null}
-                        </span>
-                        <span className="archive-title">{goal.title}</span>
-                        <span className="journey-status">
-                          {completionLabel(goal)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="stage-empty-note">
-                    Nessun obiettivo in questa tappa.
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <button
+          className="journey-path-title"
+          id={`journey-${area.id}`}
+          type="button"
+          onClick={() => onOpenHistory?.(area.id)}
+          aria-label={`Apri lo storico di ${area.name}`}
+        >
+          {area.name}
+          <ArrowRight size={16} aria-hidden="true" />
+        </button>
+      </header>
+      {areaStages.length > 0 ? (
+        <ol className="journey-path-list" aria-label={`Percorso: ${area.name}`}>
+          {areaStages.map((stage) => (
+            <Milestone
+              key={stage.id}
+              stage={stage}
+              goals={goals.filter((goal) => goal.areaId === area.id)}
+            />
+          ))}
+        </ol>
       ) : (
-        <p className="stage-empty-note no-stages">
-          Nessuna tappa in quest’area. Puoi aggiungerne una dalle impostazioni.
-        </p>
+        <p className="journey-path-empty">Il percorso non ha ancora tappe.</p>
       )}
     </section>
   );
 }
 
-export function JourneyScreen({ onObjectives }: { onObjectives: () => void }) {
+export function JourneyScreen({
+  onObjectives,
+  onOpenHistory,
+}: {
+  onObjectives: () => void;
+  onOpenHistory?: (areaId: string) => void;
+}) {
   const { state } = useGoals();
 
+  if (!state.areas.length) {
+    return (
+      <div className="empty-card wide-empty journey-path-first">
+        <span className="empty-icon"><Compass size={26} /></span>
+        <h3>Il tuo percorso comincia da qui</h3>
+        <p>Quando aggiungerai tappe e attività, le ritroverai qui.</p>
+        <button type="button" className="button button-primary" onClick={onObjectives}>
+          Crea il primo obiettivo <ArrowRight size={16} />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <>
-      {state.areas.length ? (
-        <div className="journey-list">
-          {state.areas.map((area) => (
-            <JourneyArea
-              key={area.id}
-              area={area}
-              stages={state.stages}
-              goals={state.goals}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="empty-card wide-empty">
-          <span className="empty-icon">
-            <Compass size={26} />
-          </span>
-          <h3>Il tuo percorso comincia da qui</h3>
-          <p>
-            Quando creerai i tuoi obiettivi e le tue pratiche, potrai tornare
-            qui per rileggere ciò che hai completato e quando.
-          </p>
-          <button
-            type="button"
-            className="button button-primary"
-            onClick={onObjectives}
-          >
-            Crea il primo obiettivo <ArrowRight size={16} />
-          </button>
-        </div>
-      )}
-    </>
+    <div className="journey-path-listing">
+      {state.areas.map((area) => (
+        <JourneyArea
+          key={area.id}
+          area={area}
+          stages={state.stages}
+          goals={state.goals}
+          onOpenHistory={onOpenHistory}
+        />
+      ))}
+    </div>
   );
 }

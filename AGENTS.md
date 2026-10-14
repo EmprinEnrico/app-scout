@@ -1,5 +1,8 @@
 # Scout Journey repository guide
 
+Before continuing work from another chat, read `.codex/PROJECT_CONTEXT.md` for
+the product decisions, implementation map, deployment state, and known limits.
+
 ## Project rules
 
 Apply these rules to every authored source-code file in the repository:

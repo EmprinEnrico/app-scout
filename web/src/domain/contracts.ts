@@ -69,9 +69,11 @@ export type GoalsContextValue = {
   toggleGoal(id: string): void
   deleteGoal(id: string): void
   replaceObjective(areaId: string, blocks: ObjectiveBlock[]): void
+  recordObjectiveVersion(areaId: string, reason?: 'edit' | 'completion'): void
+  getObjectiveVersions(areaId: string): Promise<import('./objectiveHistory').ObjectiveVersion[]>
   selectArea(id: string): void
   selectStage(id: string): void
-  exportData(): string
-  importData(json: string): { ok: boolean; message: string }
-  resetData(): void
+  exportData(): Promise<string>
+  importData(json: string): Promise<{ ok: boolean; message: string }>
+  resetData(): Promise<void>
 }

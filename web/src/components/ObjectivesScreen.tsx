@@ -11,10 +11,12 @@ function InlineTitle({
   value,
   label,
   onUpdate,
+  onFinish,
 }: {
   value: string;
   label: string;
   onUpdate: (value: string) => void;
+  onFinish: () => void;
 }) {
   const [draft, setDraft] = useState(value);
 
@@ -25,6 +27,7 @@ function InlineTitle({
 
   function restoreIfEmpty() {
     if (!draft.trim()) setDraft(value);
+    else onFinish();
   }
 
   return (
@@ -45,6 +48,7 @@ function ObjectiveCard({
   onRenameArea,
   onDeleteArea,
   onReplaceObjective,
+  onRecordVersion,
 }: {
   area: Area;
   stages: Stage[];
@@ -52,6 +56,7 @@ function ObjectiveCard({
   onRenameArea: (id: string, name: string) => void;
   onDeleteArea: (id: string) => void;
   onReplaceObjective: (areaId: string, blocks: ObjectiveBlock[]) => void;
+  onRecordVersion: (areaId: string, reason?: 'edit' | 'completion') => void;
 }) {
   const areaStages = stages.filter((stage) => stage.areaId === area.id);
   const areaGoals = goals.filter((goal) => goal.areaId === area.id);
@@ -65,11 +70,12 @@ function ObjectiveCard({
   return (
     <div className="hierarchy-objective">
       <header className="hierarchy-objective-heading">
-        <span className="area-dot large" style={{ backgroundColor: area.color }} />
+        <span className="area-dot large" />
         <InlineTitle
           value={area.name}
           label="Nome dell’obiettivo"
           onUpdate={(name) => onRenameArea(area.id, name)}
+          onFinish={() => onRecordVersion(area.id)}
         />
         <button
           className="icon-button danger-hover"
@@ -84,6 +90,7 @@ function ObjectiveCard({
         stages={areaStages}
         goals={areaGoals}
         onChange={(blocks) => onReplaceObjective(area.id, blocks)}
+        onFinish={(reason) => onRecordVersion(area.id, reason)}
       />
     </div>
   );
@@ -96,6 +103,7 @@ export function ObjectivesScreen() {
     renameArea,
     deleteArea,
     replaceObjective,
+    recordObjectiveVersion,
   } = useGoals();
   const [newArea, setNewArea] = useState("");
 
@@ -118,6 +126,7 @@ export function ObjectivesScreen() {
             onRenameArea={renameArea}
             onDeleteArea={deleteArea}
             onReplaceObjective={replaceObjective}
+            onRecordVersion={recordObjectiveVersion}
           />
         ))}
       </div>

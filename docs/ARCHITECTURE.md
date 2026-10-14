@@ -8,6 +8,14 @@ From `web/`: `npm ci`, `npm run dev` for local work, `npm run check` before chan
 
 IndexedDB is per browser origin or native WebView. Data does not automatically sync between devices or installations; use the JSON export/import in Settings to transfer it. Existing browser data from the old web app can be imported explicitly on the same site origin. The prior native app used a different storage mechanism and is not automatically migrated by this browser import.
 
+Each objective's current state is a Markdown file in IndexedDB. A separate
+`objectiveVersions` table holds immutable Markdown snapshots. Draft changes save
+to the current file as the user types; a snapshot is recorded when editing ends
+or a task's completion changes. Existing files receive a baseline snapshot during
+the IndexedDB v2 upgrade. Journey reads current task state to render the path;
+the history carousel reads snapshots and computes visible line differences while
+hiding private metadata. The JSON backup includes both current data and history.
+
 ## Notifications
 
 `web/src/notifications/notifications.ts` is the native notification boundary. It requests push and local-notification permissions, registers APNs/FCM device tokens, receives push events, and schedules or cancels local reminders. The web build safely reports notifications as unsupported until a web push service is added. Remote push delivery still requires a backend that stores device tokens and sends through APNs/FCM; local reminders are ready to use from the app layer.
