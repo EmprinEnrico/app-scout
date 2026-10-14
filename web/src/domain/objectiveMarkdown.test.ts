@@ -48,4 +48,15 @@ describe("objective Markdown files", () => {
       ["text", "Review the new words every Sunday."],
     ]);
   });
+
+  it("keeps prose block ids and intentional blank lines across file saves", () => {
+    const withProse: Stage[] = [{ ...stages[0]!, content: [
+      { id: "text-1", kind: "text", text: "A first thought." },
+      { id: "blank-1", kind: "text", text: "" },
+      { id: "text-2", kind: "text", text: "A second thought." },
+      stages[0]!.content![0]!,
+    ] }];
+    const file = objectiveToMarkdownFile(area, withProse, goals);
+    expect(parseObjectiveFile(file).stages).toEqual(withProse);
+  });
 });

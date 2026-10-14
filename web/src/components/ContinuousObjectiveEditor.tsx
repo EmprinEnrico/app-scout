@@ -158,19 +158,25 @@ export function ContinuousObjectiveEditor({
   stages,
   goals,
   onChange,
+  onFinish,
 }: {
   stages: Stage[]
   goals: Goal[]
   onChange: (blocks: ReturnType<typeof editorDocumentToBlocks>) => void
+  onFinish: (reason?: 'edit' | 'completion') => void
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const onChangeRef = useRef(onChange)
+  const onFinishRef = useRef(onFinish)
   const editorRef = useRef<Editor | null>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pendingBlocks = useRef<ReturnType<typeof editorDocumentToBlocks> | null>(null)
+  const sessionChanged = useRef(false)
+  const taskStates = useRef(new Map(goals.map((goal) => [goal.id, goal.completed])))
   useEffect(() => {
     onChangeRef.current = onChange
-  }, [onChange])
+    onFinishRef.current = onFinish
+  }, [onChange, onFinish])
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -185,10 +191,33 @@ export function ContinuousObjectiveEditor({
       editorRef.current = created
     },
     onFocus: () => setIsEditing(true),
-    onBlur: () => setIsEditing(false),
-    onUpdate: ({ editor: changed }) => {
-      pendingBlocks.current = editorDocumentToBlocks(changed.getJSON())
+    onBlur: () => {
+      setIsEditing(false)
       if (saveTimer.current) clearTimeout(saveTimer.current)
+      if (pendingBlocks.current) onChangeRef.current(pendingBlocks.current)
+      pendingBlocks.current = null
+      saveTimer.current = null
+      if (sessionChanged.current) onFinishRef.current()
+      sessionChanged.current = false
+    },
+    onUpdate: ({ editor: changed }) => {
+      sessionChanged.current = true
+      const blocks = editorDocumentToBlocks(changed.getJSON())
+      const completionChanged = blocks.some((block) => block.kind === 'task'
+        && block.id && taskStates.current.has(block.id)
+        && taskStates.current.get(block.id) !== block.completed)
+      taskStates.current = new Map(blocks.filter((block) => block.kind === 'task' && block.id)
+        .map((block) => [block.id!, block.completed ?? false]))
+      pendingBlocks.current = blocks
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      if (completionChanged) {
+        onChangeRef.current(blocks)
+        pendingBlocks.current = null
+        saveTimer.current = null
+        onFinishRef.current('completion')
+        sessionChanged.current = false
+        return
+      }
       saveTimer.current = setTimeout(() => {
         if (pendingBlocks.current) onChangeRef.current(pendingBlocks.current)
         pendingBlocks.current = null
@@ -240,6 +269,7 @@ export function ContinuousObjectiveEditor({
   useEffect(() => () => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
     if (pendingBlocks.current) onChangeRef.current(pendingBlocks.current)
+    if (sessionChanged.current) onFinishRef.current()
   }, [])
 
   function startNewMilestone() {

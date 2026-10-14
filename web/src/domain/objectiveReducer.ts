@@ -31,7 +31,7 @@ export function replaceObjective(
 
   blocks.forEach((block) => {
     const text = block.text.trim()
-    if (!text) return
+    if (!text && block.kind !== 'text') return
     if (block.kind === 'milestone') {
       const id = freshId(localUsed, block.id)
       const old = oldStages.find((stage) => stage.id === id)
@@ -48,9 +48,12 @@ export function replaceObjective(
     const id = freshId(localUsed, block.id)
     const old = oldGoals.find((goal) => goal.id === id)
     const completed = block.completed ?? old?.completed ?? false
+    const changed = !old || old.title !== text || old.stageId !== currentStage.id
+      || old.completed !== completed
     goals.push({
       id, areaId, stageId: currentStage.id, title: text, note: old?.note ?? '',
-      completed, createdAt: old?.createdAt ?? now, updatedAt: now,
+      completed, createdAt: old?.createdAt ?? now,
+      updatedAt: changed ? now : old.updatedAt,
       completedAt: completed ? old?.completedAt ?? now : null,
     })
     currentStage.content!.push({ id, kind: 'task', text, goalId: id })

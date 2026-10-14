@@ -1,18 +1,48 @@
 // App shell: provides the global layout and navigation for Scout Journey.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Compass, Settings2, Target, UserCircle } from "lucide-react";
 import { GoalsProvider, useGoals } from "./domain/GoalsContext";
 import { ObjectivesScreen } from "./components/ObjectivesScreen";
 import { JourneyScreen } from "./components/JourneyScreen";
+import { ObjectiveHistory } from "./components/ObjectiveHistory";
 import { SettingsScreen } from "./components/SettingsScreen";
+import type { ObjectiveVersion } from "./domain/objectiveHistory";
 import "./App.css";
 import "./Screens.css";
 
 type Tab = "objectives" | "journey" | "settings";
 
+function HistoryView({ areaId, onBack }: { areaId: string; onBack: () => void }) {
+  const { state, getObjectiveVersions } = useGoals();
+  const [versions, setVersions] = useState<ObjectiveVersion[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const area = state.areas.find((item) => item.id === areaId);
+
+  useEffect(() => {
+    let active = true;
+    void getObjectiveVersions(areaId).then((loaded) => {
+      if (active) setVersions(loaded);
+    }).catch(() => {
+      if (active) setError("Non è stato possibile caricare la storia.");
+    });
+    return () => { active = false; };
+  }, [areaId, getObjectiveVersions]);
+
+  if (!area) return null;
+  if (error) return <p role="alert">{error}</p>;
+  if (!versions) return <p role="status">Caricamento della storia…</p>;
+  return <ObjectiveHistory areaName={area.name} versions={versions} onBack={onBack} />;
+}
+
 function ScoutJourney() {
   const { ready, error } = useGoals();
   const [tab, setTab] = useState<Tab>("objectives");
+  const [historyAreaId, setHistoryAreaId] = useState<string | null>(null);
+
+  function selectTab(next: Tab) {
+    setHistoryAreaId(null);
+    setTab(next);
+  }
 
   if (!ready)
     return (
@@ -55,9 +85,12 @@ function ScoutJourney() {
           </div>
         )}
         {tab === "objectives" && <ObjectivesScreen />}
-        {tab === "journey" && (
-          <JourneyScreen onObjectives={() => setTab("objectives")} />
-        )}
+        {tab === "journey" && (historyAreaId
+          ? <HistoryView areaId={historyAreaId} onBack={() => setHistoryAreaId(null)} />
+          : <JourneyScreen
+              onObjectives={() => selectTab("objectives")}
+              onOpenHistory={setHistoryAreaId}
+            />)}
         {tab === "settings" && <SettingsScreen />}
       </main>
       <nav className="bottom-nav" aria-label="Navigazione principale">
@@ -65,7 +98,7 @@ function ScoutJourney() {
           type="button"
           className={tab === "objectives" ? "active" : ""}
           aria-current={tab === "objectives" ? "page" : undefined}
-          onClick={() => setTab("objectives")}
+          onClick={() => selectTab("objectives")}
         >
           <Target size={20} />
           <span>Objectives</span>
@@ -74,7 +107,7 @@ function ScoutJourney() {
           type="button"
           className={tab === "journey" ? "active" : ""}
           aria-current={tab === "journey" ? "page" : undefined}
-          onClick={() => setTab("journey")}
+          onClick={() => selectTab("journey")}
         >
           <Compass size={20} />
           <span>Journey</span>
@@ -83,7 +116,7 @@ function ScoutJourney() {
           type="button"
           className={tab === "settings" ? "active" : ""}
           aria-current={tab === "settings" ? "page" : undefined}
-          onClick={() => setTab("settings")}
+          onClick={() => selectTab("settings")}
         >
           <Settings2 size={20} />
           <span>Settings</span>

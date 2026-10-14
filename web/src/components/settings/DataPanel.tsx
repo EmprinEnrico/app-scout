@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 
 type DataPanelProps = {
-  exportData: () => string;
-  importData: (json: string) => { ok: boolean; message: string };
-  resetData: () => void;
+  exportData: () => Promise<string>;
+  importData: (json: string) => Promise<{ ok: boolean; message: string }>;
+  resetData: () => Promise<void>;
 };
 
 export function DataPanel({
@@ -18,9 +18,17 @@ export function DataPanel({
 }: DataPanelProps) {
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
-  function download() {
+  async function download() {
+    let content: string;
+    try {
+      content = await exportData();
+      if (!content) return;
+    } catch {
+      setMessage({ ok: false, text: "Esportazione non riuscita. Riprova." });
+      return;
+    }
     const url = URL.createObjectURL(
-      new Blob([exportData()], { type: "application/json" }),
+      new Blob([content], { type: "application/json" }),
     );
     const link = document.createElement("a");
     link.href = url;
@@ -36,7 +44,7 @@ export function DataPanel({
       "Importare questo file? Gli obiettivi, i milestone e le pratiche attuali saranno sostituiti.",
     )) return;
     try {
-      const result = importData(await file.text());
+      const result = await importData(await file.text());
       setMessage({ ok: result.ok, text: result.message });
     } catch {
       setMessage({
@@ -57,7 +65,7 @@ export function DataPanel({
       </div>
       <div className="data-actions">
         <div><strong>Esporta i dati</strong><p>Scarica una copia in formato JSON.</p></div>
-        <button type="button" className="button button-secondary" onClick={download}>
+        <button type="button" className="button button-secondary" onClick={() => void download()}>
           <ArrowDownToLine size={17} /> Esporta
         </button>
       </div>
@@ -104,8 +112,7 @@ export function DataPanel({
           if (window.confirm(
             "Vuoi eliminare tutti i tuoi dati di Scout Journey? Questa azione non si può annullare.",
           )) {
-            resetData();
-            setMessage(null);
+            void resetData().then(() => setMessage(null));
           }
         }}>
           <RotateCcw size={17} /> Reimposta

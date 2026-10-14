@@ -1,0 +1,183 @@
+/* Quiet vertical journey path and task states for the Journey screen. */
+
+.journey-path-listing {
+  display: grid;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+}
+
+.journey-path-area {
+  min-width: 0;
+  padding: 24px 24px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+}
+
+.journey-path-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.journey-path-dot {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border: 3px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px #bdccbf;
+}
+
+.journey-path-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 3px 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--font-title-size);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: -.02em;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.journey-path-title svg {
+  flex: none;
+  color: var(--color-subtle);
+  transition: transform 150ms ease;
+}
+
+.journey-path-title:hover svg { transform: translateX(2px); }
+.journey-path-title:focus-visible {
+  outline: 2px solid var(--color-accent); outline-offset: 4px;
+}
+
+.journey-path-list {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journey-path-list::before {
+  position: absolute;
+  top: 15px;
+  bottom: 17px;
+  left: 7px;
+  width: 1px;
+  background: var(--color-border);
+  content: "";
+}
+
+.journey-milestone {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0 20px;
+}
+
+.journey-milestone-node {
+  z-index: 1;
+  display: grid;
+  width: 16px;
+  height: 16px;
+  place-items: center;
+  border: 1px solid #bacabd;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--color-subtle);
+}
+
+.journey-milestone.is-complete .journey-milestone-node {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.journey-milestone-content { min-width: 0; }
+
+.journey-milestone-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 22px;
+}
+
+.journey-milestone-heading h3 {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--font-body-size);
+  font-weight: 650;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.journey-milestone-heading time {
+  flex: none;
+  color: var(--color-subtle);
+  font-size: 12px;
+}
+
+.journey-task-list {
+  display: grid;
+  gap: 7px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journey-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: var(--font-support-size);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.journey-task-mark {
+  display: grid;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 1px;
+  place-items: center;
+  border: 1px solid #bacabd;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.journey-task.is-complete .journey-task-mark {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.journey-task.is-complete > span:last-child { color: var(--color-subtle); }
+.journey-path-empty { margin: 0 0 13px 28px; color: var(--color-muted); font-size: 14px; }
+.journey-path-first { padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+
+@media (max-width: 560px) {
+  .journey-path-listing { gap: 12px; }
+  .journey-path-area { padding: 20px 18px 4px; border-radius: 18px; }
+  .journey-milestone { gap: 10px; }
+  .journey-milestone-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-path-title svg { transition: none; }
+}

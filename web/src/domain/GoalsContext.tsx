@@ -3,8 +3,12 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { GoalPatch, GoalsContextValue, GoalState, NewGoal, ObjectiveBlock } from './contracts'
 import { createInitialState, newId, reduceGoals, type GoalAction } from './goalState'
-import { loadGoalState, saveGoalState } from './goalsDb'
+import {
+  exportObjectiveHistory, loadGoalState, loadObjectiveVersions, recordObjectiveVersion,
+  replaceGoalArchive, saveGoalState,
+} from './goalsDb'
 import { parseGoalState } from './validation'
+import { parseObjectiveHistory } from './objectiveHistory'
 
 const GoalsContext = createContext<GoalsContextValue | null>(null)
 
@@ -56,18 +60,34 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     }
   }, [commit])
 
-  const importData = useCallback((json: string) => {
+  const importData = useCallback(async (json: string) => {
     if (!readyRef.current) return { ok: false, message: 'Attendere il caricamento dei dati.' }
     try {
-      const imported = parseGoalState(json)
-      commit(imported)
+      const parsed: unknown = JSON.parse(json)
+      const bundle = parsed && typeof parsed === 'object' && 'format' in parsed
+        && parsed.format === 'scout-journey-backup' && 'state' in parsed
+        && 'history' in parsed ? parsed : null
+      const imported = parseGoalState(JSON.stringify(bundle ? bundle.state : parsed))
+      const versions = bundle
+        ? parseObjectiveHistory(JSON.stringify(bundle.history))
+        : []
+      await writes.current
+      await replaceGoalArchive(imported, versions)
+      stateRef.current = imported
+      setState(imported)
+      setError(null)
       return { ok: true, message: 'Dati importati.' }
     } catch (cause) {
       const message = errorMessage(cause)
       setError(message)
       return { ok: false, message }
     }
-  }, [commit])
+  }, [])
+
+  const getObjectiveVersions = useCallback(async (areaId: string) => {
+    await writes.current
+    return loadObjectiveVersions(areaId)
+  }, [])
 
   const value: GoalsContextValue = {
     state,
@@ -101,22 +121,44 @@ export function GoalsProvider({ children }: { children: ReactNode }) {
     replaceObjective: (areaId: string, blocks: ObjectiveBlock[]) => dispatch({
       type: 'replaceObjective', areaId, blocks, now: new Date().toISOString(),
     }),
+    recordObjectiveVersion: (areaId: string, reason = 'edit') => {
+      if (!readyRef.current) return
+      writes.current = writes.current.then(() => recordObjectiveVersion(areaId, reason)).catch(
+        (cause: unknown) => setError(`Cronologia non salvata: ${errorMessage(cause)}`),
+      )
+    },
+    getObjectiveVersions,
     selectArea: (id: string) => dispatch({ type: 'selectArea', id }),
     selectStage: (id: string) => dispatch({ type: 'selectStage', id }),
-    exportData: () => {
+    exportData: async () => {
       if (!readyRef.current) {
         setError('Attendere il caricamento dei dati.')
         return ''
       }
-      return JSON.stringify(stateRef.current, null, 2)
+      await writes.current
+      return JSON.stringify({
+        format: 'scout-journey-backup',
+        schemaVersion: 2,
+        state: stateRef.current,
+        history: JSON.parse(await exportObjectiveHistory()),
+      }, null, 2)
     },
     importData,
-    resetData: () => {
+    resetData: async () => {
       if (!readyRef.current) {
         setError('Attendere il caricamento dei dati.')
         return
       }
-      commit(createInitialState())
+      const fresh = createInitialState()
+      try {
+        await writes.current
+        await replaceGoalArchive(fresh, [])
+        stateRef.current = fresh
+        setState(fresh)
+        setError(null)
+      } catch (cause) {
+        setError(`Reimpostazione non riuscita: ${errorMessage(cause)}`)
+      }
     },
   }
 

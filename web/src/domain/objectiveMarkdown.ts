@@ -50,13 +50,14 @@ export function objectiveToMarkdownFile(area: Area, stages: Stage[], goals: Goal
     lines.push(`# ${stage.name}`);
     const stageLines = stage.content
       ? stage.content.map((line) => ({
-        kind: line.kind, text: line.text,
+        id: line.id, kind: line.kind, text: line.text,
         goal: line.goalId ? goals.find((item) => item.id === line.goalId) : undefined,
       }))
       : goals.filter((goal) => goal.stageId === stage.id)
-        .map((goal) => ({ kind: "task" as const, text: goal.title, goal }));
+        .map((goal) => ({ id: goal.id, kind: "task" as const, text: goal.title, goal }));
     stageLines.forEach((line) => {
       if (line.kind === "text") {
+        lines.push(metadataLine("text", { id: line.id }));
         lines.push(line.text);
         return;
       }
@@ -94,6 +95,15 @@ export function parseObjectiveFile(content: string): ParsedObjectiveFile {
       continue;
     }
     const line = rawLine.trim();
+    if (pending?.kind === "text") {
+      if (!currentStage) throw new Error("Il testo deve appartenere a un milestone.");
+      currentStage.content ??= [];
+      currentStage.content.push({
+        id: textValue(pending.value, "id", newId()), kind: "text", text: rawLine,
+      });
+      pending = undefined;
+      continue;
+    }
     if (!line) continue;
     if (line.startsWith("# ")) {
       const heading = line.slice(2).trim();
@@ -154,7 +164,7 @@ export function parseObjectiveFile(content: string): ParsedObjectiveFile {
   const areaId = textValue(areaMeta ?? {}, "id", newId());
   const createdAt = textValue(areaMeta ?? {}, "createdAt", now);
   const area: Area = {
-    id: areaId, name: areaName, color: textValue(areaMeta ?? {}, "color", "#6366f1"), createdAt,
+    id: areaId, name: areaName, color: textValue(areaMeta ?? {}, "color", "#385f48"), createdAt,
   };
   return { area, stages: stages.map((stage) => ({ ...stage, areaId })), goals };
 }

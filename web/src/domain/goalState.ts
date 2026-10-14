@@ -31,7 +31,7 @@ export function createInitialState(id: () => string = newId, now = new Date().to
   }))
   return {
     schemaVersion: 1,
-    areas: [{ id: areaId, name: 'Il mio percorso', color: '#6366f1', createdAt: now }],
+    areas: [{ id: areaId, name: 'Il mio percorso', color: '#385f48', createdAt: now }],
     stages,
     goals: [],
     selectedAreaId: areaId,
@@ -86,7 +86,7 @@ export function reduceGoals(state: GoalState, action: GoalAction): GoalState {
       const area: Area = {
         id: action.id,
         name: name(action.name, 'Il nome'),
-        color: '#6366f1',
+        color: '#385f48',
         createdAt: action.createdAt,
       }
       const stage = { id: action.stageId, areaId: area.id, name: 'Primi passi', position: 0, content: [] }
